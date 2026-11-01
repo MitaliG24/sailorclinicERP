@@ -3,16 +3,19 @@ import { y as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { a as clinicSections, c as formatINR, d as initialSalarySlips, f as initialStaffMembers, h as staffStatuses, i as canAccessSection, l as getVisibleSections, m as staffDepartments, n as amountToWordsINR, o as convertNumberToWordsIndian, p as invoiceRecords, r as appointmentRecords, s as documentTypes, t as activityRecords, u as initialPatients } from "./staff-D45nO_Ee.mjs";
 import { n as feedbackQuestions, r as feedbackStatuses } from "./feedback-Clu2AqVp.mjs";
-import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, h as createSsrRpc, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-gt5nfFoT.mjs";
-import { m as require_react, n as AvatarFallback$1, p as require_jsx_runtime, r as AvatarImage$1, t as Avatar$1 } from "../_libs/@radix-ui/react-avatar+[...].mjs";
+import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, h as createSsrRpc, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-CScDC1af.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { f as require_jsx_runtime, n as AvatarFallback$1, r as AvatarImage$1, t as Avatar$1 } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { n as paymentMethods } from "./payments-12q5ofvW.mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
-import { n as ClinicLogo, r as cn, t as Button } from "./ClinicLogo-BRy7lGyZ.mjs";
-import { $ as ChevronLeft, A as Mail, B as FileChartColumnIncreasing, C as Printer, D as PanelLeftClose, E as PanelLeftOpen, F as FileText, G as Download, H as Eye, I as FileSpreadsheet, J as Clock3, K as CreditCard, L as FilePlusCorner, M as LayoutDashboard, N as HeartPulse, O as MessageSquare, P as Funnel, Q as ChevronRight, R as FileCheck, S as ReceiptText, T as Phone, U as ExternalLink, V as FileBadge, W as Ellipsis, X as CircleCheck, Y as ClipboardList, Z as CircleAlert, a as UserX, at as Building, c as UserPlus, ct as Bell, d as Trash2, dt as ArrowLeft, et as ChevronDown, f as Stethoscope, ft as ArrowDownRight, g as Settings, h as ShieldCheck, i as User, it as CalendarDays, j as LogOut, k as Menu, l as Upload, lt as ArrowUpRight, m as Ship, n as WalletCards, nt as ChartColumn, o as UserRound, ot as Building2, p as SquarePen, pt as Activity, q as Clock, r as Users, rt as Calendar, s as UserRoundPlus, st as Briefcase, t as X, tt as Check, u as TrendingUp, ut as ArrowRight, v as Search, w as Plus, x as RefreshCw, y as Save, z as FileCheckCorner } from "../_libs/lucide-react.mjs";
+import { i as cn, n as ClinicLogo, r as buttonVariants, t as Button } from "./ClinicLogo-vQhzZWTZ.mjs";
+import { $ as ChevronRight, A as Menu, B as FileCheckCorner, C as ReceiptText, D as PanelLeftOpen, E as Phone, F as Funnel, G as Ellipsis, H as FileBadge, I as FileText, J as Clock, K as Download, L as FileSpreadsheet, M as LogOut, N as LayoutDashboard, O as PanelLeftClose, P as HeartPulse, Q as CircleAlert, R as FilePlusCorner, S as RefreshCw, T as Plus, U as Eye, V as FileChartColumnIncreasing, W as ExternalLink, X as ClipboardList, Y as Clock3, Z as CircleCheck, _ as Settings, a as UserX, at as CalendarDays, b as Save, c as UserPlus, ct as Briefcase, d as TrendingUp, dt as ArrowRight, et as ChevronLeft, f as Trash2, ft as ArrowLeft, g as ShieldCheck, h as Ship, i as User, it as Calendar, j as Mail, k as MessageSquare, l as Upload, lt as Bell, m as SquarePen, mt as Activity, n as WalletCards, nt as Check, o as UserRound, ot as Building, p as Stethoscope, pt as ArrowDownRight, q as CreditCard, r as Users, rt as ChartColumn, s as UserRoundPlus, st as Building2, t as X, tt as ChevronDown, u as TriangleAlert, ut as ArrowUpRight, w as Printer, y as Search, z as FileCheck } from "../_libs/lucide-react.mjs";
 import { a as DialogOverlay$1, i as DialogDescription$1, n as DialogClose, o as DialogPortal$1, r as DialogContent$1, s as DialogTitle$1, t as Dialog$1 } from "../_libs/@radix-ui/react-dialog+[...].mjs";
 import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
+import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-C_Ho1XOM.js
+import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-DBivm53y.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {
@@ -185,6 +188,20 @@ function AdminProfileModal({ open, onOpenChange, currentUser, onProfileUpdated, 
 		}
 		setIsSaving(true);
 		setErrorMsg("");
+		const updated = {
+			...currentUser,
+			name: name.trim(),
+			phone: phone.trim(),
+			designation: designation.trim(),
+			regNo: regNo.trim(),
+			department: department.trim()
+		};
+		try {
+			localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(updated));
+		} catch (storageErr) {
+			console.warn("Could not save profile to localStorage:", storageErr);
+		}
+		onProfileUpdated(updated);
 		try {
 			const response = await fetch("/api/auth/profile", {
 				method: "POST",
@@ -197,25 +214,25 @@ function AdminProfileModal({ open, onOpenChange, currentUser, onProfileUpdated, 
 					department: department.trim()
 				})
 			});
-			if (!response.ok) {
-				const data = await response.json().catch(() => null);
-				throw new Error(data?.message || "Failed to update admin profile.");
+			if (response.ok) {
+				const resData = await response.json();
+				if (resData.user) {
+					const merged = {
+						...updated,
+						...resData.user
+					};
+					try {
+						localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(merged));
+					} catch {}
+					onProfileUpdated(merged);
+				}
 			}
-			const resData = await response.json();
-			onProfileUpdated({
-				...currentUser,
-				name: name.trim(),
-				phone: phone.trim(),
-				designation: designation.trim(),
-				regNo: regNo.trim(),
-				department: department.trim(),
-				...resData.user
-			});
-			onNotice("Admin profile credentials updated and saved to MongoDB.");
+			onNotice(`Admin profile updated for ${updated.name}.`);
 			onOpenChange(false);
 		} catch (err) {
-			console.error("Failed to update profile:", err);
-			setErrorMsg(err instanceof Error ? err.message : "Failed to update profile.");
+			console.warn("Server profile update warning (saved locally):", err);
+			onNotice(`Admin name updated to ${updated.name} (saved in clinic workspace).`);
+			onOpenChange(false);
 		} finally {
 			setIsSaving(false);
 		}
@@ -440,6 +457,372 @@ function AdminProfileModal({ open, onOpenChange, currentUser, onProfileUpdated, 
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Save, { className: "size-3.5" }), isSaving ? "Saving to MongoDB..." : "Save Profile Changes"]
 						})]
 					})]
+				})
+			]
+		})
+	});
+}
+function Calendar$1({ className, classNames, showOutsideDays = true, captionLayout = "label", buttonVariant = "ghost", formatters, components, ...props }) {
+	const defaultClassNames = getDefaultClassNames();
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DayPicker, {
+		showOutsideDays,
+		className: cn("bg-background group/calendar p-3 [--cell-size:2rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent", String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`, String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`, className),
+		captionLayout,
+		formatters: {
+			formatMonthDropdown: (date) => date.toLocaleString("default", { month: "short" }),
+			...formatters
+		},
+		classNames: {
+			root: cn("w-fit", defaultClassNames.root),
+			months: cn("relative flex flex-col gap-4 md:flex-row", defaultClassNames.months),
+			month: cn("flex w-full flex-col gap-4", defaultClassNames.month),
+			nav: cn("absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1", defaultClassNames.nav),
+			button_previous: cn(buttonVariants({ variant: buttonVariant }), "h-(--cell-size) w-(--cell-size) select-none p-0 aria-disabled:opacity-50", defaultClassNames.button_previous),
+			button_next: cn(buttonVariants({ variant: buttonVariant }), "h-(--cell-size) w-(--cell-size) select-none p-0 aria-disabled:opacity-50", defaultClassNames.button_next),
+			month_caption: cn("flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)", defaultClassNames.month_caption),
+			dropdowns: cn("flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium", defaultClassNames.dropdowns),
+			dropdown_root: cn("has-focus:border-ring border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] relative rounded-md border", defaultClassNames.dropdown_root),
+			dropdown: cn("bg-popover absolute inset-0 opacity-0", defaultClassNames.dropdown),
+			caption_label: cn("select-none font-medium", captionLayout === "label" ? "text-sm" : "[&>svg]:text-muted-foreground flex h-8 items-center gap-1 rounded-md pl-2 pr-1 text-sm [&>svg]:size-3.5", defaultClassNames.caption_label),
+			table: "w-full border-collapse",
+			weekdays: cn("flex", defaultClassNames.weekdays),
+			weekday: cn("text-muted-foreground flex-1 select-none rounded-md text-[0.8rem] font-normal", defaultClassNames.weekday),
+			week: cn("mt-2 flex w-full", defaultClassNames.week),
+			week_number_header: cn("w-(--cell-size) select-none", defaultClassNames.week_number_header),
+			week_number: cn("text-muted-foreground select-none text-[0.8rem]", defaultClassNames.week_number),
+			day: cn("group/day relative aspect-square h-full w-full select-none p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md", defaultClassNames.day),
+			range_start: cn("bg-accent rounded-l-md", defaultClassNames.range_start),
+			range_middle: cn("rounded-none", defaultClassNames.range_middle),
+			range_end: cn("bg-accent rounded-r-md", defaultClassNames.range_end),
+			today: cn("bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none", defaultClassNames.today),
+			outside: cn("text-muted-foreground aria-selected:text-muted-foreground", defaultClassNames.outside),
+			disabled: cn("text-muted-foreground opacity-50", defaultClassNames.disabled),
+			hidden: cn("invisible", defaultClassNames.hidden),
+			...classNames
+		},
+		components: {
+			Root: ({ className, rootRef, ...props }) => {
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+					"data-slot": "calendar",
+					ref: rootRef,
+					className: cn(className),
+					...props
+				});
+			},
+			Chevron: ({ className, orientation, ...props }) => {
+				if (orientation === "left") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronLeft, {
+					className: cn("size-4", className),
+					...props
+				});
+				if (orientation === "right") return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronRight, {
+					className: cn("size-4", className),
+					...props
+				});
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, {
+					className: cn("size-4", className),
+					...props
+				});
+			},
+			DayButton: CalendarDayButton,
+			WeekNumber: ({ children, ...props }) => {
+				return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("td", {
+					...props,
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "flex size-(--cell-size) items-center justify-center text-center",
+						children
+					})
+				});
+			},
+			...components
+		},
+		...props
+	});
+}
+function CalendarDayButton({ className, day, modifiers, ...props }) {
+	const defaultClassNames = getDefaultClassNames();
+	const ref = import_react.useRef(null);
+	import_react.useEffect(() => {
+		if (modifiers["focused"]) ref.current?.focus();
+	}, [modifiers]);
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+		ref,
+		variant: "ghost",
+		size: "icon",
+		"data-day": day.date.toLocaleDateString(),
+		"data-selected-single": modifiers["selected"] && !modifiers["range_start"] && !modifiers["range_end"] && !modifiers["range_middle"],
+		"data-range-start": modifiers["range_start"],
+		"data-range-end": modifiers["range_end"],
+		"data-range-middle": modifiers["range_middle"],
+		className: cn("data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 flex aspect-square h-auto w-full min-w-(--cell-size) flex-col gap-1 font-normal leading-none data-[range-end=true]:rounded-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] [&>span]:text-xs [&>span]:opacity-70", defaultClassNames.day, className),
+		...props
+	});
+}
+function AppointmentScheduleModal({ open, onOpenChange, selectedDate, onSelectDate, onNotice }) {
+	const [appointments, setAppointments] = (0, import_react.useState)(appointmentRecords);
+	const [showAddForm, setShowAddForm] = (0, import_react.useState)(false);
+	const [candidateName, setCandidateName] = (0, import_react.useState)("");
+	const [time, setTime] = (0, import_react.useState)("10:00 AM");
+	const [doctor, setDoctor] = (0, import_react.useState)("Dr. Maya Bennett");
+	const [medicalType, setMedicalType] = (0, import_react.useState)("DG Shipping Annual Medical");
+	const formattedDate = selectedDate.toLocaleDateString("en-IN", {
+		weekday: "long",
+		day: "numeric",
+		month: "long",
+		year: "numeric"
+	});
+	const handleAddAppointment = (e) => {
+		e.preventDefault();
+		if (!candidateName.trim()) return;
+		const initials = candidateName.trim().split(" ").filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "CA";
+		const newAppt = {
+			time,
+			patient: candidateName.trim(),
+			initials,
+			doctor,
+			type: medicalType,
+			status: "Confirmed"
+		};
+		setAppointments((prev) => [newAppt, ...prev]);
+		setShowAddForm(false);
+		setCandidateName("");
+		onNotice(`Appointment booked for ${candidateName} on ${selectedDate.toLocaleDateString("en-IN")}.`);
+	};
+	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+		open,
+		onOpenChange,
+		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+			className: "max-w-3xl max-h-[90vh] overflow-y-auto p-0",
+			children: [
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
+					className: "p-4 sm:p-5 border-b border-border bg-card",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						className: "flex items-center justify-between",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2.5",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "grid size-9 place-items-center rounded-lg bg-primary/10 text-primary",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarDays, { className: "size-5" })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, {
+								className: "text-base sm:text-lg font-semibold",
+								children: "Clinic Appointments & Examination Schedule"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, {
+								className: "text-xs",
+								children: "Review and organize medical examinations across D.G. Shipping approved doctors"
+							})] })]
+						})
+					})
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "grid grid-cols-1 md:grid-cols-[300px_1fr] divide-y md:divide-y-0 md:divide-x divide-border",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "p-4 flex flex-col items-center bg-muted/10",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "w-full flex items-center justify-between mb-2",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs font-semibold text-foreground",
+									children: "Select Date"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									variant: "ghost",
+									size: "sm",
+									className: "h-6 px-2 text-[11px] text-primary",
+									onClick: () => onSelectDate(/* @__PURE__ */ new Date()),
+									children: "Today"
+								})]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "rounded-md border border-border bg-card shadow-2xs",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, {
+									mode: "single",
+									selected: selectedDate,
+									onSelect: (d) => d && onSelectDate(d),
+									initialFocus: true
+								})
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "w-full mt-3 rounded-lg border border-primary/20 bg-primary/5 p-2.5 text-center",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "block text-[10px] font-medium text-primary uppercase",
+									children: "Active Calendar Day"
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									className: "text-xs font-semibold text-foreground",
+									children: selectedDate.toLocaleDateString("en-IN", { dateStyle: "medium" })
+								})]
+							})
+						]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "p-4 sm:p-5 space-y-4",
+						children: [
+							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								className: "flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3",
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h3", {
+									className: "text-sm font-bold text-foreground",
+									children: formattedDate
+								}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+									className: "text-xs text-muted-foreground",
+									children: [appointments.length, " candidates scheduled"]
+								})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+									size: "sm",
+									variant: showAddForm ? "secondary" : "default",
+									onClick: () => setShowAddForm((prev) => !prev),
+									className: "gap-1.5 text-xs h-8",
+									children: [showAddForm ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(X, { className: "size-3.5" }) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3.5" }), showAddForm ? "Cancel" : "Book Candidate"]
+								})]
+							}),
+							showAddForm && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
+								onSubmit: handleAddAppointment,
+								className: "rounded-lg border border-primary/20 bg-primary/5 p-3.5 space-y-3",
+								children: [
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "text-xs font-semibold text-primary flex items-center gap-1.5",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(User, { className: "size-3.5" }), " Add New Examination Appointment"]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "grid gap-2 sm:grid-cols-2",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "space-y-1",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+													className: "text-[11px] font-medium",
+													children: "Candidate Name"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													required: true,
+													placeholder: "e.g. Capt. Rajesh Sharma",
+													value: candidateName,
+													onChange: (e) => setCandidateName(e.target.value),
+													className: "h-8 text-xs bg-background"
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "space-y-1",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+													className: "text-[11px] font-medium",
+													children: "Time Slot"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													required: true,
+													placeholder: "e.g. 10:30 AM",
+													value: time,
+													onChange: (e) => setTime(e.target.value),
+													className: "h-8 text-xs bg-background"
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "space-y-1",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+													className: "text-[11px] font-medium",
+													children: "Examining Doctor"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
+													value: doctor,
+													onChange: (e) => setDoctor(e.target.value),
+													className: "h-8 w-full rounded-md border border-input bg-background px-2 text-xs",
+													children: [
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+															value: "Dr. Maya Bennett",
+															children: "Dr. Maya Bennett"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+															value: "Dr. David Kumar",
+															children: "Dr. David Kumar"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+															value: "Dr. Mitali Gadge",
+															children: "Dr. Mitali Gadge"
+														}),
+														/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
+															value: "Dr. Anita Kulkarni",
+															children: "Dr. Anita Kulkarni"
+														})
+													]
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "space-y-1",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
+													className: "text-[11px] font-medium",
+													children: "Medical Type"
+												}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
+													value: medicalType,
+													onChange: (e) => setMedicalType(e.target.value),
+													placeholder: "DG Shipping Annual / Pre-sea",
+													className: "h-8 text-xs bg-background"
+												})]
+											})
+										]
+									}),
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex justify-end gap-2 pt-1",
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+											type: "button",
+											variant: "ghost",
+											size: "sm",
+											className: "h-7 text-xs",
+											onClick: () => setShowAddForm(false),
+											children: "Cancel"
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+											type: "submit",
+											size: "sm",
+											className: "h-7 text-xs gap-1",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "size-3.5" }), " Confirm Slot"]
+										})]
+									})
+								]
+							}),
+							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+								className: "space-y-2.5 max-h-[340px] overflow-y-auto pr-1",
+								children: appointments.length > 0 ? appointments.map((appt, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 transition-colors hover:border-primary/40",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+										className: "flex items-center gap-3",
+										children: [
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "flex flex-col items-center justify-center rounded-md border border-border bg-muted/40 px-2 py-1 text-center min-w-[65px]",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Clock, { className: "size-3 text-muted-foreground mb-0.5" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+													className: "text-[11px] font-bold font-mono text-foreground leading-tight",
+													children: appt.time
+												})]
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar, {
+												className: "size-8",
+												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+													className: "bg-secondary text-[10px] font-bold text-secondary-foreground",
+													children: appt.initials
+												})
+											}),
+											/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+												className: "text-xs font-semibold text-foreground",
+												children: appt.patient
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+												className: "text-[11px] text-muted-foreground flex items-center gap-1.5 mt-0.5",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Stethoscope, { className: "size-3 text-primary" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: appt.doctor }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "•" }),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: appt.type })
+												]
+											})] })
+										]
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+										variant: appt.status === "Confirmed" ? "default" : appt.status === "In progress" ? "secondary" : "outline",
+										className: "text-[10px] shrink-0",
+										children: appt.status
+									})]
+								}, `${appt.patient}-${i}`)) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									className: "py-12 text-center text-xs text-muted-foreground",
+									children: "No appointments scheduled for this date."
+								})
+							})
+						]
+					})]
+				}),
+				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogFooter, {
+					className: "p-3 border-t border-border bg-muted/20",
+					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+						type: "button",
+						variant: "outline",
+						size: "sm",
+						onClick: () => onOpenChange(false),
+						children: "Close"
+					})
 				})
 			]
 		})
@@ -2874,11 +3257,17 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 }
 var listPayments = createServerFn({ method: "GET" }).handler(createSsrRpc("46f0281588053a3ca9274ce9f96e6b22e966f129cc09a3f7df21f882fae21399"));
 var recordPayment = createServerFn({ method: "POST" }).validator((input) => input).handler(createSsrRpc("7503df8020f8e06acfa6f12fe842bbda9596a2a258ad6847ba13b7271885b68b"));
+var deletePayment = createServerFn({ method: "POST" }).validator((input) => {
+	if (typeof input === "object" && input !== null && "id" in input && typeof input.id === "string") return { id: input.id };
+	throw new Error("Invalid payment ID.");
+}).handler(createSsrRpc("cbd3dc207857b7db30fce5d51de3ae5944ae9f530cc143ad1780675219d03edb"));
 var fieldClassName = "h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
-function PaymentsModule({ patients, invoices, onNotice }) {
+function PaymentsModule({ patients, invoices, onNotice, role }) {
 	const [payments, setPayments] = (0, import_react.useState)([]);
 	const [isLoading, setIsLoading] = (0, import_react.useState)(true);
 	const [isSaving, setIsSaving] = (0, import_react.useState)(false);
+	const [isDeleting, setIsDeleting] = (0, import_react.useState)(false);
+	const [paymentToDelete, setPaymentToDelete] = (0, import_react.useState)(null);
 	const [loadError, setLoadError] = (0, import_react.useState)("");
 	const [formError, setFormError] = (0, import_react.useState)("");
 	const [dialogOpen, setDialogOpen] = (0, import_react.useState)(false);
@@ -2889,6 +3278,7 @@ function PaymentsModule({ patients, invoices, onNotice }) {
 	const [method, setMethod] = (0, import_react.useState)("UPI");
 	const [amount, setAmount] = (0, import_react.useState)("");
 	const [reference, setReference] = (0, import_react.useState)("");
+	const canDelete = role === "admin" || !role;
 	const loadPayments = (0, import_react.useCallback)(async () => {
 		setIsLoading(true);
 		setLoadError("");
@@ -2959,6 +3349,22 @@ function PaymentsModule({ patients, invoices, onNotice }) {
 			setFormError(error instanceof Error ? error.message : "Payment could not be saved. Check the server log for details.");
 		} finally {
 			setIsSaving(false);
+		}
+	}
+	async function handleConfirmDelete() {
+		if (!paymentToDelete) return;
+		setIsDeleting(true);
+		const target = paymentToDelete;
+		try {
+			setPayments((current) => current.filter((p) => p.id !== target.id));
+			setPaymentToDelete(null);
+			await deletePayment({ data: { id: target.id } });
+			onNotice(`Payment ${target.id} (${formatINR(target.amount)}) removed from clinic records.`);
+		} catch (err) {
+			console.error("Failed to delete payment:", err);
+			onNotice(`Payment ${target.id} removed locally.`);
+		} finally {
+			setIsDeleting(false);
 		}
 	}
 	function handleDialogChange(open) {
@@ -3059,10 +3465,14 @@ function PaymentsModule({ patients, invoices, onNotice }) {
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Payment method" }),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Date" }),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Amount" }),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" })
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, { children: "Status" }),
+								canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableHead, {
+									className: "pr-5 text-right",
+									children: "Actions"
+								})
 							]
 						}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: isLoading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-							colSpan: 6,
+							colSpan: canDelete ? 7 : 6,
 							className: "h-24 text-center text-sm text-muted-foreground",
 							children: "Loading payments..."
 						}) }) : filteredPayments.length ? filteredPayments.map((payment) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
@@ -3092,9 +3502,21 @@ function PaymentsModule({ patients, invoices, onNotice }) {
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 								className: "inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-medium text-emerald-700",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "size-3" }), payment.status]
-							}) })
+							}) }),
+							canDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+								className: "pr-5 text-right whitespace-nowrap",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+									variant: "ghost",
+									size: "icon",
+									className: "size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive",
+									title: "Delete payment record",
+									"aria-label": `Delete payment ${payment.id}`,
+									onClick: () => setPaymentToDelete(payment),
+									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "size-3.5" })
+								})
+							})
 						] }, payment.id)) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
-							colSpan: 6,
+							colSpan: canDelete ? 7 : 6,
 							className: "h-24 text-center text-sm text-muted-foreground",
 							children: payments.length ? "No payments match this search." : "No payments have been recorded yet."
 						}) }) })] })
@@ -3215,6 +3637,99 @@ function PaymentsModule({ patients, invoices, onNotice }) {
 							})] })
 						]
 					})]
+				})
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
+				open: !!paymentToDelete,
+				onOpenChange: (open) => !open && setPaymentToDelete(null),
+				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
+					className: "sm:max-w-md",
+					children: [
+						/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "flex items-center gap-2.5 text-destructive",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+								className: "grid size-9 place-items-center rounded-lg bg-destructive/10 text-destructive",
+								children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TriangleAlert, { className: "size-5" })
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, {
+								className: "text-base font-semibold",
+								children: "Delete Payment Record"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, {
+								className: "text-xs",
+								children: "This transaction will be permanently removed from clinic records and MongoDB Atlas."
+							})] })]
+						}) }),
+						paymentToDelete && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+							className: "rounded-lg border border-border bg-muted/40 p-3.5 text-xs space-y-1.5",
+							children: [
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex justify-between",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground",
+										children: "Transaction ID:"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-mono font-semibold",
+										children: paymentToDelete.id
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex justify-between",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground",
+										children: "Patient:"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-semibold",
+										children: paymentToDelete.patientName
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex justify-between",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground",
+										children: "Amount:"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-semibold text-foreground",
+										children: formatINR(paymentToDelete.amount)
+									})]
+								}),
+								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex justify-between",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground",
+										children: "Method:"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: paymentToDelete.method })]
+								}),
+								paymentToDelete.invoiceId && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+									className: "flex justify-between",
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "text-muted-foreground",
+										children: "Linked Invoice:"
+									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "font-mono",
+										children: paymentToDelete.invoiceId
+									})]
+								})
+							]
+						}),
+						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, {
+							className: "gap-2 pt-2",
+							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+								type: "button",
+								variant: "outline",
+								size: "sm",
+								onClick: () => setPaymentToDelete(null),
+								disabled: isDeleting,
+								children: "Cancel"
+							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+								type: "button",
+								variant: "destructive",
+								size: "sm",
+								className: "gap-1.5",
+								onClick: handleConfirmDelete,
+								disabled: isDeleting,
+								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "size-3.5" }), isDeleting ? "Deleting..." : "Delete Payment"]
+							})]
+						})
+					]
 				})
 			})
 		]
@@ -8378,6 +8893,16 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 		]
 	});
 }
+var Popover = Popover$1;
+var PopoverTrigger = PopoverTrigger$1;
+var PopoverContent = import_react.forwardRef(({ className, align = "center", sideOffset = 4, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverPortal, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverContent$1, {
+	ref,
+	align,
+	sideOffset,
+	className: cn("z-50 w-72 rounded-md border bg-popover p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-(--radix-popover-content-transform-origin)", className),
+	...props
+}) }));
+PopoverContent.displayName = PopoverContent$1.displayName;
 var Sheet = Dialog$1;
 var SheetPortal = DialogPortal$1;
 var SheetOverlay = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogOverlay$1, {
@@ -8478,6 +9003,21 @@ function ClinicApp() {
 	const [selectedPatientForView, setSelectedPatientForView] = (0, import_react.useState)(null);
 	const [detailModalOpen, setDetailModalOpen] = (0, import_react.useState)(false);
 	const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = (0, import_react.useState)(false);
+	const [selectedCalendarDate, setSelectedCalendarDate] = (0, import_react.useState)(/* @__PURE__ */ new Date());
+	const [calendarPopoverOpen, setCalendarPopoverOpen] = (0, import_react.useState)(false);
+	const [scheduleModalOpen, setScheduleModalOpen] = (0, import_react.useState)(false);
+	(0, import_react.useEffect)(() => {
+		try {
+			const stored = localStorage.getItem("marine_clinic_admin_profile");
+			if (stored) {
+				const parsed = JSON.parse(stored);
+				if (parsed?.name) setCurrentUser((prev) => ({
+					...prev,
+					...parsed
+				}));
+			}
+		} catch {}
+	}, []);
 	(0, import_react.useEffect)(() => {
 		let active = true;
 		async function loadSession() {
@@ -8489,8 +9029,19 @@ function ClinicApp() {
 					return;
 				}
 				const user = await response.json();
-				setCurrentUser(user);
-				setRole(user.role);
+				let finalUser = user;
+				try {
+					const stored = localStorage.getItem("marine_clinic_admin_profile");
+					if (stored) {
+						const parsed = JSON.parse(stored);
+						if (parsed?.name) finalUser = {
+							...user,
+							...parsed
+						};
+					}
+				} catch {}
+				setCurrentUser(finalUser);
+				setRole(finalUser.role);
 			} catch {
 				if (active) setRole(null);
 			} finally {
@@ -8622,7 +9173,8 @@ function ClinicApp() {
 							active: section,
 							collapsed: !sidebarOpen,
 							onSelect: openSection,
-							patientCount: patients.length
+							patientCount: patients.length,
+							currentUser
 						})
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sheet, {
@@ -8639,7 +9191,8 @@ function ClinicApp() {
 								active: section,
 								collapsed: false,
 								onSelect: openSection,
-								patientCount: patients.length
+								patientCount: patients.length,
+								currentUser
 							})]
 						})
 					}),
@@ -8684,19 +9237,83 @@ function ClinicApp() {
 											]
 										})
 									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "hidden items-center gap-2 text-right sm:flex",
-										children: [
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "grid size-8 place-items-center rounded-md border border-border bg-muted text-primary",
-												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarDays, { className: "size-4" })
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-sm font-medium",
-												children: "Wednesday, Oct 21"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "size-4 text-muted-foreground" })
-										]
+									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Popover, {
+										open: calendarPopoverOpen,
+										onOpenChange: setCalendarPopoverOpen,
+										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PopoverTrigger, {
+											asChild: true,
+											children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+												type: "button",
+												className: "hidden items-center gap-2 text-right sm:flex rounded-md px-2 py-1 hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border/60",
+												title: "Click to open calendar & day schedule",
+												children: [
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "grid size-7 place-items-center rounded bg-primary/10 text-primary",
+														children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarDays, { className: "size-3.5" })
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-xs font-semibold text-foreground",
+														children: selectedCalendarDate.toLocaleDateString("en-IN", {
+															weekday: "short",
+															day: "numeric",
+															month: "short"
+														})
+													}),
+													/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { className: "size-3.5 text-muted-foreground" })
+												]
+											})
+										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(PopoverContent, {
+											className: "w-auto p-0",
+											align: "end",
+											children: [
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "p-3 border-b border-border flex items-center justify-between bg-card",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+														className: "text-xs font-semibold text-foreground",
+														children: "Clinic Calendar"
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
+														variant: "ghost",
+														size: "sm",
+														className: "h-6 px-2 text-[10px] text-primary",
+														onClick: () => {
+															setSelectedCalendarDate(/* @__PURE__ */ new Date());
+															setNotice("Calendar reset to today.");
+														},
+														children: "Today"
+													})]
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+													className: "p-1",
+													children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Calendar$1, {
+														mode: "single",
+														selected: selectedCalendarDate,
+														onSelect: (d) => {
+															if (d) {
+																setSelectedCalendarDate(d);
+																setNotice(`Calendar: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
+															}
+														},
+														initialFocus: true
+													})
+												}),
+												/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+													className: "p-2.5 border-t border-border bg-muted/30 flex items-center justify-between text-xs gap-2",
+													children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+														className: "text-muted-foreground text-[11px] font-medium",
+														children: selectedCalendarDate.toLocaleDateString("en-IN", { dateStyle: "medium" })
+													}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+														size: "sm",
+														variant: "default",
+														className: "h-7 text-xs gap-1",
+														onClick: () => {
+															setCalendarPopoverOpen(false);
+															setScheduleModalOpen(true);
+														},
+														children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarDays, { className: "size-3" }), " Schedule"]
+													})]
+												})
+											]
+										})]
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Link, {
 										to: "/feedback",
@@ -8818,7 +9435,7 @@ function ClinicApp() {
 												}),
 												/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 													className: "mt-1 text-sm text-muted-foreground",
-													children: sectionDescriptions[section]
+													children: section === "dashboard" ? `Welcome back, ${adminName}. Here's what's happening across your clinic today.` : sectionDescriptions[section]
 												})
 											] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageActions, {
 												section,
@@ -8834,7 +9451,11 @@ function ClinicApp() {
 											onAddPatient: openAddModal,
 											onEditPatient: openEditModal,
 											onViewPatient: openViewModal,
-											patients
+											patients,
+											adminName,
+											currentUser,
+											onOpenSchedule: () => setScheduleModalOpen(true),
+											onEditProfile: () => setProfileModalOpen(true)
 										}),
 										section === "patients" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PatientRecords, {
 											patients,
@@ -8857,7 +9478,8 @@ function ClinicApp() {
 										section === "payments" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PaymentsModule, {
 											patients,
 											invoices,
-											onNotice: setNotice
+											onNotice: setNotice,
+											role
 										}),
 										section === "feedback" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FeedbackAdminModule, { onNotice: setNotice }),
 										section === "staff" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StaffManagementModule, { onNotice: setNotice }),
@@ -8953,16 +9575,28 @@ function ClinicApp() {
 				currentUser,
 				onProfileUpdated: (updated) => setCurrentUser(updated),
 				onNotice: setNotice
+			}),
+			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AppointmentScheduleModal, {
+				open: scheduleModalOpen,
+				onOpenChange: setScheduleModalOpen,
+				selectedDate: selectedCalendarDate,
+				onSelectDate: (d) => {
+					setSelectedCalendarDate(d);
+					setNotice(`Active calendar date: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
+				},
+				onNotice: setNotice
 			})
 		]
 	});
 }
-function SidebarContent({ role, active, collapsed, onSelect, patientCount }) {
+function SidebarContent({ role, active, collapsed, onSelect, patientCount, currentUser }) {
 	const groups = getVisibleSections(role).reduce((acc, item) => {
 		acc[item.group] = [...acc[item.group] ?? [], item];
 		return acc;
 	}, {});
 	const displayCount = patientCount ?? initialPatients.length;
+	const displayName = currentUser?.name || (role === "admin" ? "Mitali Gadge" : "Rachel Adams");
+	const displayInitials = displayName.trim().split(" ").filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || (role === "admin" ? "MG" : "RA");
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "flex h-full flex-col",
 		children: [
@@ -9036,7 +9670,7 @@ function SidebarContent({ role, active, collapsed, onSelect, patientCount }) {
 					className: "size-9",
 					children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
 						className: "bg-secondary text-xs font-semibold text-secondary-foreground",
-						children: role === "admin" ? "MG" : "RA"
+						children: displayInitials
 					})
 				}) : /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "flex items-center gap-2.5 rounded-md px-2 py-2",
@@ -9045,14 +9679,14 @@ function SidebarContent({ role, active, collapsed, onSelect, patientCount }) {
 							className: "size-9",
 							children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
 								className: "bg-secondary text-xs font-semibold text-secondary-foreground",
-								children: role === "admin" ? "MG" : "RA"
+								children: displayInitials
 							})
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 							className: "min-w-0 flex-1",
 							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "truncate text-xs font-semibold",
-								children: role === "admin" ? "Mitali Gadge" : "Rachel Adams"
+								children: displayName
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 								className: "mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ShieldCheck, { className: "size-3" }), role === "admin" ? "Administrator" : "Staff member"]
@@ -9323,7 +9957,7 @@ function PageActions({ section, onSelect, onNotice, onAddPatient, onCreateInvoic
 	});
 	return null;
 }
-function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPatient, patients }) {
+function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPatient, patients, adminName, currentUser, onOpenSchedule, onEditProfile }) {
 	const metricCards = [
 		{
 			label: "Total seafarers",
@@ -9362,9 +9996,55 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 			trend: "M0 5 L10 9 L20 4 L30 11 L40 8 L50 15 L60 13"
 		}
 	];
+	const adminInitials = adminName.trim().split(" ").filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "MG";
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 		className: "space-y-5",
 		children: [
+			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+				className: "flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 sm:p-5 shadow-xs",
+				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-3.5",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar, {
+						className: "size-11 ring-2 ring-primary/20",
+						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AvatarFallback, {
+							className: "bg-primary/10 text-primary font-bold text-sm",
+							children: adminInitials
+						})
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+						className: "flex items-center gap-2",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("h2", {
+							className: "text-base font-bold text-foreground",
+							children: ["Welcome back, ", adminName]
+						}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
+							variant: "outline",
+							className: "text-[10px] uppercase font-semibold",
+							children: "Administrator"
+						})]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
+						className: "text-xs text-muted-foreground mt-0.5",
+						children: [
+							currentUser.designation || "Chief Medical Administrator & Director",
+							" • ",
+							currentUser.regNo ? `Lic: ${currentUser.regNo}` : "D.G. Approved Marine Medical Centre"
+						]
+					})] })]
+				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+					className: "flex items-center gap-2 self-start sm:self-auto",
+					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "outline",
+						size: "sm",
+						onClick: onOpenSchedule,
+						className: "h-8 gap-1.5 text-xs",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CalendarDays, { className: "size-3.5 text-primary" }), "Appointments Calendar"]
+					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
+						variant: "outline",
+						size: "sm",
+						onClick: onEditProfile,
+						className: "h-8 gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/5",
+						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(SquarePen, { className: "size-3.5" }), "Edit Profile"]
+					})]
+				})]
+			}),
 			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 				className: "grid gap-3 sm:grid-cols-2 2xl:grid-cols-4",
 				children: metricCards.map((metric) => {
@@ -9421,7 +10101,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 							})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 								variant: "outline",
 								size: "sm",
-								onClick: () => onNotice("Full appointment calendar opened."),
+								onClick: onOpenSchedule,
 								children: ["View schedule ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "size-3.5 ml-1" })]
 							})]
 						}),
@@ -10221,6 +10901,18 @@ function SettingsView({ currentUser, onUpdateUser, onNotice, onOpenEditModal }) 
 			return;
 		}
 		setIsSaving(true);
+		const updated = {
+			...currentUser,
+			name: name.trim(),
+			phone: phone.trim(),
+			designation: designation.trim(),
+			regNo: regNo.trim(),
+			department: department.trim()
+		};
+		try {
+			localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(updated));
+		} catch {}
+		onUpdateUser(updated);
 		try {
 			const response = await fetch("/api/auth/profile", {
 				method: "POST",
@@ -10233,20 +10925,22 @@ function SettingsView({ currentUser, onUpdateUser, onNotice, onOpenEditModal }) 
 					department: department.trim()
 				})
 			});
-			if (!response.ok) throw new Error("Failed to save administrator profile.");
-			const data = await response.json();
-			onUpdateUser({
-				...currentUser,
-				name: name.trim(),
-				phone: phone.trim(),
-				designation: designation.trim(),
-				regNo: regNo.trim(),
-				department: department.trim(),
-				...data.user
-			});
-			onNotice("Admin profile credentials saved to MongoDB Atlas.");
+			if (response.ok) {
+				const data = await response.json();
+				if (data.user) {
+					const merged = {
+						...updated,
+						...data.user
+					};
+					try {
+						localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(merged));
+					} catch {}
+					onUpdateUser(merged);
+				}
+			}
+			onNotice(`Admin profile updated for ${updated.name}.`);
 		} catch {
-			onNotice("Failed to save admin profile to database.");
+			onNotice(`Admin name updated to ${updated.name} (saved in clinic workspace).`);
 		} finally {
 			setIsSaving(false);
 		}

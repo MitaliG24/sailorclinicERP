@@ -2,7 +2,7 @@ import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
 import { t as getDatabase } from "./mongodb.server-DjK6AyEN.mjs";
 import { t as createPaymentSchema } from "./payments-12q5ofvW.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/payments.server-rxVFY1d5.js
+//#region node_modules/.nitro/vite/services/ssr/assets/payments.server-DJdV2maZ.js
 var listPayments_createServerFn_handler = createServerRpc({
 	id: "46f0281588053a3ca9274ce9f96e6b22e966f129cc09a3f7df21f882fae21399",
 	name: "listPayments",
@@ -95,6 +95,40 @@ var recordPayment = createServerFn({ method: "POST" }).validator((input) => inpu
 		};
 	}
 });
+var deletePayment_createServerFn_handler = createServerRpc({
+	id: "cbd3dc207857b7db30fce5d51de3ae5944ae9f530cc143ad1780675219d03edb",
+	name: "deletePayment",
+	filename: "src/lib/payments.server.ts"
+}, (opts) => deletePayment.__executeServer(opts));
+var deletePayment = createServerFn({ method: "POST" }).validator((input) => {
+	if (typeof input === "object" && input !== null && "id" in input && typeof input.id === "string") return { id: input.id };
+	throw new Error("Invalid payment ID.");
+}).handler(deletePayment_createServerFn_handler, async ({ data }) => {
+	try {
+		const db = await getDatabase();
+		const existing = await db.collection("payments").findOne({ id: data.id });
+		await db.collection("payments").deleteOne({ id: data.id });
+		try {
+			await db.collection("activity_logs").insertOne({
+				user: "Clinic Admin",
+				action: "Deleted payment record",
+				subject: `${data.id}${existing?.amount ? ` · ₹${Number(existing.amount).toLocaleString("en-IN")}` : ""}`,
+				time: "Just now",
+				kind: "Payments",
+				timestamp: (/* @__PURE__ */ new Date()).toISOString()
+			});
+		} catch (actErr) {
+			console.warn("Could not log payment deletion in MongoDB:", actErr);
+		}
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to delete payment from MongoDB:", error);
+		return {
+			success: false,
+			message: error instanceof Error ? error.message : "Failed to delete payment."
+		};
+	}
+});
 function getPaymentSaveErrorMessage(error) {
 	const message = error instanceof Error ? error.message : "";
 	const code = error?.code;
@@ -105,4 +139,4 @@ function getPaymentSaveErrorMessage(error) {
 	return "MongoDB could not save this payment. Check the server log for the database error.";
 }
 //#endregion
-export { listPayments_createServerFn_handler, recordPayment_createServerFn_handler };
+export { deletePayment_createServerFn_handler, listPayments_createServerFn_handler, recordPayment_createServerFn_handler };

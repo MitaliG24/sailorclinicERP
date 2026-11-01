@@ -1,4 +1,4 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/__23tanstack-start-server-fn-resolver-Cc1lEhT4.js
+//#region node_modules/.nitro/vite/services/ssr/assets/__23tanstack-start-server-fn-resolver-jEig8d49.js
 var manifest = {
 	"126cb06bb09c8851636148e68d9aba290eb699a7383b834f3c23b834815bdcb4": {
 		functionName: "saveStaffServer_createServerFn_handler",
@@ -22,7 +22,7 @@ var manifest = {
 	},
 	"46f0281588053a3ca9274ce9f96e6b22e966f129cc09a3f7df21f882fae21399": {
 		functionName: "listPayments_createServerFn_handler",
-		importer: () => import("./_ssr/payments.server-rxVFY1d5.mjs")
+		importer: () => import("./_ssr/payments.server-DJdV2maZ.mjs")
 	},
 	"50a6ce61e934d0b8a72d69231c3e2103e9c0cc08a7f2092fbf23c2b3011c99f9": {
 		functionName: "listActivitiesServer_createServerFn_handler",
@@ -46,11 +46,15 @@ var manifest = {
 	},
 	"7503df8020f8e06acfa6f12fe842bbda9596a2a258ad6847ba13b7271885b68b": {
 		functionName: "recordPayment_createServerFn_handler",
-		importer: () => import("./_ssr/payments.server-rxVFY1d5.mjs")
+		importer: () => import("./_ssr/payments.server-DJdV2maZ.mjs")
 	},
 	"b4e8fa6605ee12e31e9471aa101e35d001b6c868596accdf58d57443e23b1c1d": {
 		functionName: "updateFeedbackStatusServer_createServerFn_handler",
 		importer: () => import("./_ssr/clinic.server-C8mfcV_E.mjs")
+	},
+	"cbd3dc207857b7db30fce5d51de3ae5944ae9f530cc143ad1780675219d03edb": {
+		functionName: "deletePayment_createServerFn_handler",
+		importer: () => import("./_ssr/payments.server-DJdV2maZ.mjs")
 	},
 	"d9e3c80e681c33a5c282c9bee15213c8fc49bade77f608eb4311acf4fe7be400": {
 		functionName: "listStaffServer_createServerFn_handler",

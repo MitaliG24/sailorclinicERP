@@ -1,8 +1,9 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
-import { h as createSsrRpc } from "./clinic.server-gt5nfFoT.mjs";
-import { m as require_react, p as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/db-test-CnktfVeS.js
+import { h as createSsrRpc } from "./clinic.server-CScDC1af.mjs";
+import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
+import { f as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/db-test-B7gLTiGI.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var testMongoConnection = createServerFn({ method: "GET" }).handler(createSsrRpc("2dbbd49a26aa7ad8ec44dcfa3f1334d5c4bd99175bc0fc762cb847a41191e192"));

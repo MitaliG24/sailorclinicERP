@@ -1,5 +1,6 @@
 import { o as __toESM } from "../_runtime.mjs";
-import { m as require_react, p as require_jsx_runtime } from "./@radix-ui/react-avatar+[...].mjs";
+import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
+import { f as require_jsx_runtime } from "./@radix-ui/react-avatar+[...].mjs";
 //#region node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js
 var import_react = /* @__PURE__ */ __toESM(require_react(), 1);
 var import_jsx_runtime = require_jsx_runtime();

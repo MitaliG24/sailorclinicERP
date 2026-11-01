@@ -1,5 +1,5 @@
 import { o as __toESM } from "../_runtime.mjs";
-import { m as require_react } from "./@radix-ui/react-avatar+[...].mjs";
+import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
 //#region node_modules/lucide-react/dist/esm/shared/src/utils/mergeClasses.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 /**
@@ -1298,6 +1298,26 @@ var TrendingUp = createLucideIcon("trending-up", [["path", {
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
+var TriangleAlert = createLucideIcon("triangle-alert", [
+	["path", {
+		d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3",
+		key: "wmoenq"
+	}],
+	["path", {
+		d: "M12 9v4",
+		key: "juzpu7"
+	}],
+	["path", {
+		d: "M12 17h.01",
+		key: "p32p05"
+	}]
+]);
+/**
+* @license lucide-react v0.575.0 - ISC
+*
+* This source code is licensed under the ISC license.
+* See the LICENSE file in the root directory of this source tree.
+*/
 var Upload = createLucideIcon("upload", [
 	["path", {
 		d: "M12 3v12",
@@ -1496,4 +1516,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { ChevronLeft as $, Mail as A, FileChartColumnIncreasing as B, Printer as C, PanelLeftClose as D, PanelLeftOpen as E, FileText as F, Download as G, Eye as H, FileSpreadsheet as I, Clock3 as J, CreditCard as K, FilePlusCorner as L, LayoutDashboard as M, HeartPulse as N, MessageSquare as O, Funnel as P, ChevronRight as Q, FileCheck as R, ReceiptText as S, Phone as T, ExternalLink as U, FileBadge as V, Ellipsis as W, CircleCheck as X, ClipboardList as Y, CircleAlert as Z, Send as _, UserX as a, Building as at, RotateCcw as b, UserPlus as c, Bell as ct, Trash2 as d, ArrowLeft as dt, ChevronDown as et, Stethoscope as f, ArrowDownRight as ft, Settings as g, ShieldCheck as h, User as i, CalendarDays as it, LogOut as j, Menu as k, Upload as l, ArrowUpRight as lt, Ship as m, WalletCards as n, ChartColumn as nt, UserRound as o, Building2 as ot, SquarePen as p, Activity as pt, Clock as q, Users as r, Calendar as rt, UserRoundPlus as s, Briefcase as st, X as t, Check as tt, TrendingUp as u, ArrowRight as ut, Search as v, Plus as w, RefreshCw as x, Save as y, FileCheckCorner as z };
+export { ChevronRight as $, Menu as A, FileCheckCorner as B, ReceiptText as C, PanelLeftOpen as D, Phone as E, Funnel as F, Ellipsis as G, FileBadge as H, FileText as I, Clock as J, Download as K, FileSpreadsheet as L, LogOut as M, LayoutDashboard as N, PanelLeftClose as O, HeartPulse as P, CircleAlert as Q, FilePlusCorner as R, RefreshCw as S, Plus as T, Eye as U, FileChartColumnIncreasing as V, ExternalLink as W, ClipboardList as X, Clock3 as Y, CircleCheck as Z, Settings as _, UserX as a, CalendarDays as at, Save as b, UserPlus as c, Briefcase as ct, TrendingUp as d, ArrowRight as dt, ChevronLeft as et, Trash2 as f, ArrowLeft as ft, ShieldCheck as g, Ship as h, User as i, Calendar as it, Mail as j, MessageSquare as k, Upload as l, Bell as lt, SquarePen as m, Activity as mt, WalletCards as n, Check as nt, UserRound as o, Building as ot, Stethoscope as p, ArrowDownRight as pt, CreditCard as q, Users as r, ChartColumn as rt, UserRoundPlus as s, Building2 as st, X as t, ChevronDown as tt, TriangleAlert as u, ArrowUpRight as ut, Send as v, Printer as w, RotateCcw as x, Search as y, FileCheck as z };

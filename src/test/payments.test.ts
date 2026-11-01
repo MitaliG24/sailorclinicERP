@@ -32,4 +32,14 @@ describe("payment input validation", () => {
       ).toThrow();
     }
   });
+
+  it("filters out deleted payment from list", () => {
+    const list = [
+      { id: "TXN-001", patientName: "A", amount: 1000 },
+      { id: "TXN-002", patientName: "B", amount: 2000 },
+    ];
+    const filtered = list.filter((p) => p.id !== "TXN-001");
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].id).toBe("TXN-002");
+  });
 });

@@ -1,5 +1,6 @@
 import { o as __toESM } from "../../_runtime.mjs";
-import { a as dispatchDiscreteCustomEvent, c as useLayoutEffect2, d as createSlot, f as useComposedRefs, i as Primitive, l as createContextScope, m as require_react, o as require_react_dom, p as require_jsx_runtime, s as useCallbackRef$1 } from "./react-avatar+[...].mjs";
+import { l as require_react_dom, u as require_react } from "../@floating-ui/react-dom+[...].mjs";
+import { a as dispatchDiscreteCustomEvent, c as createContextScope, d as useComposedRefs, f as require_jsx_runtime, i as Primitive, o as useCallbackRef$1, s as useLayoutEffect2, u as createSlot } from "./react-avatar+[...].mjs";
 import { t as composeEventHandlers } from "../radix-ui__primitive.mjs";
 import { __assign, __rest, __spreadArray } from "tslib";
 //#region node_modules/@radix-ui/react-id/dist/index.mjs
@@ -1899,4 +1900,4 @@ function getState(open) {
 }
 __name(getState, "getState");
 //#endregion
-export { DialogOverlay as a, DialogDescription as i, DialogClose as n, DialogPortal as o, DialogContent as r, DialogTitle as s, Dialog as t };
+export { DismissableLayer as _, DialogOverlay as a, hideOthers as c, Presence as d, Portal as f, useFocusScopeBranchRegistry as g, useFocusScopeBranch as h, DialogDescription as i, ReactRemoveScroll as l, FocusScopeBranchProvider as m, DialogClose as n, DialogPortal as o, FocusScope as p, DialogContent as r, DialogTitle as s, Dialog as t, useFocusGuards as u, useControllableState as v, useId as y };

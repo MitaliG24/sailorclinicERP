@@ -1,6 +1,7 @@
 import { i as __require, o as __toESM, t as __commonJSMin } from "../../_runtime.mjs";
 import { i as parseHref, r as normalizeProtocolRelative } from "../tanstack__history.mjs";
-import { m as require_react, o as require_react_dom, p as require_jsx_runtime } from "../@radix-ui/react-avatar+[...].mjs";
+import { l as require_react_dom, u as require_react } from "../@floating-ui/react-dom+[...].mjs";
+import { f as require_jsx_runtime } from "../@radix-ui/react-avatar+[...].mjs";
 import { PassThrough, Readable } from "node:stream";
 //#region node_modules/@tanstack/router-core/dist/esm/not-found.js
 /** Determine if a value is a TanStack Router not-found error. */

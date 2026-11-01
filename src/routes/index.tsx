@@ -54,6 +54,7 @@ import {
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { AdminProfileModal, type UserProfileData } from "@/components/clinic/AdminProfileModal";
+import { AppointmentScheduleModal } from "@/components/clinic/AppointmentScheduleModal";
 import { ClinicLogo } from "@/components/clinic/ClinicLogo";
 import { CreateInvoiceModal } from "@/components/clinic/CreateInvoiceModal";
 import { FeedbackAdminModule } from "@/components/clinic/FeedbackAdminModule";
@@ -76,7 +77,9 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Sheet,
   SheetContent,
@@ -183,6 +186,24 @@ function ClinicApp() {
   // Invoice Modal State
   const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = useState(false);
 
+  // Calendar & Schedule States
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date>(new Date());
+  const [calendarPopoverOpen, setCalendarPopoverOpen] = useState(false);
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+
+  // Load locally saved admin profile immediately on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("marine_clinic_admin_profile");
+      if (stored) {
+        const parsed = JSON.parse(stored) as UserProfileData;
+        if (parsed?.name) {
+          setCurrentUser((prev) => ({ ...prev, ...parsed }));
+        }
+      }
+    } catch {}
+  }, []);
+
   useEffect(() => {
     let active = true;
     async function loadSession() {
@@ -194,8 +215,18 @@ function ClinicApp() {
           return;
         }
         const user = (await response.json()) as UserProfileData;
-        setCurrentUser(user);
-        setRole(user.role);
+        let finalUser = user;
+        try {
+          const stored = localStorage.getItem("marine_clinic_admin_profile");
+          if (stored) {
+            const parsed = JSON.parse(stored) as UserProfileData;
+            if (parsed?.name) {
+              finalUser = { ...user, ...parsed };
+            }
+          }
+        } catch {}
+        setCurrentUser(finalUser);
+        setRole(finalUser.role);
       } catch {
         if (active) setRole(null);
       } finally {
@@ -407,15 +438,72 @@ function ClinicApp() {
                 </span>
               </div>
             </div>
-            <div className="hidden items-center gap-2 text-right sm:flex">
-              <span className="grid size-8 place-items-center rounded-md border border-border bg-muted text-primary">
-                <CalendarDays className="size-4" />
-              </span>
-              <span className="text-sm font-medium">
-                {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}
-              </span>
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </div>
+            <Popover open={calendarPopoverOpen} onOpenChange={setCalendarPopoverOpen}>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="hidden items-center gap-2 text-right sm:flex rounded-md px-2 py-1 hover:bg-muted/60 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border/60"
+                  title="Click to open calendar & day schedule"
+                >
+                  <span className="grid size-7 place-items-center rounded bg-primary/10 text-primary">
+                    <CalendarDays className="size-3.5" />
+                  </span>
+                  <span className="text-xs font-semibold text-foreground">
+                    {selectedCalendarDate.toLocaleDateString("en-IN", {
+                      weekday: "short",
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                  <ChevronDown className="size-3.5 text-muted-foreground" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="end">
+                <div className="p-3 border-b border-border flex items-center justify-between bg-card">
+                  <div className="text-xs font-semibold text-foreground">Clinic Calendar</div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-[10px] text-primary"
+                    onClick={() => {
+                      setSelectedCalendarDate(new Date());
+                      setNotice("Calendar reset to today.");
+                    }}
+                  >
+                    Today
+                  </Button>
+                </div>
+                <div className="p-1">
+                  <Calendar
+                    mode="single"
+                    selected={selectedCalendarDate}
+                    onSelect={(d) => {
+                      if (d) {
+                        setSelectedCalendarDate(d);
+                        setNotice(`Calendar: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
+                      }
+                    }}
+                    initialFocus
+                  />
+                </div>
+                <div className="p-2.5 border-t border-border bg-muted/30 flex items-center justify-between text-xs gap-2">
+                  <span className="text-muted-foreground text-[11px] font-medium">
+                    {selectedCalendarDate.toLocaleDateString("en-IN", { dateStyle: "medium" })}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="default"
+                    className="h-7 text-xs gap-1"
+                    onClick={() => {
+                      setCalendarPopoverOpen(false);
+                      setScheduleModalOpen(true);
+                    }}
+                  >
+                    <CalendarDays className="size-3" /> Schedule
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
             <Link to="/feedback" target="_blank" className="hidden sm:inline-flex">
               <Button
                 variant="outline"
@@ -513,7 +601,9 @@ function ClinicApp() {
                     {clinicSections.find((item) => item.id === section)?.label}
                   </h1>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {sectionDescriptions[section]}
+                    {section === "dashboard"
+                      ? `Welcome back, ${adminName}. Here's what's happening across your clinic today.`
+                      : sectionDescriptions[section]}
                   </p>
                 </div>
                 <PageActions
@@ -533,6 +623,10 @@ function ClinicApp() {
                   onEditPatient={openEditModal}
                   onViewPatient={openViewModal}
                   patients={patients}
+                  adminName={adminName}
+                  currentUser={currentUser}
+                  onOpenSchedule={() => setScheduleModalOpen(true)}
+                  onEditProfile={() => setProfileModalOpen(true)}
                 />
               )}
               {section === "patients" && (
@@ -654,6 +748,16 @@ function ClinicApp() {
         onOpenChange={setProfileModalOpen}
         currentUser={currentUser}
         onProfileUpdated={(updated) => setCurrentUser(updated)}
+        onNotice={setNotice}
+      />
+      <AppointmentScheduleModal
+        open={scheduleModalOpen}
+        onOpenChange={setScheduleModalOpen}
+        selectedDate={selectedCalendarDate}
+        onSelectDate={(d) => {
+          setSelectedCalendarDate(d);
+          setNotice(`Active calendar date: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
+        }}
         onNotice={setNotice}
       />
     </div>
@@ -1004,6 +1108,10 @@ function Dashboard({
   onEditPatient,
   onViewPatient,
   patients,
+  adminName,
+  currentUser,
+  onOpenSchedule,
+  onEditProfile,
 }: {
   onSelect: (target: ClinicSection) => void;
   onNotice: (message: string) => void;
@@ -1011,6 +1119,10 @@ function Dashboard({
   onEditPatient: (patient: PatientRecord) => void;
   onViewPatient: (patient: PatientRecord) => void;
   patients: PatientRecord[];
+  adminName: string;
+  currentUser: UserProfileData;
+  onOpenSchedule: () => void;
+  onEditProfile: () => void;
 }) {
   const metricCards = [
     { label: "Total seafarers", value: `${2480 + patients.length}`, detail: "+14 registered today", positive: true, icon: Users, shade: "bg-secondary text-secondary-foreground", trend: "M0 18 L10 15 L20 17 L30 8 L40 11 L50 4 L60 7" },
@@ -1019,8 +1131,61 @@ function Dashboard({
     { label: "Pending medicals", value: "6", detail: "Awaiting USG / Lab", positive: false, icon: FileText, shade: "bg-[color:color-mix(in_oklab,var(--chart-4)_12%,white)] text-foreground", trend: "M0 5 L10 9 L20 4 L30 11 L40 8 L50 15 L60 13" },
   ];
 
+  const adminInitials =
+    adminName
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .map((p) => p[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "MG";
+
   return (
     <div className="space-y-5">
+      {/* Admin Executive Profile Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-card p-4 sm:p-5 shadow-xs">
+        <div className="flex items-center gap-3.5">
+          <Avatar className="size-11 ring-2 ring-primary/20">
+            <AvatarFallback className="bg-primary/10 text-primary font-bold text-sm">
+              {adminInitials}
+            </AvatarFallback>
+          </Avatar>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-foreground">Welcome back, {adminName}</h2>
+              <Badge variant="outline" className="text-[10px] uppercase font-semibold">
+                Administrator
+              </Badge>
+            </div>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {currentUser.designation || "Chief Medical Administrator & Director"} • {currentUser.regNo ? `Lic: ${currentUser.regNo}` : "D.G. Approved Marine Medical Centre"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onOpenSchedule}
+            className="h-8 gap-1.5 text-xs"
+          >
+            <CalendarDays className="size-3.5 text-primary" />
+            Appointments Calendar
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onEditProfile}
+            className="h-8 gap-1.5 text-xs text-primary border-primary/30 hover:bg-primary/5"
+          >
+            <Edit className="size-3.5" />
+            Edit Profile
+          </Button>
+        </div>
+      </div>
+
       <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
         {metricCards.map((metric) => {
           const Icon = metric.icon;
@@ -1056,7 +1221,7 @@ function Dashboard({
               <h2 className="text-sm font-semibold">Appointments today</h2>
               <p className="mt-1 text-xs text-muted-foreground">Your clinic schedule at a glance</p>
             </div>
-            <Button variant="outline" size="sm" onClick={() => onNotice("Full appointment calendar opened.")}>
+            <Button variant="outline" size="sm" onClick={onOpenSchedule}>
               View schedule <ArrowRight className="size-3.5 ml-1" />
             </Button>
           </div>
