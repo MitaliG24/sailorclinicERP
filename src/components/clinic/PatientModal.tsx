@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  ArrowLeft,
+  ArrowRight,
   Calendar,
   Clock,
   CreditCard,
@@ -90,6 +92,19 @@ const COMMON_COMPANIES = [
   "Executive Ship Management",
 ];
 
+const COMMON_VESSELS = [
+  "MV Maersk Mc-Kinney",
+  "MT Synergy Tide",
+  "MV Pacific Pioneer",
+  "MV Eastern Glory",
+  "MSC Oscar",
+  "MT Nordic Voyager",
+  "MV Ever Given",
+  "MT BSM Stralsund",
+  "MV Jag Anand",
+  "MT Ridgebury Pioneer",
+];
+
 export function PatientModal({
   open,
   onOpenChange,
@@ -111,6 +126,7 @@ export function PatientModal({
   const [typeOfMedical, setTypeOfMedical] = useState<string>("Annual Seafarer Medical");
   const [usgXray, setUsgXray] = useState<string>("USG & Chest X-Ray Normal");
   const [companyName, setCompanyName] = useState<string>("");
+  const [vessel, setVessel] = useState<string>("");
 
   // Payment status
   const [paymentStatus, setPaymentStatus] = useState<"Paid" | "Own" | "Pending">("Paid");
@@ -129,7 +145,7 @@ export function PatientModal({
   const [cdcNo, setCdcNo] = useState<string>("");
   const [invoiceNo, setInvoiceNo] = useState<string>("");
 
-  const [activeTab, setActiveTab] = useState<"candidate" | "medical" | "credentials" | "payment">("candidate");
+  const [activeTab, setActiveTab] = useState<"candidate" | "medical" | "payment">("candidate");
 
   // Populate when patientToEdit changes or modal opens
   useEffect(() => {
@@ -146,6 +162,7 @@ export function PatientModal({
       setTypeOfMedical(patientToEdit.typeOfMedical || "Annual Seafarer Medical");
       setUsgXray(patientToEdit.usgXray || "USG & Chest X-Ray Normal");
       setCompanyName(patientToEdit.companyName || "");
+      setVessel(patientToEdit.vesselName || patientToEdit.vessel || "");
       setPaymentStatus(patientToEdit.paymentStatus || "Paid");
       setPaymentAmount(patientToEdit.paymentAmount || "₹4,500.00");
       setPaymentMode(patientToEdit.paymentMode || "Trans. ID");
@@ -172,6 +189,7 @@ export function PatientModal({
       setTypeOfMedical("Annual Seafarer Medical");
       setUsgXray("USG & Chest X-Ray Normal");
       setCompanyName("Maersk Marine Services");
+      setVessel("MV Maersk Mc-Kinney");
       setPaymentStatus("Paid");
       setPaymentAmount("₹4,500.00");
       setPaymentMode("Trans. ID");
@@ -245,6 +263,8 @@ export function PatientModal({
       typeOfMedical: typeOfMedical || "Annual Seafarer Medical",
       usgXray: usgXray || "USG & Chest X-Ray Normal",
       companyName: companyName || "Independent / Agency",
+      vessel: vessel.trim() || undefined,
+      vesselName: vessel.trim() || undefined,
       paymentStatus: paymentStatus || "Paid",
       paymentAmount: paymentAmount || "₹4,500.00",
       paymentMode: paymentMode || "Trans. ID",
@@ -305,18 +325,6 @@ export function PatientModal({
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab("credentials")}
-              className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-                activeTab === "credentials"
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-background text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              <FileBadge className="size-3.5" />
-              2. Credentials (INDoS / CDC)
-            </button>
-            <button
-              type="button"
               onClick={() => setActiveTab("medical")}
               className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
                 activeTab === "medical"
@@ -325,7 +333,7 @@ export function PatientModal({
               }`}
             >
               <Stethoscope className="size-3.5" />
-              3. Medical & Timing
+              2. Medical & Timing
             </button>
             <button
               type="button"
@@ -337,7 +345,7 @@ export function PatientModal({
               }`}
             >
               <CreditCard className="size-3.5" />
-              4. Payment & Invoice
+              3. Payment & Invoice
             </button>
           </div>
         </DialogHeader>
@@ -472,7 +480,7 @@ export function PatientModal({
                   </div>
                 </div>
 
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1.5">
                     <label htmlFor="field-rank" className="text-xs font-medium text-foreground">
                       Rank <span className="text-destructive">*</span>
@@ -516,91 +524,133 @@ export function PatientModal({
                       </datalist>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* TAB 2: Alphanumeric Credentials */}
-          {activeTab === "credentials" && (
-            <div className="space-y-4">
-              <div className="rounded-lg border border-border/70 bg-card p-4">
-                <div className="mb-3 flex items-center justify-between border-b border-border/50 pb-2">
-                  <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Maritime Identification & Certificates
-                  </h3>
-                  <Badge variant="outline" className="text-[10px]">
-                    Alphanumeric: Char A-Z, 0-9
-                  </Badge>
-                </div>
-
-                <div className="space-y-3.5">
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor="field-cert" className="text-xs font-medium text-foreground">
-                        Certificate No.
-                      </label>
-                      <span className="text-[11px] text-muted-foreground">Char. A to Z, Numbers</span>
+                    <label htmlFor="field-vessel" className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                      <Ship className="size-3.5 text-primary" />
+                      Vessel Name
+                    </label>
+                    <div className="relative">
+                      <Input
+                        id="field-vessel"
+                        list="vessel-suggestions"
+                        placeholder="e.g. MV Maersk Mc-Kinney"
+                        value={vessel}
+                        onChange={(e) => setVessel(e.target.value)}
+                        className="h-9 text-xs"
+                      />
+                      <datalist id="vessel-suggestions">
+                        {COMMON_VESSELS.map((v) => (
+                          <option key={v} value={v} />
+                        ))}
+                      </datalist>
                     </div>
-                    <Input
-                      id="field-cert"
-                      placeholder="e.g. MC-2026-9041"
-                      value={certificateNo}
-                      onChange={(e) => setCertificateNo(sanitizeAlphanumeric(e.target.value))}
-                      className="h-9 font-mono text-xs uppercase tracking-wide"
-                    />
-                    <p className="text-[11px] text-muted-foreground">
-                      Official Medical Fitness Certificate Reference issued by DG Shipping approved medical examiner.
-                    </p>
+                  </div>
+                </div>
+
+                {/* Candidate Credentials Section (Kept in Candidate Details) */}
+                <div className="mt-4 rounded-lg border border-primary/25 bg-primary/5 p-4 space-y-3.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-primary/15 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="grid size-7 place-items-center rounded-md bg-primary/10 text-primary">
+                        <FileBadge className="size-4" />
+                      </span>
+                      <div>
+                        <h4 className="text-xs font-semibold text-foreground">
+                          Candidate Maritime Credentials
+                        </h4>
+                        <p className="text-[10px] text-muted-foreground">
+                          Official DG Shipping seafarer identification and fitness certificate reference
+                        </p>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="bg-background text-[10px] font-mono">
+                      Alphanumeric: Char A-Z, 0-9
+                    </Badge>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-3">
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <label htmlFor="field-indos" className="text-xs font-medium text-foreground">
+                        <label htmlFor="field-indos-cand" className="text-xs font-medium text-foreground">
                           INDoS No. <span className="text-destructive">*</span>
                         </label>
-                        <span className="text-[11px] text-muted-foreground">Char. A to Z, Numbers</span>
+                        <span className="text-[10px] font-mono text-muted-foreground">Char A-Z, 0-9</span>
                       </div>
                       <Input
-                        id="field-indos"
+                        id="field-indos-cand"
                         placeholder="e.g. 12NL8492"
                         value={indosNo}
                         onChange={(e) => setIndosNo(sanitizeAlphanumeric(e.target.value))}
-                        className="h-9 font-mono text-xs uppercase tracking-wide"
+                        className="h-9 font-mono text-xs uppercase tracking-wide bg-background"
                         required
                       />
-                      <p className="text-[11px] text-muted-foreground">
-                        Indian National Database of Seafarers identifier.
+                      <p className="text-[10px] text-muted-foreground">
+                        Indian National Database of Seafarers
                       </p>
                     </div>
 
                     <div className="space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <label htmlFor="field-cdc" className="text-xs font-medium text-foreground">
+                        <label htmlFor="field-cdc-cand" className="text-xs font-medium text-foreground">
                           CDC No. <span className="text-destructive">*</span>
                         </label>
-                        <span className="text-[11px] text-muted-foreground">Char. A to Z, Numbers</span>
+                        <span className="text-[10px] font-mono text-muted-foreground">Char A-Z, 0-9</span>
                       </div>
                       <Input
-                        id="field-cdc"
-                        placeholder="e.g. MUM 248910 or CHE 087221"
+                        id="field-cdc-cand"
+                        placeholder="e.g. MUM 248910"
                         value={cdcNo}
                         onChange={(e) => setCdcNo(sanitizeAlphanumeric(e.target.value))}
-                        className="h-9 font-mono text-xs uppercase tracking-wide"
+                        className="h-9 font-mono text-xs uppercase tracking-wide bg-background"
                         required
                       />
-                      <p className="text-[11px] text-muted-foreground">
-                        Continuous Discharge Certificate / Seaman’s Book Number.
+                      <p className="text-[10px] text-muted-foreground">
+                        Continuous Discharge Certificate
+                      </p>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between">
+                        <label htmlFor="field-cert-cand" className="text-xs font-medium text-foreground">
+                          Certificate No.
+                        </label>
+                        <span className="text-[10px] font-mono text-muted-foreground">Fitness Ref</span>
+                      </div>
+                      <Input
+                        id="field-cert-cand"
+                        placeholder="e.g. MC-2026-9041"
+                        value={certificateNo}
+                        onChange={(e) => setCertificateNo(sanitizeAlphanumeric(e.target.value))}
+                        className="h-9 font-mono text-xs uppercase tracking-wide bg-background"
+                      />
+                      <p className="text-[10px] text-muted-foreground">
+                        Official Medical Fitness Cert Ref
                       </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                  <span className="text-[11px] text-muted-foreground">
+                    Candidate info & credentials completed
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="gap-1.5 text-xs font-medium"
+                    onClick={() => setActiveTab("medical")}
+                  >
+                    Next: Medical & Timing
+                    <ArrowRight className="size-3.5" />
+                  </Button>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 3: Medical & Timing */}
+          {/* TAB 2: Medical & Timing */}
           {activeTab === "medical" && (
             <div className="space-y-4">
               <div className="rounded-lg border border-border/70 bg-card p-4">
@@ -685,11 +735,34 @@ export function PatientModal({
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5 text-xs"
+                    onClick={() => setActiveTab("candidate")}
+                  >
+                    <ArrowLeft className="size-3.5" />
+                    Back to Candidate Details
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    className="gap-1.5 text-xs font-medium"
+                    onClick={() => setActiveTab("payment")}
+                  >
+                    Next: Payment & Invoice
+                    <ArrowRight className="size-3.5" />
+                  </Button>
+                </div>
               </div>
             </div>
           )}
 
-          {/* TAB 4: Payment & Invoice */}
+          {/* TAB 3: Payment & Invoice */}
           {activeTab === "payment" && (
             <div className="space-y-4">
               <div className="rounded-lg border border-border/70 bg-card p-4">
@@ -756,7 +829,7 @@ export function PatientModal({
                   </div>
                 </div>
 
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <div className="mt-3 grid gap-3 sm:grid-cols-3">
                   <div className="space-y-1.5">
                     <label htmlFor="field-transid" className="text-xs font-medium text-foreground">
                       Trans. ID / Transaction Reference
@@ -812,6 +885,22 @@ export function PatientModal({
                       </p>
                     </div>
                   </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5 text-xs"
+                    onClick={() => setActiveTab("medical")}
+                  >
+                    <ArrowLeft className="size-3.5" />
+                    Back to Medical & Timing
+                  </Button>
+                  <span className="text-[11px] text-muted-foreground">
+                    All sections completed. Review and click Save Record below.
+                  </span>
                 </div>
               </div>
             </div>

@@ -4,6 +4,8 @@ import {
   initialStaffMembers,
   staffDepartments,
   staffStatuses,
+  convertNumberToWordsIndian,
+  initialSalarySlips,
 } from "@/lib/staff";
 
 describe("Staff Management Module validation", () => {

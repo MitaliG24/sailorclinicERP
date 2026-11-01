@@ -56,6 +56,7 @@ export interface FeedbackRecord {
   date: string;
   name: string;
   companyName?: string;
+  vessel?: string;
   rank?: string;
   passportOrCdcNo?: string;
   indosNo?: string;
@@ -82,6 +83,7 @@ export const createFeedbackSchema = z.object({
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   date: z.string().trim().min(1, "Date is required"),
   companyName: z.string().trim().max(100).optional().or(z.literal("")),
+  vessel: z.string().trim().max(100).optional().or(z.literal("")),
   rank: z.string().trim().max(50).optional().or(z.literal("")),
   passportOrCdcNo: z.string().trim().max(50).optional().or(z.literal("")),
   indosNo: z.string().trim().max(50).optional().or(z.literal("")),
@@ -111,6 +113,7 @@ export const initialFeedbackRecords: FeedbackRecord[] = [
     date: "2026-10-24",
     name: "Capt. Rajesh Nair",
     companyName: "Maersk Marine Services",
+    vessel: "MV Maersk Mc-Kinney",
     rank: "Master / Captain",
     passportOrCdcNo: "MUM 248910",
     indosNo: "02NL1844",
@@ -137,6 +140,7 @@ export const initialFeedbackRecords: FeedbackRecord[] = [
     date: "2026-10-25",
     name: "Pooja Sharma",
     companyName: "Synergy Maritime",
+    vessel: "MT Synergy Tide",
     rank: "2nd Officer",
     passportOrCdcNo: "CHE 192844",
     indosNo: "18NL7714",

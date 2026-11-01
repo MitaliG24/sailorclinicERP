@@ -16,6 +16,7 @@ export function exportGrievancesToExcel(
     "Date": r.date,
     "Candidate Name": r.name,
     "Company Name": r.companyName || "N/A",
+    "Vessel": r.vessel || "N/A",
     "Rank": r.rank || "N/A",
     "Passport or CDC No": r.passportOrCdcNo || "N/A",
     "Indos No": r.indosNo || "N/A",
@@ -48,6 +49,7 @@ export function exportGrievancesToExcel(
     { wch: 14 }, // Date
     { wch: 24 }, // Candidate Name
     { wch: 26 }, // Company Name
+    { wch: 24 }, // Vessel
     { wch: 20 }, // Rank
     { wch: 20 }, // Passport or CDC No
     { wch: 16 }, // Indos No
@@ -91,6 +93,7 @@ export function exportGrievancesToCSV(
     "Date",
     "Candidate Name",
     "Company Name",
+    "Vessel",
     "Rank",
     "Passport or CDC No",
     "Indos No",
@@ -117,6 +120,7 @@ export function exportGrievancesToCSV(
     `"${r.date}"`,
     `"${(r.name || "").replace(/"/g, '""')}"`,
     `"${(r.companyName || "").replace(/"/g, '""')}"`,
+    `"${(r.vessel || "").replace(/"/g, '""')}"`,
     `"${(r.rank || "").replace(/"/g, '""')}"`,
     `"${(r.passportOrCdcNo || "").replace(/"/g, '""')}"`,
     `"${(r.indosNo || "").replace(/"/g, '""')}"`,

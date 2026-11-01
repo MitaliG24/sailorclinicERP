@@ -163,9 +163,18 @@ export function InvoiceDocument({ invoice, onPrint, onClose }: InvoiceDocumentPr
                 {invoice.patient}
               </p>
               {invoice.rank && (
-                <Badge variant="secondary" className="text-[10px] font-medium">
-                  {invoice.rank}
-                </Badge>
+                <div className="flex flex-col items-end gap-1">
+                  <Badge variant="secondary" className="text-[10px] font-medium">
+                    {invoice.rank}
+                  </Badge>
+  
+                  {invoice.vessel && (
+                    <span className="text-[10px] text-primary flex items-center gap-1 font-semibold">
+                      <Ship className="size-3" /> {invoice.vessel}
+                    </span>
+                  )}
+                </div>
+
               )}
             </div>
 

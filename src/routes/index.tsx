@@ -358,6 +358,7 @@ function ClinicApp() {
             collapsed={!sidebarOpen}
             onSelect={openSection}
             patientCount={patients.length}
+            currentUser={currentUser}
           />
         </aside>
 
@@ -370,6 +371,7 @@ function ClinicApp() {
               collapsed={false}
               onSelect={openSection}
               patientCount={patients.length}
+              currentUser={currentUser}
             />
           </SheetContent>
         </Sheet>
@@ -409,7 +411,9 @@ function ClinicApp() {
               <span className="grid size-8 place-items-center rounded-md border border-border bg-muted text-primary">
                 <CalendarDays className="size-4" />
               </span>
-              <span className="text-sm font-medium">Wednesday, Oct 21</span>
+              <span className="text-sm font-medium">
+                {new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}
+              </span>
               <ChevronDown className="size-4 text-muted-foreground" />
             </div>
             <Link to="/feedback" target="_blank" className="hidden sm:inline-flex">
@@ -558,6 +562,7 @@ function ClinicApp() {
                   patients={patients}
                   invoices={invoices}
                   onNotice={setNotice}
+                  role={role}
                 />
               )}
               {section === "feedback" && <FeedbackAdminModule onNotice={setNotice} />}
@@ -661,12 +666,14 @@ function SidebarContent({
   collapsed,
   onSelect,
   patientCount,
+  currentUser,
 }: {
   role: ClinicRole;
   active: ClinicSection;
   collapsed: boolean;
   onSelect: (target: ClinicSection) => void;
   patientCount?: number;
+  currentUser?: UserProfileData;
 }) {
   const groups = getVisibleSections(role).reduce(
     (acc, item) => {
@@ -677,6 +684,16 @@ function SidebarContent({
   );
 
   const displayCount = patientCount ?? initialPatients.length;
+  const displayName = currentUser?.name || (role === "admin" ? "Mitali Gadge" : "Rachel Adams");
+  const displayInitials =
+    displayName
+      .trim()
+      .split(" ")
+      .filter(Boolean)
+      .map((p) => p[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || (role === "admin" ? "MG" : "RA");
 
   return (
     <div className="flex h-full flex-col">
@@ -738,15 +755,15 @@ function SidebarContent({
       <div className={`border-t border-sidebar-border p-3 ${collapsed ? "flex justify-center" : ""}`}>
         {collapsed ? (
           <Avatar className="size-9">
-            <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">{role === "admin" ? "MG" : "RA"}</AvatarFallback>
+            <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">{displayInitials}</AvatarFallback>
           </Avatar>
         ) : (
           <div className="flex items-center gap-2.5 rounded-md px-2 py-2">
             <Avatar className="size-9">
-              <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">{role === "admin" ? "MG" : "RA"}</AvatarFallback>
+              <AvatarFallback className="bg-secondary text-xs font-semibold text-secondary-foreground">{displayInitials}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-xs font-semibold">{role === "admin" ? "Mitali Gadge" : "Rachel Adams"}</div>
+              <div className="truncate text-xs font-semibold">{displayName}</div>
               <div className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                 <ShieldCheck className="size-3" />
                 {role === "admin" ? "Administrator" : "Staff member"}
@@ -1197,7 +1214,7 @@ function PatientRecords({
   const filtered = useMemo(
     () =>
       patients.filter((patient) =>
-        `${patient.name} ${patient.id} ${patient.rank || ""} ${patient.companyName || ""} ${patient.certificateNo || ""} ${patient.indosNo || ""} ${patient.cdcNo || ""} ${patient.typeOfMedical || ""} ${patient.paymentStatus || ""} ${patient.condition || ""}`
+        `${patient.name} ${patient.id} ${patient.rank || ""} ${patient.companyName || ""} ${patient.vesselName || patient.vessel || ""} ${patient.certificateNo || ""} ${patient.indosNo || ""} ${patient.cdcNo || ""} ${patient.typeOfMedical || ""} ${patient.paymentStatus || ""} ${patient.condition || ""}`
           .toLowerCase()
           .includes(search.toLowerCase()),
       ),
@@ -1276,7 +1293,7 @@ function PatientRecords({
             <div>
               <h3 className="text-sm font-semibold text-foreground">Examine & Register New Marine Candidate</h3>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Opens complete popup form: Sr. No, Date, Contact, Rank, Medical Type, USG/X-Ray, Company, Payment (Paid/Own, Amt, Proof, Mode), Time In/Out, Cert, INDoS & CDC.
+                Opens complete popup form: Candidate Details (with Rank, Company, Vessel Name, INDoS & CDC Credentials), Medical & Timing, Payment & Invoice.
               </p>
             </div>
           </div>
@@ -1345,7 +1362,9 @@ function PatientTable({
                 </TableCell>
                 <TableCell>
                   <div className="text-xs font-medium text-foreground">{patient.rank}</div>
-                  <div className="text-[11px] text-muted-foreground truncate max-w-[150px]">{patient.companyName}</div>
+                  <div className="text-[11px] text-muted-foreground truncate max-w-[150px]">
+                    {patient.companyName}{(patient.vesselName || patient.vessel) ? ` · ${patient.vesselName || patient.vessel}` : ""}
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-1.5">
@@ -1471,6 +1490,14 @@ function PatientTable({
               {/* 4. Company & Medical Type */}
               <TableCell>
                 <div className="text-xs font-semibold text-foreground truncate max-w-[170px]" title={patient.companyName}>
+                  {patient.companyName}
+                </div>
+                {(patient.vesselName || patient.vessel) && (
+                  <div className="text-[10px] text-primary flex items-center gap-1 font-medium truncate max-w-[170px]" title={patient.vesselName || patient.vessel}>
+                    <Ship className="size-3" /> {patient.vesselName || patient.vessel}
+                  </div>
+                )}
+                <div className="hidden">
                   {patient.companyName}
                 </div>
                 <div className="text-[11px] text-muted-foreground truncate max-w-[170px]" title={patient.typeOfMedical}>
@@ -1640,6 +1667,20 @@ function SettingsView({
       return;
     }
     setIsSaving(true);
+    const updated: UserProfileData = {
+      ...currentUser,
+      name: name.trim(),
+      phone: phone.trim(),
+      designation: designation.trim(),
+      regNo: regNo.trim(),
+      department: department.trim(),
+    };
+
+    try {
+      localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(updated));
+    } catch {}
+    onUpdateUser(updated);
+
     try {
       const response = await fetch("/api/auth/profile", {
         method: "POST",
@@ -1653,24 +1694,19 @@ function SettingsView({
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to save administrator profile.");
+      if (response.ok) {
+        const data = (await response.json()) as { success: boolean; user: UserProfileData };
+        if (data.user) {
+          const merged: UserProfileData = { ...updated, ...data.user };
+          try {
+            localStorage.setItem("marine_clinic_admin_profile", JSON.stringify(merged));
+          } catch {}
+          onUpdateUser(merged);
+        }
       }
-
-      const data = (await response.json()) as { success: boolean; user: UserProfileData };
-      const updated: UserProfileData = {
-        ...currentUser,
-        name: name.trim(),
-        phone: phone.trim(),
-        designation: designation.trim(),
-        regNo: regNo.trim(),
-        department: department.trim(),
-        ...data.user,
-      };
-      onUpdateUser(updated);
-      onNotice("Admin profile credentials saved to MongoDB Atlas.");
+      onNotice(`Admin profile updated for ${updated.name}.`);
     } catch {
-      onNotice("Failed to save admin profile to database.");
+      onNotice(`Admin name updated to ${updated.name} (saved in clinic workspace).`);
     } finally {
       setIsSaving(false);
     }

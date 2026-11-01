@@ -49,6 +49,7 @@ export function SailorFeedbackFormPage() {
   const [name, setName] = useState("");
   const [date, setDate] = useState(todayStr);
   const [companyName, setCompanyName] = useState("");
+  const [vessel, setVessel] = useState("");
   const [rank, setRank] = useState("");
   const [passportOrCdcNo, setPassportOrCdcNo] = useState("");
   const [indosNo, setIndosNo] = useState("");
@@ -97,6 +98,7 @@ export function SailorFeedbackFormPage() {
         name: name.trim(),
         date,
         companyName: companyName.trim(),
+        vessel: vessel.trim(),
         rank: rank.trim(),
         passportOrCdcNo: passportOrCdcNo.trim(),
         indosNo: indosNo.trim(),
@@ -166,6 +168,7 @@ export function SailorFeedbackFormPage() {
     setName("");
     setDate(todayStr);
     setCompanyName("");
+    setVessel("");
     setRank("");
     setPassportOrCdcNo("");
     setIndosNo("");
@@ -235,6 +238,12 @@ export function SailorFeedbackFormPage() {
                 <span>Candidate Name</span>
                 <span className="font-semibold text-foreground">{submittedRecord.name}</span>
               </div>
+              {submittedRecord.vessel && (
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span>Vessel</span>
+                  <span className="font-semibold text-foreground">{submittedRecord.vessel}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between pt-0.5">
                 <span>Date Recorded</span>
                 <span className="text-foreground">{submittedRecord.date}</span>
@@ -429,21 +438,38 @@ export function SailorFeedbackFormPage() {
                   </div>
                 </div>
 
-                {/* Row 2: Company Name */}
-                <div className="flex items-center gap-2">
-                  <label
-                    htmlFor="cand-company"
-                    className="whitespace-nowrap font-bold text-slate-900 dark:text-slate-100"
-                  >
-                    Company Name
-                  </label>
-                  <input
-                    id="cand-company"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    placeholder="Shipping Company / Manning Agency"
-                    className="w-full border-b border-slate-500 bg-transparent px-2 py-1 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-600 dark:text-slate-100"
-                  />
+                {/* Row 2: Company Name and Vessel */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-12 sm:items-center">
+                  <div className="flex items-center gap-2 sm:col-span-7">
+                    <label
+                      htmlFor="cand-company"
+                      className="whitespace-nowrap font-bold text-slate-900 dark:text-slate-100"
+                    >
+                      Company Name :
+                    </label>
+                    <input
+                      id="cand-company"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder="Shipping Company / Manning Agency"
+                      className="w-full border-b border-slate-500 bg-transparent px-2 py-1 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-600 dark:text-slate-100"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2 sm:col-span-5">
+                    <label
+                      htmlFor="cand-vessel"
+                      className="whitespace-nowrap font-bold text-slate-900 dark:text-slate-100"
+                    >
+                      Vessel :
+                    </label>
+                    <input
+                      id="cand-vessel"
+                      value={vessel}
+                      onChange={(e) => setVessel(e.target.value)}
+                      placeholder="e.g. MV Maersk Mc-Kinney"
+                      className="w-full border-b border-slate-500 bg-transparent px-2 py-1 text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:border-blue-600 focus:outline-none dark:border-slate-600 dark:text-slate-100"
+                    />
+                  </div>
                 </div>
 
                 {/* Row 3: Rank, Passport or CDC No, Indos No */}

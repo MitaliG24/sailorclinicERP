@@ -12,6 +12,7 @@ describe("Sailor's Medical Clinic feedback validation", () => {
       name: "Capt. Rajesh Nair",
       date: "2026-10-27",
       companyName: "Maersk Marine Services",
+      vessel: "MV Maersk Mc-Kinney",
       rank: "Master / Captain",
       passportOrCdcNo: "MUM 248910",
       indosNo: "02NL1844",
@@ -33,6 +34,7 @@ describe("Sailor's Medical Clinic feedback validation", () => {
     expect(parsed.success).toBe(true);
     if (parsed.success) {
       expect(parsed.data.name).toBe("Capt. Rajesh Nair");
+      expect(parsed.data.vessel).toBe("MV Maersk Mc-Kinney");
       expect(parsed.data.timeTakenAtReception).toBe("Good");
       expect(parsed.data.hygieneCleanlinessClinics).toBe("Excellent");
     }

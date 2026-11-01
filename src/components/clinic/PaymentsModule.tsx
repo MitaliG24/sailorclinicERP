@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 import {
+  AlertTriangle,
   CheckCircle2,
   Clock3,
   CreditCard,
   Plus,
   Search,
+  Trash2,
   WalletCards,
   type LucideIcon,
 } from "lucide-react";
@@ -20,23 +22,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatINR, type InvoiceRecord, type PatientRecord } from "@/lib/clinic";
+import { formatINR, type ClinicRole, type InvoiceRecord, type PatientRecord } from "@/lib/clinic";
 import { paymentMethods, type PaymentRecord } from "@/lib/payments";
-import { listPayments, recordPayment } from "@/lib/payments.server";
+import { deletePayment, listPayments, recordPayment } from "@/lib/payments.server";
 
 interface PaymentsModuleProps {
   patients: PatientRecord[];
   invoices: InvoiceRecord[];
   onNotice: (message: string) => void;
+  role?: ClinicRole | null;
 }
 
 const fieldClassName =
   "h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
-export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleProps) {
+export function PaymentsModule({ patients, invoices, onNotice, role }: PaymentsModuleProps) {
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [paymentToDelete, setPaymentToDelete] = useState<PaymentRecord | null>(null);
   const [loadError, setLoadError] = useState("");
   const [formError, setFormError] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -47,6 +52,8 @@ export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleP
   const [method, setMethod] = useState<(typeof paymentMethods)[number]>("UPI");
   const [amount, setAmount] = useState("");
   const [reference, setReference] = useState("");
+
+  const canDelete = role === "admin" || !role;
 
   const loadPayments = useCallback(async () => {
     setIsLoading(true);
@@ -134,6 +141,23 @@ export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleP
     }
   }
 
+  async function handleConfirmDelete() {
+    if (!paymentToDelete) return;
+    setIsDeleting(true);
+    const target = paymentToDelete;
+    try {
+      setPayments((current) => current.filter((p) => p.id !== target.id));
+      setPaymentToDelete(null);
+      await deletePayment({ data: { id: target.id } });
+      onNotice(`Payment ${target.id} (${formatINR(target.amount)}) removed from clinic records.`);
+    } catch (err) {
+      console.error("Failed to delete payment:", err);
+      onNotice(`Payment ${target.id} removed locally.`);
+    } finally {
+      setIsDeleting(false);
+    }
+  }
+
   function handleDialogChange(open: boolean) {
     setDialogOpen(open);
     if (!open) resetForm();
@@ -215,12 +239,13 @@ export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleP
                 <TableHead>Date</TableHead>
                 <TableHead>Amount</TableHead>
                 <TableHead>Status</TableHead>
+                {canDelete && <TableHead className="pr-5 text-right">Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={canDelete ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">
                     Loading payments...
                   </TableCell>
                 </TableRow>
@@ -253,11 +278,25 @@ export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleP
                         {payment.status}
                       </span>
                     </TableCell>
+                    {canDelete && (
+                      <TableCell className="pr-5 text-right whitespace-nowrap">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                          title="Delete payment record"
+                          aria-label={`Delete payment ${payment.id}`}
+                          onClick={() => setPaymentToDelete(payment)}
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-24 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={canDelete ? 7 : 6} className="h-24 text-center text-sm text-muted-foreground">
                     {payments.length
                       ? "No payments match this search."
                       : "No payments have been recorded yet."}
@@ -374,6 +413,75 @@ export function PaymentsModule({ patients, invoices, onNotice }: PaymentsModuleP
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Payment Confirmation Dialog */}
+      <Dialog open={!!paymentToDelete} onOpenChange={(open) => !open && setPaymentToDelete(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-2.5 text-destructive">
+              <span className="grid size-9 place-items-center rounded-lg bg-destructive/10 text-destructive">
+                <AlertTriangle className="size-5" />
+              </span>
+              <div>
+                <DialogTitle className="text-base font-semibold">Delete Payment Record</DialogTitle>
+                <DialogDescription className="text-xs">
+                  This transaction will be permanently removed from clinic records and MongoDB Atlas.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          {paymentToDelete && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3.5 text-xs space-y-1.5">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Transaction ID:</span>
+                <span className="font-mono font-semibold">{paymentToDelete.id}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Patient:</span>
+                <span className="font-semibold">{paymentToDelete.patientName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Amount:</span>
+                <span className="font-semibold text-foreground">{formatINR(paymentToDelete.amount)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Method:</span>
+                <span>{paymentToDelete.method}</span>
+              </div>
+              {paymentToDelete.invoiceId && (
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Linked Invoice:</span>
+                  <span className="font-mono">{paymentToDelete.invoiceId}</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          <DialogFooter className="gap-2 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPaymentToDelete(null)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="gap-1.5"
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+            >
+              <Trash2 className="size-3.5" />
+              {isDeleting ? "Deleting..." : "Delete Payment"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

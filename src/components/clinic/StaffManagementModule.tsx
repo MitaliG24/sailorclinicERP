@@ -30,6 +30,8 @@ import {
   Mail,
   MapPin,
   HeartPulse,
+  ReceiptText,
+  Send,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -71,6 +73,7 @@ import {
   type DocumentType,
 } from "@/lib/staff";
 import { formatINR } from "@/lib/clinic";
+import { SalarySlipModal } from "@/components/clinic/SalarySlipModal";
 
 interface StaffManagementModuleProps {
   onNotice: (msg: string) => void;
@@ -108,6 +111,10 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
   // Document Viewer State
   const [docViewerOpen, setDocViewerOpen] = useState(false);
   const [viewingDoc, setViewingDoc] = useState<StaffDocument | null>(null);
+
+  // Salary Slip Modal
+  const [salarySlipModalOpen, setSalarySlipModalOpen] = useState(false);
+  const [selectedStaffForSlip, setSelectedStaffForSlip] = useState<StaffMember | null>(null);
 
   // Document File Upload State
   const [newDocFileData, setNewDocFileData] = useState("");
@@ -510,6 +517,19 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
             <Button
               variant="outline"
               size="sm"
+              onClick={() => {
+                setSelectedStaffForSlip(null);
+                setSalarySlipModalOpen(true);
+              }}
+              className="gap-1.5 text-xs h-9 border-emerald-600/40 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+              title="Generate, download or send monthwise salary slips"
+            >
+              <ReceiptText className="size-3.5 text-emerald-600" />
+              Salary Slips / Payroll
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => exportStaffToExcel(filteredStaff)}
               className="gap-1.5 text-xs h-9 border-emerald-600/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
               title="Download Staff Directory as Excel spreadsheet"
@@ -723,6 +743,19 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
                         </Button>
                         <Button
                           size="sm"
+                          variant="outline"
+                          className="h-8 px-2 text-xs gap-1 border-emerald-600/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+                          onClick={() => {
+                            setSelectedStaffForSlip(staff);
+                            setSalarySlipModalOpen(true);
+                          }}
+                          title="Generate, download or send salary slip for this employee"
+                        >
+                          <ReceiptText className="size-3.5" />
+                          Salary Slip
+                        </Button>
+                        <Button
+                          size="sm"
                           variant="ghost"
                           className="size-8 p-0 text-muted-foreground hover:text-foreground"
                           onClick={() => handleOpenEdit(staff)}
@@ -909,6 +942,22 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
                     <span className="text-muted-foreground block text-[11px]">PAN Card Number:</span>
                     <span className="font-semibold font-mono">{selectedStaff.panNo || "—"}</span>
                   </div>
+                </div>
+
+                <div className="mt-2.5">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="w-full gap-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow-xs"
+                    onClick={() => {
+                      setSelectedStaffForSlip(selectedStaff);
+                      setViewModalOpen(false);
+                      setSalarySlipModalOpen(true);
+                    }}
+                  >
+                    <ReceiptText className="size-3.5" />
+                    Generate & Download Salary Slip ({selectedStaff.name})
+                  </Button>
                 </div>
               </div>
 
@@ -1674,6 +1723,15 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Salary Slip Modal */}
+      <SalarySlipModal
+        open={salarySlipModalOpen}
+        onOpenChange={setSalarySlipModalOpen}
+        staffList={staffList}
+        selectedStaffForSlip={selectedStaffForSlip}
+        onNotice={onNotice}
+      />
     </div>
   );
 }

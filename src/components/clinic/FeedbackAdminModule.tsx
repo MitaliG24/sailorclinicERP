@@ -106,7 +106,7 @@ export function FeedbackAdminModule({ onNotice }: FeedbackAdminModuleProps) {
     return records.filter((r) => {
       const matchesSearch =
         !q ||
-        `${r.id} ${r.name} ${r.companyName || ""} ${r.rank || ""} ${r.passportOrCdcNo || ""} ${r.indosNo || ""} ${r.mobileNo} ${r.email || ""} ${r.suggestionsComments || ""}`
+        `${r.id} ${r.name} ${r.companyName || ""} ${r.vessel || ""} ${r.rank || ""} ${r.passportOrCdcNo || ""} ${r.indosNo || ""} ${r.mobileNo} ${r.email || ""} ${r.suggestionsComments || ""}`
           .toLowerCase()
           .includes(q);
 
@@ -385,7 +385,12 @@ export function FeedbackAdminModule({ onNotice }: FeedbackAdminModuleProps) {
                       </div>
                     </TableCell>
                     <TableCell className="text-xs font-medium">
-                      {r.companyName || "Private Candidate"}
+                      <div>{r.companyName || "Private Candidate"}</div>
+                      {r.vessel && (
+                        <div className="text-[10px] text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Ship className="size-3" /> {r.vessel}
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="hidden text-xs text-muted-foreground md:table-cell font-mono">
                       <div>CDC: {r.passportOrCdcNo || "N/A"}</div>
@@ -484,6 +489,12 @@ export function FeedbackAdminModule({ onNotice }: FeedbackAdminModuleProps) {
                   <span className="text-muted-foreground">Company Name:</span>
                   <div className="font-semibold text-foreground">
                     {selectedRecord.companyName || "N/A"}
+                  </div>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Vessel:</span>
+                  <div className="font-semibold text-foreground">
+                    {selectedRecord.vessel || "N/A"}
                   </div>
                 </div>
                 <div>

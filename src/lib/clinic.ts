@@ -51,6 +51,8 @@ export type PatientRecord = {
   phone: string;
   email: string;
   rank: string;
+  vessel?: string | undefined;
+  vesselName?: string | undefined;
   typeOfMedical: string;
   usgXray: string;
   companyName: string;
@@ -85,6 +87,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 98201 44821",
     email: "amara.j@seafarer.demo",
     rank: "Chief Officer",
+    vessel: "MV Maersk Mc-Kinney",
+    vesselName: "MV Maersk Mc-Kinney",
     typeOfMedical: "Annual Seafarer Medical",
     usgXray: "USG & Chest X-Ray Normal",
     companyName: "Maersk Marine Services",
@@ -117,6 +121,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 98402 11963",
     email: "noah.w@seafarer.demo",
     rank: "Captain / Master",
+    vessel: "MT Synergy Tide",
+    vesselName: "MT Synergy Tide",
     typeOfMedical: "Flag State Medical",
     usgXray: "Chest X-Ray Done",
     companyName: "Synergy Maritime",
@@ -149,6 +155,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 97115 90113",
     email: "sofia.p@seafarer.demo",
     rank: "2nd Officer",
+    vessel: "MV Pacific Pioneer",
+    vesselName: "MV Pacific Pioneer",
     typeOfMedical: "Pre-Sea Examination",
     usgXray: "USG & X-Ray Normal",
     companyName: "Fleet Management Ltd",
@@ -181,6 +189,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 98334 50177",
     email: "ethan.c@seafarer.demo",
     rank: "Chief Engineer",
+    vessel: "MV Eastern Glory",
+    vesselName: "MV Eastern Glory",
     typeOfMedical: "Periodic Maritime Medical",
     usgXray: "Pending USG",
     companyName: "Anglo-Eastern Shipping",
@@ -213,6 +223,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 98210 50144",
     email: "olivia.m@seafarer.demo",
     rank: "Deck Cadet",
+    vessel: "MSC Oscar",
+    vesselName: "MSC Oscar",
     typeOfMedical: "Pre-Sea Examination",
     usgXray: "USG & X-Ray Normal",
     companyName: "MSC Mediterranean",
@@ -245,6 +257,8 @@ export const initialPatients: PatientRecord[] = [
     phone: "+91 98401 55182",
     email: "liam.t@seafarer.demo",
     rank: "Bosun",
+    vessel: "MT Nordic Voyager",
+    vesselName: "MT Nordic Voyager",
     typeOfMedical: "Periodic Maritime Medical",
     usgXray: "Chest X-Ray Normal",
     companyName: "Teekay Tankers",
@@ -283,6 +297,7 @@ export type InvoiceRecord = {
   patient: string;
   patientId?: string;
   rank?: string;
+  vessel?: string;
   indosNo?: string;
   cdcNo?: string;
   certificateNo?: string;
@@ -389,6 +404,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Amara Johnson",
     patientId: "PT-2408",
     rank: "Chief Officer",
+    vessel: "MV Maersk Mc-Kinney",
     indosNo: "12NL8492",
     cdcNo: "MUM 248910",
     certificateNo: "MC-2026-9041",
@@ -418,6 +434,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Noah Williams",
     patientId: "PT-2407",
     rank: "Captain / Master",
+    vessel: "MT Synergy Tide",
     indosNo: "05NL3190",
     cdcNo: "CHE 192844",
     certificateNo: "MC-2026-9040",
@@ -447,6 +464,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Sofia Patel",
     patientId: "PT-2406",
     rank: "2nd Officer",
+    vessel: "MV Pacific Pioneer",
     indosNo: "18NL7714",
     cdcNo: "KOL 309112",
     certificateNo: "MC-2026-9039",
@@ -476,6 +494,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Ethan Chen",
     patientId: "PT-2405",
     rank: "Chief Engineer",
+    vessel: "MV Eastern Glory",
     indosNo: "11NL4562",
     cdcNo: "GOA 154890",
     certificateNo: "MC-2026-9038",
@@ -504,6 +523,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Olivia Martinez",
     patientId: "PT-2404",
     rank: "Deck Cadet",
+    vessel: "MSC Oscar",
     indosNo: "24NL9012",
     cdcNo: "MUM 398110",
     certificateNo: "MC-2026-9037",
@@ -531,6 +551,7 @@ export const invoiceRecords: InvoiceRecord[] = [
     patient: "Liam Thompson",
     patientId: "PT-2403",
     rank: "Bosun",
+    vessel: "MT Nordic Voyager",
     indosNo: "98NL0123",
     cdcNo: "CHE 087221",
     certificateNo: "MC-2026-9036",

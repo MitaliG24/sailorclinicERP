@@ -63,6 +63,7 @@ export function CreateInvoiceModal({
   );
   const [candidateName, setCandidateName] = useState<string>("");
   const [rank, setRank] = useState<string>("Chief Officer");
+  const [vessel, setVessel] = useState<string>("");
   const [indosNo, setIndosNo] = useState<string>("");
   const [cdcNo, setCdcNo] = useState<string>("");
   const [certificateNo, setCertificateNo] = useState<string>("");
@@ -108,6 +109,7 @@ export function CreateInvoiceModal({
     if (found) {
       setCandidateName(found.name);
       setRank(found.rank || "Seafarer");
+      setVessel(found.vesselName || found.vessel || "");
       setIndosNo(found.indosNo || "");
       setCdcNo(found.cdcNo || "");
       setCertificateNo(found.certificateNo || "");
@@ -176,6 +178,7 @@ export function CreateInvoiceModal({
       patient: candidateName.trim(),
       patientId: selectedPatientId || undefined,
       rank,
+      vessel: vessel.trim() || undefined,
       indosNo: indosNo.toUpperCase().trim(),
       cdcNo: cdcNo.toUpperCase().trim(),
       certificateNo: certificateNo.toUpperCase().trim(),
@@ -267,7 +270,7 @@ export function CreateInvoiceModal({
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-3 pt-1">
+            <div className="grid gap-3 sm:grid-cols-4 pt-1">
               <div className="space-y-1.5">
                 <label className="font-medium text-foreground">
                   Candidate Name <span className="text-destructive">*</span>
@@ -287,6 +290,16 @@ export function CreateInvoiceModal({
                   placeholder="e.g. Chief Officer"
                   value={rank}
                   onChange={(e) => setRank(e.target.value)}
+                  className="h-9 text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="font-medium text-foreground">Vessel Name</label>
+                <Input
+                  placeholder="e.g. MV Maersk Mc-Kinney"
+                  value={vessel}
+                  onChange={(e) => setVessel(e.target.value)}
                   className="h-9 text-xs"
                 />
               </div>

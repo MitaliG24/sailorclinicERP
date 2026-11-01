@@ -129,6 +129,42 @@ export const recordPayment = createServerFn({ method: "POST" })
     }
   });
 
+export const deletePayment = createServerFn({ method: "POST" })
+  .validator((input: unknown): { id: string } => {
+    if (typeof input === "object" && input !== null && "id" in input && typeof (input as { id: unknown }).id === "string") {
+      return { id: (input as { id: string }).id };
+    }
+    throw new Error("Invalid payment ID.");
+  })
+  .handler(async ({ data }): Promise<{ success: boolean; message?: string }> => {
+    try {
+      const db = await getDatabase();
+      const existing = await db.collection("payments").findOne({ id: data.id });
+      await db.collection("payments").deleteOne({ id: data.id });
+
+      try {
+        await db.collection("activity_logs").insertOne({
+          user: "Clinic Admin",
+          action: "Deleted payment record",
+          subject: `${data.id}${existing?.amount ? ` · ₹${Number(existing.amount).toLocaleString("en-IN")}` : ""}`,
+          time: "Just now",
+          kind: "Payments",
+          timestamp: new Date().toISOString(),
+        });
+      } catch (actErr) {
+        console.warn("Could not log payment deletion in MongoDB:", actErr);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Failed to delete payment from MongoDB:", error);
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to delete payment.",
+      };
+    }
+  });
+
 function getPaymentSaveErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "";
   const code = (error as { code?: number } | null)?.code;

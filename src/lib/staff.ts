@@ -138,6 +138,100 @@ export const staffMemberSchema = z.object({
 
 export type StaffMemberInput = z.infer<typeof staffMemberSchema>;
 
+export interface SalarySlip {
+  id: string; // e.g. "SLIP-2026-09-001"
+  employeeId: string;
+  employeeName: string;
+  designation: string;
+  payPeriod: string; // e.g. "SEP 2026"
+  payDate: string; // e.g. "05-10-2026"
+  month: string; // e.g. "SEP"
+  year: number; // e.g. 2026
+
+  // Earnings
+  grossSalary: number;
+  travellingAllowance: number;
+  grossEarnings: number;
+
+  // Deductions
+  totalLeaves: string; // e.g. "2 DAY & HALF DAY"
+  deductionAmount: number;
+  totalDeductions: number;
+
+  // Net Payable
+  netPay: number;
+  amountInWords: string;
+  formulaNote?: string;
+
+  employeePhone?: string;
+  employeeEmail?: string;
+  createdAt: string;
+}
+
+export function convertNumberToWordsIndian(num: number): string {
+  if (!num || isNaN(num) || num <= 0) return "ZERO RUPEES ONLY";
+
+  const single = [
+    "",
+    "ONE",
+    "TWO",
+    "THREE",
+    "FOUR",
+    "FIVE",
+    "SIX",
+    "SEVEN",
+    "EIGHT",
+    "NINE",
+    "TEN",
+    "ELEVEN",
+    "TWELVE",
+    "THIRTEEN",
+    "FOURTEEN",
+    "FIFTEEN",
+    "SIXTEEN",
+    "SEVENTEEN",
+    "EIGHTEEN",
+    "NINETEEN",
+  ];
+  const tens = [
+    "",
+    "",
+    "TWENTY",
+    "THIRTY",
+    "FORTY",
+    "FIFTY",
+    "SIXTY",
+    "SEVENTY",
+    "EIGHTY",
+    "NINETY",
+  ];
+
+  const numToWords = (n: number): string => {
+    if (n === 0) return "";
+    if (n < 20) return single[n] + " ";
+    if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + single[n % 10] : "") + " ";
+    return single[Math.floor(n / 100)] + " HUNDRED " + (n % 100 !== 0 ? numToWords(n % 100) : "");
+  };
+
+  let n = Math.floor(num);
+  let str = "";
+
+  const crore = Math.floor(n / 10000000);
+  n %= 10000000;
+  const lakh = Math.floor(n / 100000);
+  n %= 100000;
+  const thousand = Math.floor(n / 1000);
+  n %= 1000;
+  const remainder = n;
+
+  if (crore > 0) str += numToWords(crore) + "CRORE ";
+  if (lakh > 0) str += numToWords(lakh) + "LAKH ";
+  if (thousand > 0) str += numToWords(thousand) + "THOUSAND ";
+  if (remainder > 0) str += numToWords(remainder);
+
+  return str.trim().replace(/\s+/g, " ") + " RUPEES ONLY";
+}
+
 export const initialStaffMembers: StaffMember[] = [
   {
     id: "SMC-EMP-001",
@@ -466,5 +560,135 @@ export const initialStaffMembers: StaffMember[] = [
         verificationStatus: "Verified",
       },
     ],
+  },
+  {
+    id: "SMC-EMP-008",
+    name: "Yukta Jadhav",
+    initials: "YJ",
+    gender: "Female",
+    dob: "1998-06-15",
+    phone: "+91 98205 61402",
+    email: "yukta.j@sailorsmedical.com",
+    address: "Sector 11, CBD Belapur, Navi Mumbai 400614",
+    emergencyContactName: "Sanjay Jadhav (Father)",
+    emergencyContactPhone: "+91 98205 61410",
+    role: "Lab Technician",
+    department: "Pathology & Laboratory",
+    employmentType: "Full-time",
+    status: "Active / On duty",
+    joiningDate: "2024-01-10",
+    schedule: "Mon – Sat, 8:30 AM – 4:30 PM",
+    basicSalary: 17000,
+    allowances: 350,
+    deductions: 1416,
+    netSalary: 15934,
+    payFrequency: "Monthly",
+    panNo: "JDHYP4910L",
+    bankName: "HDFC Bank (CBD Belapur)",
+    bankAccountNo: "•••• •••• 5591",
+    ifscCode: "HDFC0000492",
+    notes: "Lead pathology diagnostic technician, blood sampling & DG shipping medical reports.",
+    createdAt: "2024-01-10T00:00:00.000Z",
+    documents: [
+      {
+        id: "DOC-014",
+        name: "Diploma in Medical Laboratory Technology (DMLT)",
+        type: "Educational Degree / Qualification",
+        documentNo: "DMLT-MUM-2019-441",
+        issuedDate: "2019-07-20",
+        verificationStatus: "Verified",
+      },
+    ],
+  },
+];
+
+export const initialSalarySlips: SalarySlip[] = [
+  {
+    id: "SLIP-2026-09-001",
+    employeeId: "SMC-EMP-008",
+    employeeName: "YUKTA JADHAV",
+    designation: "LAB TECHNICIAN",
+    payPeriod: "SEP 2026",
+    payDate: "05-10-2026",
+    month: "SEP",
+    year: 2026,
+    grossSalary: 17000,
+    travellingAllowance: 350,
+    grossEarnings: 17350,
+    totalLeaves: "2 DAY & HALF DAY",
+    deductionAmount: 1416,
+    totalDeductions: 1416,
+    netPay: 15934,
+    amountInWords: "FIFTEEN THOUSAND NINE HUNDRED THIRTYFOUR RUPEES ONLY",
+    formulaNote: "**Total Net Payable = Gross Earnings+ T.A.- Total Deductions",
+    employeePhone: "+91 98205 61402",
+    employeeEmail: "yukta.j@sailorsmedical.com",
+    createdAt: "2026-10-05T10:00:00.000Z",
+  },
+  {
+    id: "SLIP-2026-09-002",
+    employeeId: "SMC-EMP-001",
+    employeeName: "DR. MAYA BENNETT",
+    designation: "MEDICAL DIRECTOR & DG EXAMINER",
+    payPeriod: "SEP 2026",
+    payDate: "05-10-2026",
+    month: "SEP",
+    year: 2026,
+    grossSalary: 180000,
+    travellingAllowance: 5000,
+    grossEarnings: 185000,
+    totalLeaves: "1 DAY",
+    deductionAmount: 6000,
+    totalDeductions: 6000,
+    netPay: 179000,
+    amountInWords: "ONE LAKH SEVENTY NINE THOUSAND RUPEES ONLY",
+    formulaNote: "**Total Net Payable = Gross Earnings+ T.A.- Total Deductions",
+    employeePhone: "+91 98201 44910",
+    employeeEmail: "dr.maya@sailorsmedical.com",
+    createdAt: "2026-10-05T10:00:00.000Z",
+  },
+  {
+    id: "SLIP-2026-09-003",
+    employeeId: "SMC-EMP-006",
+    employeeName: "SANJAY VERMA",
+    designation: "ECG & AUDIOMETRY TECHNICIAN",
+    payPeriod: "SEP 2026",
+    payDate: "05-10-2026",
+    month: "SEP",
+    year: 2026,
+    grossSalary: 35000,
+    travellingAllowance: 1200,
+    grossEarnings: 36200,
+    totalLeaves: "NONE",
+    deductionAmount: 0,
+    totalDeductions: 0,
+    netPay: 36200,
+    amountInWords: "THIRTY SIX THOUSAND TWO HUNDRED RUPEES ONLY",
+    formulaNote: "**Total Net Payable = Gross Earnings+ T.A.- Total Deductions",
+    employeePhone: "+91 98209 11844",
+    employeeEmail: "sanjay.v@sailorsmedical.com",
+    createdAt: "2026-10-05T10:00:00.000Z",
+  },
+  {
+    id: "SLIP-2026-08-001",
+    employeeId: "SMC-EMP-008",
+    employeeName: "YUKTA JADHAV",
+    designation: "LAB TECHNICIAN",
+    payPeriod: "AUG 2026",
+    payDate: "05-09-2026",
+    month: "AUG",
+    year: 2026,
+    grossSalary: 17000,
+    travellingAllowance: 350,
+    grossEarnings: 17350,
+    totalLeaves: "1 DAY",
+    deductionAmount: 566,
+    totalDeductions: 566,
+    netPay: 16784,
+    amountInWords: "SIXTEEN THOUSAND SEVEN HUNDRED EIGHTY FOUR RUPEES ONLY",
+    formulaNote: "**Total Net Payable = Gross Earnings+ T.A.- Total Deductions",
+    employeePhone: "+91 98205 61402",
+    employeeEmail: "yukta.j@sailorsmedical.com",
+    createdAt: "2026-09-05T10:00:00.000Z",
   },
 ];

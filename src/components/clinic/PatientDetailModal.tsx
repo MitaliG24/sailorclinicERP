@@ -73,6 +73,15 @@ export function PatientDetailModal({
                   <span className="font-medium text-foreground">{patient.rank}</span>
                   <span>·</span>
                   <span>{patient.companyName}</span>
+                  {(patient.vesselName || patient.vessel) && (
+                    <>
+                      <span>·</span>
+                      <span className="flex items-center gap-1 font-medium text-primary">
+                        <Ship className="size-3" />
+                        {patient.vesselName || patient.vessel}
+                      </span>
+                    </>
+                  )}
                 </DialogDescription>
               </div>
             </div>
@@ -124,7 +133,7 @@ export function PatientDetailModal({
             <div className="mb-2 flex items-center justify-between">
               <div className="flex items-center gap-1.5 font-semibold text-primary">
                 <FileBadge className="size-4" />
-                Seafarer Official Credentials
+                Candidate Maritime Credentials
               </div>
               <Badge variant="outline" className="bg-background text-[10px]">
                 Char A-Z, 0-9
@@ -186,6 +195,12 @@ export function PatientDetailModal({
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Company Name:</span>
                   <span className="font-medium text-foreground">{patient.companyName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Vessel Name:</span>
+                  <span className="font-semibold text-foreground flex items-center gap-1">
+                    <Ship className="size-3 text-primary" /> {patient.vesselName || patient.vessel || "—"}
+                  </span>
                 </div>
               </div>
             </div>
