@@ -60,7 +60,6 @@ import { CreateInvoiceModal } from "@/components/clinic/CreateInvoiceModal";
 import { FeedbackAdminModule } from "@/components/clinic/FeedbackAdminModule";
 import { InvoiceModal } from "@/components/clinic/InvoiceModal";
 import { InvoiceModule } from "@/components/clinic/InvoiceModule";
-import { PaymentsModule } from "@/components/clinic/PaymentsModule";
 import { PatientDetailModal } from "@/components/clinic/PatientDetailModal";
 import { PatientModal } from "@/components/clinic/PatientModal";
 import { StaffManagementModule } from "@/components/clinic/StaffManagementModule";
@@ -133,8 +132,7 @@ export const Route = createFileRoute("/")({
 const navIcons: Record<ClinicSection, typeof LayoutDashboard> = {
   dashboard: LayoutDashboard,
   patients: Users,
-  invoices: FileText,
-  payments: CreditCard,
+  invoices: CreditCard,
   feedback: ClipboardList,
   staff: UserRound,
   reports: FileChartColumnIncreasing,
@@ -145,8 +143,7 @@ const navIcons: Record<ClinicSection, typeof LayoutDashboard> = {
 const sectionDescriptions: Record<ClinicSection, string> = {
   dashboard: "Here's what's happening across your clinic today.",
   patients: "View and manage your clinic's patient records.",
-  invoices: "Manage billing and keep tabs on outstanding balances.",
-  payments: "A real-time view of incoming payments and transactions.",
+  invoices: "Candidate payment records, fee settlements, and official money receipts.",
   feedback:
     "Review patient complaints, grievance redressal logs, and reviews. Download compliance reports in Excel (.xlsx) per government medical rules.",
   staff: "Manage your clinical team and day-to-day coverage.",
@@ -159,7 +156,7 @@ function ClinicApp() {
   const [role, setRole] = useState<ClinicRole | null>(null);
   const [currentUser, setCurrentUser] = useState<UserProfileData>({
     name: "Mitali Gadge",
-    email: "admin@sailorsmedical.com",
+    email: "medical@sailorsmedicalclinic.com",
     role: "admin",
     phone: "+91 95614 50104",
     designation: "Chief Medical Administrator & Director",
@@ -294,10 +291,61 @@ function ClinicApp() {
       setNotice(`${saved.name} was added to patient records in MongoDB (Sr. #${saved.srNo}).`);
     }
 
+    // Automatically sync candidate payment record to Payment Records module and MongoDB
+    const invId = saved.invoiceNo || `REC-2026-${String(saved.srNo || 1).padStart(3, "0")}`;
+    const rawAmt = Number(saved.paymentAmount?.replace(/[^0-9.]/g, "")) || (saved.paymentStatus === "Pending" ? 0 : 3500);
+    const totalFeeNum = saved.totalFee || 3500;
+    const isPaidStatus = saved.paymentStatus === "Paid" || saved.paymentStatus === "Own";
+    const paymentRecordEntry: InvoiceRecord = {
+      id: invId,
+      patient: saved.name,
+      patientId: saved.id,
+      date: saved.date || new Date().toISOString().slice(0, 10),
+      dueDate: isPaidStatus ? (saved.date || new Date().toISOString().slice(0, 10)) : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+      amount: formatINR(totalFeeNum),
+      total: totalFeeNum,
+      subtotal: totalFeeNum,
+      tax: 0,
+      discount: 0,
+      status: isPaidStatus ? "Paid" : "Pending",
+      company: saved.companyName || "Independent / Agency",
+      rank: saved.rank,
+      vessel: saved.vesselName || saved.vessel,
+      indosNo: saved.indosNo,
+      cdcNo: saved.cdcNo,
+      certificateNo: saved.certificateNo,
+      paymentMethod: saved.paymentMode || "UPI",
+      transactionRef: saved.transactionId,
+      paidDate: (isPaidStatus || saved.paymentStatus === "Partial")
+        ? (saved.date ? new Date(saved.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Today")
+        : undefined,
+      items: [
+        {
+          id: "item-1",
+          description: saved.typeOfMedical || "Marine Medical Fitness Examination",
+          sacCode: "999312",
+          qty: 1,
+          rate: totalFeeNum,
+          amount: totalFeeNum,
+        },
+      ],
+      amountPaid: rawAmt,
+      balanceDue: saved.balanceDue ?? (saved.paymentStatus === "Partial" ? Math.max(0, totalFeeNum - rawAmt) : saved.paymentStatus === "Pending" ? totalFeeNum : 0),
+      paymentStatus: saved.paymentStatus,
+    };
+
+    setInvoices((prev) => {
+      const exists = prev.some((inv) => inv.patientId === saved.id || inv.id === invId);
+      return exists
+        ? prev.map((inv) => (inv.patientId === saved.id || inv.id === invId ? { ...inv, ...paymentRecordEntry } : inv))
+        : [paymentRecordEntry, ...prev];
+    });
+
     try {
       await savePatientServer({ data: saved });
+      await saveInvoiceServer({ data: paymentRecordEntry });
     } catch (err) {
-      console.error("Failed to save patient to MongoDB Atlas:", err);
+      console.error("Failed to save patient or payment record to MongoDB Atlas:", err);
     }
   };
 
@@ -627,6 +675,7 @@ function ClinicApp() {
                   currentUser={currentUser}
                   onOpenSchedule={() => setScheduleModalOpen(true)}
                   onEditProfile={() => setProfileModalOpen(true)}
+                  role={role}
                 />
               )}
               {section === "patients" && (
@@ -649,13 +698,7 @@ function ClinicApp() {
                   onUpdateInvoice={handleUpdateInvoice}
                   onDeleteInvoice={handleDeleteInvoice}
                   onNotice={setNotice}
-                />
-              )}
-              {section === "payments" && (
-                <PaymentsModule
-                  patients={patients}
-                  invoices={invoices}
-                  onNotice={setNotice}
+                  onUpdatePatient={handleSavePatient}
                   role={role}
                 />
               )}
@@ -929,7 +972,7 @@ function SignIn() {
             Centre for Marine Medical Examinations.
           </h1>
           <p className="mt-5 max-w-[430px] text-base leading-7 text-muted-foreground">
-            CBD Belapur, Navi Mumbai • Tel: +91 95614 50104 • Email: medical@sailorsmedical.com
+            CBD Belapur, Navi Mumbai • Tel: +91 95614 50104 • Email: medical@sailorsmedicalclinic.com
           </p>
           <div className="mt-10 flex items-center gap-3 border-t border-border pt-6">
             <div className="flex -space-x-2">
@@ -974,7 +1017,7 @@ function SignIn() {
                 id="clinic-email"
                 type="email"
                 autoComplete="username"
-                placeholder="medical@sailorsmedical.com"
+                placeholder="medical@sailorsmedicalclinic.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -1076,7 +1119,7 @@ function PageActions({
   if (section === "invoices") {
     return (
       <Button onClick={onCreateInvoice} className="gap-2">
-        <FilePlus2 className="size-4" /> New invoice
+        <FilePlus2 className="size-4" /> New payment record
       </Button>
     );
   }
@@ -1091,14 +1134,7 @@ function PageActions({
 }
 
 function PageActionsStaff() {
-  if (false) {
-    return (
-      <Button onClick={() => onNotice("Invite link copied for a new team member.")} className="gap-2">
-        <UserRoundPlus className="size-4" /> Add team member
-      </Button>
-    );
-  }
-
+  return null;
 }
 
 function Dashboard({
@@ -1112,6 +1148,7 @@ function Dashboard({
   currentUser,
   onOpenSchedule,
   onEditProfile,
+  role,
 }: {
   onSelect: (target: ClinicSection) => void;
   onNotice: (message: string) => void;
@@ -1123,11 +1160,50 @@ function Dashboard({
   currentUser: UserProfileData;
   onOpenSchedule: () => void;
   onEditProfile: () => void;
+  role?: ClinicRole | null;
 }) {
+  const isStaff = role === "staff";
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayPayments = patients.filter((p) => {
+    const isToday =
+      p.date === todayStr ||
+      (p.lastVisit && p.lastVisit.includes(todayStr)) ||
+      (p.date && new Date(p.date).toISOString().slice(0, 10) === todayStr);
+    return isToday && (p.paymentStatus === "Paid" || p.paymentStatus === "Own" || p.paymentStatus === "Partial");
+  });
+  const todayAmountReceived = todayPayments.reduce((sum, p) => {
+    const amt =
+      Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) ||
+      (p.paymentStatus === "Pending" ? 0 : 3500);
+    return sum + amt;
+  }, 0);
+
   const metricCards = [
     { label: "Total seafarers", value: `${2480 + patients.length}`, detail: "+14 registered today", positive: true, icon: Users, shade: "bg-secondary text-secondary-foreground", trend: "M0 18 L10 15 L20 17 L30 8 L40 11 L50 4 L60 7" },
     { label: "Medicals today", value: "38", detail: "USG & X-Ray active", positive: true, icon: CalendarDays, shade: "bg-accent text-accent-foreground", trend: "M0 16 L10 13 L20 15 L30 7 L40 10 L50 2 L60 5" },
-    { label: "Revenue this month", value: "₹4,82,900", detail: "+6.2% vs last month", positive: true, icon: WalletCards, shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground", trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2" },
+    ...(isStaff
+      ? [
+          {
+            label: "Daily payments received",
+            value: formatINR(todayAmountReceived > 0 ? todayAmountReceived : 14000),
+            detail: `${todayPayments.length > 0 ? todayPayments.length : 4} receipts settled today`,
+            positive: true,
+            icon: WalletCards,
+            shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground",
+            trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2",
+          },
+        ]
+      : [
+          {
+            label: "Revenue this month",
+            value: "₹4,82,900",
+            detail: "All records date-wise",
+            positive: true,
+            icon: WalletCards,
+            shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground",
+            trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2",
+          },
+        ]),
     { label: "Pending medicals", value: "6", detail: "Awaiting USG / Lab", positive: false, icon: FileText, shade: "bg-[color:color-mix(in_oklab,var(--chart-4)_12%,white)] text-foreground", trend: "M0 5 L10 9 L20 4 L30 11 L40 8 L50 15 L60 13" },
   ];
 
@@ -1186,7 +1262,7 @@ function Dashboard({
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-4">
+      <div className={`grid gap-3 sm:grid-cols-2 ${isStaff ? "lg:grid-cols-3" : "2xl:grid-cols-4"}`}>
         {metricCards.map((metric) => {
           const Icon = metric.icon;
           return (
@@ -1272,8 +1348,8 @@ function Dashboard({
             </div>
             <div className="grid grid-cols-2 gap-2.5 p-4 sm:p-5">
               <QuickAction icon={UserRoundPlus} title="Add patient" detail="Popup form with CDC & INDoS" onClick={onAddPatient} />
-              <QuickAction icon={FilePlus2} title="New invoice" detail="Candidate billing draft" onClick={() => onSelect("invoices")} />
-              <QuickAction icon={CreditCard} title="Record payment" detail="Paid / Own status" onClick={() => onSelect("payments")} />
+              <QuickAction icon={FilePlus2} title="Payment records" detail="Candidate billing & receipts" onClick={() => onSelect("invoices")} />
+              <QuickAction icon={CreditCard} title="Record payment" detail="Paid / Partial / Dues" onClick={() => onSelect("invoices")} />
               <QuickAction icon={FileChartColumnIncreasing} title="View reports" detail="DG Shipping statistics" onClick={() => onSelect("reports")} />
             </div>
           </section>
@@ -1588,7 +1664,7 @@ function PatientTable({
             <TableHead className="min-w-[200px] text-xs">Candidate & Rank</TableHead>
             <TableHead className="min-w-[170px] text-xs">Credentials (INDoS / CDC / Cert)</TableHead>
             <TableHead className="min-w-[180px] text-xs">Medical & Company</TableHead>
-            <TableHead className="min-w-[160px] text-xs">USG / X-Ray</TableHead>
+            <TableHead className="min-w-[170px] text-xs">Test / Medical & Fitness</TableHead>
             <TableHead className="min-w-[130px] text-xs">Time In & Out</TableHead>
             <TableHead className="min-w-[160px] text-xs">Payment (Paid / Own)</TableHead>
             <TableHead className="min-w-[110px] text-xs">Exam Date</TableHead>
@@ -1675,11 +1751,25 @@ function PatientTable({
                 )}
               </TableCell>
 
-              {/* 5. USG / XRay */}
+              {/* 5. Test / Medical & Fitness */}
               <TableCell>
-                <div className="inline-flex items-center gap-1 text-xs font-medium text-accent-foreground">
-                  <CheckCircle2 className="size-3.5 shrink-0" />
-                  <span className="truncate max-w-[140px]" title={patient.usgXray}>{patient.usgXray}</span>
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1 text-xs font-medium text-foreground">
+                    <span className="truncate max-w-[150px]" title={patient.testMedical || patient.usgXray}>
+                      {patient.testMedical || patient.usgXray}
+                    </span>
+                  </div>
+                  <div>
+                    {patient.fitnessStatus === "Unfit" ? (
+                      <Badge variant="destructive" className="text-[9px] px-1.5 py-0 font-semibold">
+                        Unfit ({patient.unfitType || "Temporary"})
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[9px] px-1.5 py-0 font-semibold">
+                        Fit
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </TableCell>
 
@@ -2066,7 +2156,7 @@ function SettingsView({
                 <Input id="setting-clinic-name" defaultValue="Sailor's Medical Clinic" />
               </Field>
               <Field label="Contact email" htmlFor="setting-clinic-email">
-                <Input id="setting-clinic-email" defaultValue="medical@sailorsmedical.com" />
+                <Input id="setting-clinic-email" defaultValue="medical@sailorsmedicalclinic.com" />
               </Field>
               <Field label="Phone number" htmlFor="setting-clinic-phone">
                 <Input id="setting-clinic-phone" defaultValue="+91 95614 50104" />
@@ -2099,7 +2189,7 @@ function SettingsView({
                 <div>
                   <p className="text-xs font-semibold">Admin access</p>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    Full access to all clinic areas: Patient Records, Invoices, Payments, Grievances & Reviews, Staff Management, Reports, Activity Logs, and System Settings.
+                    Full access to all clinic areas: Patient Records, Payment Records, Grievances & Reviews, Staff Management, Reports, Activity Logs, and System Settings.
                   </p>
                 </div>
               </div>
@@ -2108,7 +2198,7 @@ function SettingsView({
                 <div>
                   <p className="text-xs font-semibold">Staff access</p>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    Access to daily clinical operations: Dashboard, Patient Records, Invoices, Payments, and Reports.
+                    Access to daily clinical operations: Dashboard, Patient Records, Payment Records, and Reports.
                   </p>
                 </div>
               </div>
@@ -2119,33 +2209,6 @@ function SettingsView({
     </div>
   );
 }
-/* obsolete remnants
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-      </div>
-    </div>
-  );
-}
-
-
-
-}
-  return (
-    <div className="grid items-start gap-5 xl:grid-cols-[220px_minmax(0,1fr)]">
-
-      <div className="space-y-5">
-
-
-      </div>
-    </div>
-  );
-}
-
-*/
 function SmallMetric({
   label,
   value,

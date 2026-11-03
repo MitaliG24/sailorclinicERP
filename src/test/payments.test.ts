@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createPaymentSchema } from "@/lib/payments";
+import { createPaymentSchema, updatePaymentSchema } from "@/lib/payments";
 
 describe("payment input validation", () => {
   it("accepts a valid payment record", () => {
@@ -10,14 +10,41 @@ describe("payment input validation", () => {
         patientName: "Amara Johnson",
         invoiceId: "INV-2026-084",
         method: "UPI",
-        amount: 4500,
+        amount: 3500,
         reference: "UPI-1234",
       }),
     ).toMatchObject({
       patientId: "PT-2408",
       method: "UPI",
-      amount: 4500,
+      amount: 3500,
     });
+  });
+
+  it("accepts a partial payment record with balance", () => {
+    const parsed = createPaymentSchema.parse({
+      patientId: "PT-2408",
+      patientName: "Amara Johnson",
+      method: "Cash",
+      amount: 2000,
+      totalAmount: 3500,
+      balanceDue: 1500,
+      status: "Partial",
+    });
+    expect(parsed.amount).toBe(2000);
+    expect(parsed.status).toBe("Partial");
+    expect(parsed.balanceDue).toBe(1500);
+  });
+
+  it("validates payment update schema", () => {
+    const updated = updatePaymentSchema.parse({
+      id: "TXN-001",
+      amount: 3500,
+      status: "Completed",
+      method: "UPI",
+    });
+    expect(updated.id).toBe("TXN-001");
+    expect(updated.amount).toBe(3500);
+    expect(updated.status).toBe("Completed");
   });
 
   it("rejects non-positive and non-finite amounts", () => {

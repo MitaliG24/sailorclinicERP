@@ -235,7 +235,7 @@ export function FeedbackAdminModule({ onNotice }: FeedbackAdminModuleProps) {
                 </Badge>
               </div>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Shop No. 21, Punit Tower - 1, CBD Belapur, Navi Mumbai • Mob: +91 95614 50104 • Email: medical@sailorsmedical.com
+                Shop No. 21, Punit Tower - 1, CBD Belapur, Navi Mumbai • Mob: +91 95614 50104 • Email: medical@sailorsmedicalclinic.com
               </p>
             </div>
           </div>

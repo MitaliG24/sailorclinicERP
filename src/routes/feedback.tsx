@@ -395,7 +395,7 @@ export function SailorFeedbackFormPage() {
                   Shop No. 21, Punit Tower - 1, Sec-11, CBD Belapur, Navi Mumbai
                 </span>{" "}
                 | <span>Mob.: +91 95614 50104</span> |{" "}
-                <span>Email : medical@sailorsmedical.com</span>
+                <span>Email : medical@sailorsmedicalclinic.com</span>
               </div>
             </header>
 

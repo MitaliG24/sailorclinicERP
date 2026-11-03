@@ -3,6 +3,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Calendar,
+  CheckCircle2,
   Clock,
   CreditCard,
   FileBadge,
@@ -124,13 +125,19 @@ export function PatientModal({
   const [gender, setGender] = useState<string>("Male");
   const [rank, setRank] = useState<string>("");
   const [typeOfMedical, setTypeOfMedical] = useState<string>("Annual Seafarer Medical");
-  const [usgXray, setUsgXray] = useState<string>("USG & Chest X-Ray Normal");
+  const [usgXray, setUsgXray] = useState<string>("Normal (USG & CXR Normal)");
+  const [testMedical, setTestMedical] = useState<string>("Normal (USG & CXR Normal, ECG Clear)");
+  const [fitnessStatus, setFitnessStatus] = useState<"Fit" | "Unfit">("Fit");
+  const [unfitType, setUnfitType] = useState<"Temporary" | "Permanent">("Temporary");
+  const [unfitReason, setUnfitReason] = useState<string>("");
+  const [examinationRemark, setExaminationRemark] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("");
   const [vessel, setVessel] = useState<string>("");
 
-  // Payment status
-  const [paymentStatus, setPaymentStatus] = useState<"Paid" | "Own" | "Pending">("Paid");
-  const [paymentAmount, setPaymentAmount] = useState<string>("₹4,500.00");
+  // Payment status & partial settlement fields
+  const [paymentStatus, setPaymentStatus] = useState<"Paid" | "Own" | "Partial" | "Pending">("Paid");
+  const [totalFee, setTotalFee] = useState<number>(3500);
+  const [amountPaid, setAmountPaid] = useState<number>(3500);
   const [paymentMode, setPaymentMode] = useState<"Cash" | "Trans. ID" | "UPI" | "Bank Transfer">("Trans. ID");
   const [paymentProof, setPaymentProof] = useState<string>("");
   const [transactionId, setTransactionId] = useState<string>("");
@@ -160,11 +167,20 @@ export function PatientModal({
       setGender(patientToEdit.gender || "Male");
       setRank(patientToEdit.rank || "");
       setTypeOfMedical(patientToEdit.typeOfMedical || "Annual Seafarer Medical");
-      setUsgXray(patientToEdit.usgXray || "USG & Chest X-Ray Normal");
+      const findings = patientToEdit.testMedical || patientToEdit.usgXray || "Normal (USG & CXR Normal, ECG Clear)";
+      setUsgXray(findings);
+      setTestMedical(findings);
+      setFitnessStatus(patientToEdit.fitnessStatus || (patientToEdit.condition?.toLowerCase().includes("unfit") ? "Unfit" : "Fit"));
+      setUnfitType(patientToEdit.unfitType || "Temporary");
+      setUnfitReason(patientToEdit.unfitReason || "");
+      setExaminationRemark(patientToEdit.examinationRemark || "");
       setCompanyName(patientToEdit.companyName || "");
       setVessel(patientToEdit.vesselName || patientToEdit.vessel || "");
       setPaymentStatus(patientToEdit.paymentStatus || "Paid");
-      setPaymentAmount(patientToEdit.paymentAmount || "₹4,500.00");
+      const fee = patientToEdit.totalFee || 3500;
+      setTotalFee(fee);
+      const rawAmt = Number(patientToEdit.paymentAmount?.replace(/[^0-9.]/g, "")) || (patientToEdit.paymentStatus === "Pending" ? 0 : fee);
+      setAmountPaid(rawAmt);
       setPaymentMode(patientToEdit.paymentMode || "Trans. ID");
       setPaymentProof(patientToEdit.paymentProof || "");
       setTransactionId(patientToEdit.transactionId || "");
@@ -173,7 +189,7 @@ export function PatientModal({
       setCertificateNo(patientToEdit.certificateNo || "");
       setIndosNo(patientToEdit.indosNo || "");
       setCdcNo(patientToEdit.cdcNo || "");
-      setInvoiceNo(patientToEdit.invoiceNo || `INV-2026-${String(patientToEdit.srNo || nextSrNo).padStart(3, "0")}`);
+      setInvoiceNo(patientToEdit.invoiceNo || `REC-2026-${String(patientToEdit.srNo || nextSrNo).padStart(3, "0")}`);
     } else {
       // New patient defaults
       const today = new Date().toISOString().slice(0, 10);
@@ -187,11 +203,17 @@ export function PatientModal({
       setGender("Male");
       setRank("Chief Officer");
       setTypeOfMedical("Annual Seafarer Medical");
-      setUsgXray("USG & Chest X-Ray Normal");
+      setUsgXray("Normal (USG & CXR Normal, ECG Clear)");
+      setTestMedical("Normal (USG & CXR Normal, ECG Clear)");
+      setFitnessStatus("Fit");
+      setUnfitType("Temporary");
+      setUnfitReason("");
+      setExaminationRemark("Fit for worldwide maritime sea service without restrictions.");
       setCompanyName("Maersk Marine Services");
       setVessel("MV Maersk Mc-Kinney");
       setPaymentStatus("Paid");
-      setPaymentAmount("₹4,500.00");
+      setTotalFee(3500);
+      setAmountPaid(3500);
       setPaymentMode("Trans. ID");
       setPaymentProof("Online receipt attached");
       setTransactionId(`TXN-${Math.floor(10000 + Math.random() * 90000)}`);
@@ -200,7 +222,7 @@ export function PatientModal({
       setCertificateNo(`MC-2026-${Math.floor(9000 + nextSrNo)}`);
       setIndosNo(`${Math.floor(10 + Math.random() * 89)}NL${Math.floor(1000 + Math.random() * 9000)}`);
       setCdcNo(`MUM ${Math.floor(100000 + Math.random() * 900000)}`);
-      setInvoiceNo(`INV-2026-${String(nextSrNo + 84).padStart(3, "0")}`);
+      setInvoiceNo(`REC-2026-${String(nextSrNo + 84).padStart(3, "0")}`);
     }
     setActiveTab("candidate");
   }, [patientToEdit, open, nextSrNo]);
@@ -261,25 +283,32 @@ export function PatientModal({
       email: email || `${cleanName.toLowerCase().replace(/\s+/g, ".")}@seafarer.demo`,
       rank: rank || "Seafarer",
       typeOfMedical: typeOfMedical || "Annual Seafarer Medical",
-      usgXray: usgXray || "USG & Chest X-Ray Normal",
+      usgXray: testMedical.trim() || usgXray || "Normal (USG & CXR Normal)",
+      testMedical: testMedical.trim() || "Normal (USG & CXR Normal, ECG Clear)",
+      fitnessStatus,
+      unfitType: fitnessStatus === "Unfit" ? unfitType : undefined,
+      unfitReason: fitnessStatus === "Unfit" ? unfitReason.trim() : undefined,
+      examinationRemark: examinationRemark.trim() || undefined,
       companyName: companyName || "Independent / Agency",
       vessel: vessel.trim() || undefined,
       vesselName: vessel.trim() || undefined,
       paymentStatus: paymentStatus || "Paid",
-      paymentAmount: paymentAmount || "₹4,500.00",
-      paymentMode: paymentMode || "Trans. ID",
-      paymentProof: paymentProof || "Standard voucher",
-      transactionId: transactionId || `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
+      paymentAmount: paymentStatus === "Pending" ? "₹0.00" : `₹${(amountPaid || 3500).toLocaleString("en-IN")}.00`,
+      totalFee: Number(totalFee) || 3500,
+      balanceDue: paymentStatus === "Partial" ? Math.max(0, (Number(totalFee) || 3500) - (Number(amountPaid) || 0)) : paymentStatus === "Pending" ? (Number(totalFee) || 3500) : 0,
+      paymentMode: paymentStatus === "Pending" ? "Cash" : paymentMode || "Trans. ID",
+      paymentProof: paymentStatus === "Pending" ? "Pending clearance" : paymentProof || "Standard voucher",
+      transactionId: paymentStatus === "Pending" ? "" : transactionId || `TXN-${Math.floor(10000 + Math.random() * 90000)}`,
       timeIn: timeIn || "09:00 AM",
       timeOut: timeOut || "01:00 PM",
       certificateNo: sanitizeAlphanumeric(certificateNo),
       indosNo: sanitizeAlphanumeric(indosNo),
       cdcNo: sanitizeAlphanumeric(cdcNo),
-      invoiceNo: invoiceNo || `INV-2026-${String(srNo).padStart(3, "0")}`,
+      invoiceNo: invoiceNo || `REC-2026-${String(srNo).padStart(3, "0")}`,
       lastVisit: formattedDate,
       nextVisit: "Scheduled in 1 yr",
-      condition: typeOfMedical || "Annual Seafarer Medical",
-      status: paymentStatus === "Paid" ? "Active" : "Follow-up",
+      condition: fitnessStatus === "Unfit" ? `Unfit (${unfitType || "Temporary"})` : typeOfMedical || "Annual Seafarer Medical",
+      status: fitnessStatus === "Unfit" ? "Follow-up" : paymentStatus === "Paid" ? "Active" : "Follow-up",
     };
 
     onSave(savedRecord);
@@ -345,7 +374,7 @@ export function PatientModal({
               }`}
             >
               <CreditCard className="size-3.5" />
-              3. Payment & Invoice
+              3. Payment Details
             </button>
           </div>
         </DialogHeader>
@@ -631,20 +660,31 @@ export function PatientModal({
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
                   <span className="text-[11px] text-muted-foreground">
                     Candidate info & credentials completed
                   </span>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    className="gap-1.5 text-xs font-medium"
-                    onClick={() => setActiveTab("medical")}
-                  >
-                    Next: Medical & Timing
-                    <ArrowRight className="size-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs font-medium border-primary/40 text-primary hover:bg-primary/5"
+                    >
+                      <FileCheck2 className="size-3.5" />
+                      Save Record
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="gap-1.5 text-xs font-medium"
+                      onClick={() => setActiveTab("medical")}
+                    >
+                      Next: Medical & Timing
+                      <ArrowRight className="size-3.5" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -682,22 +722,139 @@ export function PatientModal({
                   </div>
 
                   <div className="space-y-1.5">
-                    <label htmlFor="field-usg" className="text-xs font-medium text-foreground">
-                      USG / XRay Status & Findings <span className="text-destructive">*</span>
+                    <label htmlFor="field-test-medical" className="text-xs font-medium text-foreground">
+                      Test / Medical Findings (Enter manually) <span className="text-destructive">*</span>
                     </label>
-                    <select
-                      id="field-usg"
-                      value={usgXray}
-                      onChange={(e) => setUsgXray(e.target.value)}
-                      className="h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs"
+                    <Input
+                      id="field-test-medical"
+                      placeholder="e.g. CXR Clear, USG Abdomen Normal, ECG Normal, CBC in range"
+                      value={testMedical}
+                      onChange={(e) => {
+                        setTestMedical(e.target.value);
+                        setUsgXray(e.target.value);
+                      }}
+                      className="h-9 text-xs"
                       required
+                    />
+                  </div>
+                </div>
+
+                {/* Medical Fitness: Fit / Unfit assessment */}
+                <div className="mt-4 rounded-lg border border-border/80 bg-muted/20 p-3.5 space-y-3.5">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                    <div className="flex items-center gap-2">
+                      <HeartPulse className="size-4 text-primary" />
+                      <h4 className="text-xs font-semibold text-foreground">
+                        Medical Fitness Assessment
+                      </h4>
+                    </div>
+                    <Badge
+                      variant={fitnessStatus === "Fit" ? "default" : "destructive"}
+                      className="text-[10px] font-semibold"
                     >
-                      {USG_XRAY_OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
+                      {fitnessStatus === "Fit" ? "FIT" : `UNFIT (${unfitType.toUpperCase()})`}
+                    </Badge>
+                  </div>
+
+                  {/* Fit / Unfit selector */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground">
+                      Candidate Fitness Status <span className="text-destructive">*</span>
+                    </label>
+                    <div className="flex gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-medium bg-background px-3 py-1.5 rounded-md border border-input hover:border-emerald-500/50 transition-colors">
+                        <input
+                          type="radio"
+                          name="patient-fitness-status"
+                          value="Fit"
+                          checked={fitnessStatus === "Fit"}
+                          onChange={() => setFitnessStatus("Fit")}
+                          className="size-3.5 text-emerald-600"
+                        />
+                        <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="size-3.5 text-emerald-600" />
+                          Fit for Sea Service
+                        </span>
+                      </label>
+
+                      <label className="flex items-center gap-2 cursor-pointer text-xs font-medium bg-background px-3 py-1.5 rounded-md border border-input hover:border-destructive/50 transition-colors">
+                        <input
+                          type="radio"
+                          name="patient-fitness-status"
+                          value="Unfit"
+                          checked={fitnessStatus === "Unfit"}
+                          onChange={() => setFitnessStatus("Unfit")}
+                          className="size-3.5 text-destructive"
+                        />
+                        <span className="text-destructive font-semibold flex items-center gap-1">
+                          <X className="size-3.5 text-destructive" />
+                          Unfit
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* If Unfit: show Type of Unfitness (Temporary / Permanent) and Reason of Unfit */}
+                  {fitnessStatus === "Unfit" && (
+                    <div className="rounded-md border border-destructive/30 bg-destructive/5 p-3.5 space-y-3">
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-semibold text-destructive">
+                          Type of Unfitness <span className="text-destructive">*</span>
+                        </label>
+                        <div className="flex flex-wrap gap-4">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-medium bg-background px-3 py-1.5 rounded border border-border">
+                            <input
+                              type="radio"
+                              name="patient-unfit-type"
+                              value="Temporary"
+                              checked={unfitType === "Temporary"}
+                              onChange={() => setUnfitType("Temporary")}
+                              className="size-3.5 text-amber-600"
+                            />
+                            <span className="text-amber-800 font-semibold">Temporary Unfitness</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-medium bg-background px-3 py-1.5 rounded border border-border">
+                            <input
+                              type="radio"
+                              name="patient-unfit-type"
+                              value="Permanent"
+                              checked={unfitType === "Permanent"}
+                              onChange={() => setUnfitType("Permanent")}
+                              className="size-3.5 text-destructive"
+                            />
+                            <span className="text-destructive font-semibold">Permanent Unfitness</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label htmlFor="field-unfit-reason" className="text-xs font-medium text-foreground">
+                          Reason of Unfit <span className="text-destructive">*</span>
+                        </label>
+                        <Input
+                          id="field-unfit-reason"
+                          placeholder="Specify reason for unfitness (e.g. Uncontrolled Hypertension, Defective Color Vision)"
+                          value={unfitReason}
+                          onChange={(e) => setUnfitReason(e.target.value)}
+                          className="h-9 text-xs bg-background"
+                          required={fitnessStatus === "Unfit"}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Examination Remark */}
+                  <div className="space-y-1.5">
+                    <label htmlFor="field-exam-remark" className="text-xs font-medium text-foreground">
+                      Examination Remark
+                    </label>
+                    <Input
+                      id="field-exam-remark"
+                      placeholder="e.g. Fit for sea duty with corrective spectacles. Review in 6 months."
+                      value={examinationRemark}
+                      onChange={(e) => setExaminationRemark(e.target.value)}
+                      className="h-9 text-xs bg-background"
+                    />
                   </div>
                 </div>
 
@@ -736,7 +893,7 @@ export function PatientModal({
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
                   <Button
                     type="button"
                     size="sm"
@@ -747,22 +904,33 @@ export function PatientModal({
                     <ArrowLeft className="size-3.5" />
                     Back to Candidate Details
                   </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    className="gap-1.5 text-xs font-medium"
-                    onClick={() => setActiveTab("payment")}
-                  >
-                    Next: Payment & Invoice
-                    <ArrowRight className="size-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs font-medium border-primary/40 text-primary hover:bg-primary/5"
+                    >
+                      <FileCheck2 className="size-3.5" />
+                      Save Record
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="gap-1.5 text-xs font-medium"
+                      onClick={() => setActiveTab("payment")}
+                    >
+                      Next: Payment Details
+                      <ArrowRight className="size-3.5" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* TAB 3: Payment & Invoice */}
+          {/* TAB 3: Payment Details */}
           {activeTab === "payment" && (
             <div className="space-y-4">
               <div className="rounded-lg border border-border/70 bg-card p-4">
@@ -771,123 +939,172 @@ export function PatientModal({
                     Payment Status & Financial Settlement
                   </h3>
                   <Badge
-                    variant={paymentStatus === "Paid" ? "default" : "outline"}
+                    variant={paymentStatus === "Paid" ? "default" : paymentStatus === "Partial" ? "secondary" : "outline"}
                     className="text-[10px]"
                   >
                     Status: {paymentStatus}
                   </Badge>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="space-y-1.5">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5 sm:col-span-2">
                     <label htmlFor="field-status" className="text-xs font-medium text-foreground">
-                      Status (Payment - Paid / Own) <span className="text-destructive">*</span>
+                      Status (Payment - Paid / Own / Partial / Pending) <span className="text-destructive">*</span>
                     </label>
                     <select
                       id="field-status"
                       value={paymentStatus}
-                      onChange={(e) => setPaymentStatus(e.target.value as "Paid" | "Own" | "Pending")}
+                      onChange={(e) => {
+                        const val = e.target.value as "Paid" | "Own" | "Partial" | "Pending";
+                        setPaymentStatus(val);
+                        if (val === "Paid" || val === "Own") {
+                          setAmountPaid(totalFee);
+                        } else if (val === "Pending") {
+                          setAmountPaid(0);
+                        } else if (val === "Partial" && (amountPaid === 0 || amountPaid === totalFee)) {
+                          setAmountPaid(2000);
+                        }
+                      }}
                       className="h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs font-semibold"
                     >
-                      <option value="Paid">Paid (Company / Cleared)</option>
-                      <option value="Own">Own (Candidate Paid)</option>
-                      <option value="Pending">Pending / Due</option>
+                      <option value="Paid">Paid (Full Examination Cleared - ₹3,500)</option>
+                      <option value="Own">Own (Candidate Paid In Full)</option>
+                      <option value="Partial">Partial Payment (Candidate Paid Part Amount)</option>
+                      <option value="Pending">Pending / Due (Payment Not Received Yet)</option>
                     </select>
                   </div>
 
-                  <div className="space-y-1.5">
-                    <label htmlFor="field-amt" className="text-xs font-medium text-foreground">
-                      Amount (Amt) <span className="text-destructive">*</span>
-                    </label>
-                    <Input
-                      id="field-amt"
-                      placeholder="₹4,500.00 or Rs. 4,500"
-                      value={paymentAmount}
-                      onChange={(e) => setPaymentAmount(e.target.value)}
-                      className="h-9 text-xs font-medium"
-                      required
-                    />
-                  </div>
+                  {/* Partial Payment Options: Total Fee, Amount Paid, Dues */}
+                  {paymentStatus === "Partial" ? (
+                    <div className="sm:col-span-2 rounded-lg border border-amber-300 bg-amber-50/50 p-3.5 space-y-3">
+                      <div className="text-xs font-semibold text-amber-800 flex items-center gap-1.5">
+                        <CreditCard className="size-3.5" />
+                        Partial Payment Breakdown & Dues
+                      </div>
+                      <div className="grid gap-3 sm:grid-cols-3">
+                        <div className="space-y-1.5">
+                          <label htmlFor="field-total-fee" className="text-xs font-medium text-foreground">
+                            Total Examination Fee
+                          </label>
+                          <Input
+                            id="field-total-fee"
+                            type="number"
+                            min="1"
+                            value={totalFee}
+                            onChange={(e) => setTotalFee(Number(e.target.value) || 3500)}
+                            className="h-9 text-xs font-semibold bg-background font-mono"
+                          />
+                        </div>
 
-                  <div className="space-y-1.5">
-                    <label htmlFor="field-mode" className="text-xs font-medium text-foreground">
-                      Payment Mode (Cash / Trans. ID) <span className="text-destructive">*</span>
-                    </label>
-                    <select
-                      id="field-mode"
-                      value={paymentMode}
-                      onChange={(e) =>
-                        setPaymentMode(e.target.value as "Cash" | "Trans. ID" | "UPI" | "Bank Transfer")
-                      }
-                      className="h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs"
-                    >
-                      <option value="Cash">Cash</option>
-                      <option value="Trans. ID">Trans. ID (Online / POS)</option>
-                      <option value="UPI">UPI / Digital</option>
-                      <option value="Bank Transfer">Bank Transfer</option>
-                    </select>
-                  </div>
-                </div>
+                        <div className="space-y-1.5">
+                          <label htmlFor="field-amt-paid" className="text-xs font-medium text-foreground">
+                            Amount Paid (Received) <span className="text-destructive">*</span>
+                          </label>
+                          <Input
+                            id="field-amt-paid"
+                            type="number"
+                            min="1"
+                            max={totalFee}
+                            value={amountPaid}
+                            onChange={(e) => setAmountPaid(Number(e.target.value) || 0)}
+                            className="h-9 text-xs font-bold bg-background text-emerald-700 font-mono"
+                            required
+                          />
+                        </div>
 
-                <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                  <div className="space-y-1.5">
-                    <label htmlFor="field-transid" className="text-xs font-medium text-foreground">
-                      Trans. ID / Transaction Reference
-                    </label>
-                    <Input
-                      id="field-transid"
-                      placeholder="e.g. TXN-50941 or UPI/UTR reference"
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      className="h-9 font-mono text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <label htmlFor="field-proof" className="text-xs font-medium text-foreground">
-                      Payment Proof (Proof / Receipt Memo)
-                    </label>
-                    <Input
-                      id="field-proof"
-                      placeholder="e.g. Receipt #441 / Voucher #0912"
-                      value={paymentProof}
-                      onChange={(e) => setPaymentProof(e.target.value)}
-                      className="h-9 text-xs"
-                    />
-                  </div>
-                </div>
-
-                {/* Invoice Section from Note */}
-                <div className="mt-4 rounded-md border border-primary/20 bg-primary/5 p-3.5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-                      <FileText className="size-3.5" />
-                      Invoice Section
+                        <div className="space-y-1.5">
+                          <label className="text-xs font-medium text-foreground">
+                            Remaining Dues (Balance)
+                          </label>
+                          <div className="h-9 flex items-center px-3 rounded-md border border-amber-200 bg-amber-100/60 font-mono font-bold text-destructive text-xs">
+                            ₹{Math.max(0, totalFee - amountPaid).toLocaleString("en-IN")}.00
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <span className="text-[10px] text-muted-foreground">Auto-generated invoice link</span>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="space-y-1">
-                      <label htmlFor="field-inv" className="text-[11px] font-medium text-foreground">
-                        Invoice No.
-                      </label>
-                      <Input
-                        id="field-inv"
-                        value={invoiceNo}
-                        onChange={(e) => setInvoiceNo(e.target.value)}
-                        className="h-8 font-mono text-xs uppercase"
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-medium text-foreground">Candidate Name</span>
-                      <p className="truncate rounded-md border border-border/60 bg-background px-3 py-1.5 text-xs font-semibold text-foreground">
-                        {name || "Candidate Name —"}
+                  ) : paymentStatus === "Pending" ? (
+                    <div className="sm:col-span-2 rounded-lg border border-destructive/20 bg-destructive/5 p-3.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-semibold text-foreground">Total Fee Outstanding / Due:</span>
+                        <span className="font-bold font-mono text-destructive text-sm">₹{totalFee.toLocaleString("en-IN")}.00</span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-1.5">
+                        Payment mode, reference, and receipt options are hidden while payment is pending.
                       </p>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      <label htmlFor="field-amt" className="text-xs font-medium text-foreground">
+                        Examination Fee Cleared
+                      </label>
+                      <Input
+                        id="field-amt"
+                        type="number"
+                        min="1"
+                        value={amountPaid}
+                        onChange={(e) => {
+                          const val = Number(e.target.value) || 3500;
+                          setAmountPaid(val);
+                          setTotalFee(val);
+                        }}
+                        className="h-9 text-xs font-bold text-foreground font-mono"
+                        required
+                      />
+                    </div>
+                  )}
+
+                  {/* Mode and Transaction Reference: Shown if not Pending */}
+                  {paymentStatus !== "Pending" && (
+                    <>
+                      <div className="space-y-1.5">
+                        <label htmlFor="field-mode" className="text-xs font-medium text-foreground">
+                          Payment Mode <span className="text-destructive">*</span>
+                        </label>
+                        <select
+                          id="field-mode"
+                          value={paymentMode}
+                          onChange={(e) =>
+                            setPaymentMode(e.target.value as "Cash" | "Trans. ID" | "UPI" | "Bank Transfer")
+                          }
+                          className="h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs"
+                        >
+                          <option value="Cash">Cash</option>
+                          <option value="Trans. ID">Trans. ID (Online / POS)</option>
+                          <option value="UPI">UPI / Digital</option>
+                          <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label htmlFor="field-transid" className="text-xs font-medium text-foreground">
+                          Trans. ID / Transaction Reference
+                        </label>
+                        <Input
+                          id="field-transid"
+                          placeholder="e.g. TXN-50941 or UPI/UTR reference"
+                          value={transactionId}
+                          onChange={(e) => setTransactionId(e.target.value)}
+                          className="h-9 font-mono text-xs"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <label htmlFor="field-proof" className="text-xs font-medium text-foreground">
+                          Payment Proof / Receipt Memo
+                        </label>
+                        <Input
+                          id="field-proof"
+                          placeholder="e.g. Online receipt attached / Voucher #441"
+                          value={paymentProof}
+                          onChange={(e) => setPaymentProof(e.target.value)}
+                          className="h-9 text-xs"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60 pt-3">
                   <Button
                     type="button"
                     size="sm"
@@ -898,9 +1115,14 @@ export function PatientModal({
                     <ArrowLeft className="size-3.5" />
                     Back to Medical & Timing
                   </Button>
-                  <span className="text-[11px] text-muted-foreground">
-                    All sections completed. Review and click Save Record below.
-                  </span>
+                  <Button
+                    type="submit"
+                    size="sm"
+                    className="gap-1.5 text-xs font-medium"
+                  >
+                    <FileCheck2 className="size-3.5" />
+                    {isEditing ? "Save Changes" : "Save Record"}
+                  </Button>
                 </div>
               </div>
             </div>

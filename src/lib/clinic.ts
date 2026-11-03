@@ -4,7 +4,6 @@ export type ClinicSection =
   | "dashboard"
   | "patients"
   | "invoices"
-  | "payments"
   | "feedback"
   | "staff"
   | "reports"
@@ -14,8 +13,7 @@ export type ClinicSection =
 export const clinicSections: Array<{ id: ClinicSection; label: string; group: string }> = [
   { id: "dashboard", label: "Dashboard", group: "Workspace" },
   { id: "patients", label: "Patient Records", group: "Workspace" },
-  { id: "invoices", label: "Invoices", group: "Workspace" },
-  { id: "payments", label: "Payments", group: "Workspace" },
+  { id: "invoices", label: "Payment Records", group: "Workspace" },
   { id: "feedback", label: "Grievances & Reviews", group: "Clinic administration" },
   { id: "staff", label: "Staff Management", group: "Clinic administration" },
   { id: "reports", label: "Reports", group: "Clinic administration" },
@@ -27,7 +25,6 @@ const staffSections: ClinicSection[] = [
   "dashboard",
   "patients",
   "invoices",
-  "payments",
   "reports",
 ];
 
@@ -55,9 +52,16 @@ export type PatientRecord = {
   vesselName?: string | undefined;
   typeOfMedical: string;
   usgXray: string;
+  testMedical?: string | undefined;
+  fitnessStatus?: ("Fit" | "Unfit") | undefined;
+  unfitType?: ("Temporary" | "Permanent") | undefined;
+  unfitReason?: string | undefined;
+  examinationRemark?: string | undefined;
   companyName: string;
-  paymentStatus: "Paid" | "Own" | "Pending";
+  paymentStatus: "Paid" | "Own" | "Partial" | "Pending";
   paymentAmount: string;
+  totalFee?: number | undefined;
+  balanceDue?: number | undefined;
   paymentMode: "Cash" | "Trans. ID" | "UPI" | "Bank Transfer";
   paymentProof: string;
   transactionId: string;
@@ -284,7 +288,7 @@ export const initialPatients: PatientRecord[] = [
 export type InvoiceItem = {
   id: string;
   description: string;
-  sacCode: string;
+  sacCode?: string | undefined;
   qty: number;
   rate: number;
   amount: number;
@@ -295,15 +299,15 @@ export type InvoiceRecord = {
   date: string;
   dueDate: string;
   patient: string;
-  patientId?: string;
-  rank?: string;
-  vessel?: string;
-  indosNo?: string;
-  cdcNo?: string;
-  certificateNo?: string;
+  patientId?: string | undefined;
+  rank?: string | undefined;
+  vessel?: string | undefined;
+  indosNo?: string | undefined;
+  cdcNo?: string | undefined;
+  certificateNo?: string | undefined;
   company: string;
-  companyGstin?: string;
-  companyAddress?: string;
+  companyGstin?: string | undefined;
+  companyAddress?: string | undefined;
   status: "Paid" | "Pending" | "Overdue";
   items: InvoiceItem[];
   subtotal: number;
@@ -311,10 +315,13 @@ export type InvoiceRecord = {
   discount: number;
   total: number;
   amount: string;
-  paymentMethod?: string;
-  transactionRef?: string;
-  paidDate?: string;
-  notes?: string;
+  amountPaid?: number | undefined;
+  balanceDue?: number | undefined;
+  paymentStatus?: "Paid" | "Own" | "Partial" | "Pending" | undefined;
+  paymentMethod?: string | undefined;
+  transactionRef?: string | undefined;
+  paidDate?: string | undefined;
+  notes?: string | undefined;
 };
 
 export function formatINR(val: number): string {

@@ -1,5 +1,6 @@
 import { Edit, FileText, Printer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ClinicLogo } from "@/components/clinic/ClinicLogo";
 import type { SalarySlip } from "@/lib/staff";
 
 interface SalarySlipDocumentProps {
@@ -82,22 +83,49 @@ function buildSlipHtml(slip: SalarySlip): string {
     margin: 0;
   }
   /* ── Header row ── */
-  .hdr-iso {
-    font-size: 11px;
-    font-weight: bold;
-    line-height: 1.5;
-    padding: 6px 12px 4px;
-    vertical-align: bottom;
-    width: 40%;
+  .hdr-brand {
+    padding: 8px 12px 6px;
+    vertical-align: middle;
   }
-  .hdr-dg {
-    font-size: 13px;
+  .hdr-brand table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .hdr-logo {
+    width: 60px;
+    vertical-align: middle;
+    padding-right: 10px;
+  }
+  .hdr-name {
+    font-size: 17px;
+    font-weight: bold;
+    color: #800000;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+  .hdr-sub {
+    font-size: 10px;
     font-weight: bold;
     color: #1e3a8a;
+    text-transform: uppercase;
+    margin-top: 2px;
+    letter-spacing: 0.2px;
+  }
+  .hdr-tag {
     text-align: right;
-    padding: 6px 12px 4px;
-    vertical-align: bottom;
-    width: 60%;
+    vertical-align: middle;
+    padding-left: 10px;
+  }
+  .hdr-tag span {
+    display: inline-block;
+    border: 1.5px solid #800000;
+    background: #fff5f5;
+    color: #800000;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 3px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
   }
   /* ── Double divider ── */
   .dbl-div {
@@ -195,20 +223,36 @@ function buildSlipHtml(slip: SalarySlip): string {
 <body>
 
 <table class="outer">
-  <!-- ── HEADER ── -->
+  <!-- ── HEADER: CLINIC NAME & LOGO (NO ISO, NO GST) ── -->
   <tr>
-    <td class="hdr-iso">ISO 9001:2015<br>CERTIFIED CENTRE</td>
-    <td class="hdr-dg">THE D.G. SHIPPING GOVT. OF INDIA APPROVED DOCTORS</td>
+    <td colspan="2" class="hdr-brand">
+      <table>
+        <tr>
+          <td class="hdr-logo">
+            <img src="/logo.png" alt="Logo" style="height: 48px; width: auto; object-fit: contain; display: block;" onerror="this.style.display='none'" />
+          </td>
+          <td style="vertical-align: middle; text-align: left;">
+            <div class="hdr-name">SAILOR'S MEDICAL CLINIC</div>
+            <div class="hdr-sub">
+              Centre for Marine Medical Examinations &bull; D.G. Shipping Approved Doctors
+            </div>
+          </td>
+          <td class="hdr-tag">
+            <span>PAYSLIP</span>
+          </td>
+        </tr>
+      </table>
+    </td>
   </tr>
 
   <!-- ── DOUBLE DIVIDER ── -->
   <tr><td colspan="2" class="dbl-div"></td></tr>
 
-  <!-- ── ADDRESS ── -->
+  <!-- ── ADDRESS & EMAIL ── -->
   <tr>
     <td colspan="2" class="addr">
       Shop No. 21, Punit Tower 1, Opp. YAK Marine, MTNL Lane, Sec-11, CBD Belapur, Navi Mumbai - 400 614<br>
-      Tel: 022-2756 0304 &nbsp;|&nbsp; Email : medical@sailorsmedicalclinic.com &nbsp;|&nbsp; Web: www.sailorsmedicalclinic.com
+      Tel: 022-2756 0304 / +91 95614 50104 &nbsp;|&nbsp; Email : medical@sailorsmedicalclinic.com &nbsp;|&nbsp; Web: www.sailorsmedicalclinic.com
     </td>
   </tr>
 
@@ -434,24 +478,33 @@ export function SalarySlipDocument({
 
       {/* ── Printable Payslip preview (matches image format) ── */}
       <div className="payslip-sheet mx-auto w-full max-w-[780px] bg-white text-black p-4 sm:p-6 shadow-sm border border-[#800000] print:border-[#800000] print:p-0 print:shadow-none font-sans">
-        {/* Header */}
-        <div className="flex items-end justify-between px-2 pt-1 pb-0.5">
-          <div className="text-left text-[11px] font-bold leading-tight text-black">
-            <div>ISO 9001:2015</div>
-            <div>CERTIFIED CENTRE</div>
+        {/* Header: Clinic Logo & Name (No ISO, No GST) */}
+        <div className="flex items-center justify-between px-2 py-2">
+          <div className="flex items-center gap-3">
+            <ClinicLogo size="md" showText={false} />
+            <div>
+              <div className="text-base sm:text-lg font-bold tracking-tight text-[#800000]">
+                SAILOR'S MEDICAL CLINIC
+              </div>
+              <div className="text-[11px] font-bold uppercase tracking-wider text-[#1e3a8a]">
+                Centre for Marine Medical Examinations • D.G. Shipping Approved Doctors
+              </div>
+            </div>
           </div>
-          <div className="text-right text-[13px] font-bold tracking-wide text-[#1e3a8a] uppercase">
-            THE D.G. SHIPPING GOVT. OF INDIA APPROVED DOCTORS
+          <div className="text-right">
+            <span className="inline-block rounded border border-[#800000]/40 bg-[#800000]/5 px-2.5 py-0.5 text-xs font-bold text-[#800000] uppercase tracking-wider">
+              Payslip
+            </span>
           </div>
         </div>
 
         {/* Double Border Divider */}
         <div className="my-1 border-t border-b border-black py-[0.5px]" />
 
-        {/* Address */}
+        {/* Address & Email */}
         <div className="text-center text-[11px] leading-snug px-2 text-black">
           <div>Shop No. 21, Punit Tower 1, Opp. YAK Marine, MTNL Lane, Sec-11, CBD Belapur, Navi Mumbai - 400 614</div>
-          <div className="mt-0.5">Tel: 022-2756 0304 | Email : medical@sailorsmedicalclinic.com | Web: www.sailorsmedicalclinic.com</div>
+          <div className="mt-0.5">Tel: 022-2756 0304 / +91 95614 50104 | Email : medical@sailorsmedicalclinic.com | Web: www.sailorsmedicalclinic.com</div>
         </div>
 
         {/* Title */}

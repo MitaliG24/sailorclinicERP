@@ -94,7 +94,7 @@ export async function getSession(request: Request): Promise<ClinicUser | null> {
 }
 
 async function bootstrapUsers(users: any) {
-  const adminEmail = (process.env.CLINIC_ADMIN_EMAIL || "medical@sailorsmedical.com").toLowerCase().trim();
+  const adminEmail = (process.env.CLINIC_ADMIN_EMAIL || "medical@sailorsmedicalclinic.com").toLowerCase().trim();
   const adminPassword = process.env.CLINIC_ADMIN_PASSWORD || "Admin@123";
   const staffEmail = (process.env.CLINIC_STAFF_EMAIL || "info@sailorsmedical.com").toLowerCase().trim();
   const staffPassword = process.env.CLINIC_STAFF_PASSWORD || "Staff@1";

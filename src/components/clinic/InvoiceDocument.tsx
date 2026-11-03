@@ -96,7 +96,7 @@ export function InvoiceDocument({ invoice, onPrint, onClose }: InvoiceDocumentPr
                   Centre for Marine Medical Examinations • D.G. Shipping Approved Doctors
                 </p>
                 <p className="text-[11px] text-muted-foreground mt-1 max-w-[420px] leading-relaxed">
-                  Shop No. 21, Punit Tower - 1, Sec-11, CBD Belapur, Navi Mumbai | Mob.: +91 95614 50104 | Email: medical@sailorsmedical.com
+                  Shop No. 21, Punit Tower - 1, Sec-11, CBD Belapur, Navi Mumbai | Mob.: +91 95614 50104 | Email: medical@sailorsmedicalclinic.com
                 </p>
                 <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground mt-1.5 font-mono">
                   <span>ISO 9001:2015 & ISO 45001:2018 Certified</span>
@@ -167,7 +167,7 @@ export function InvoiceDocument({ invoice, onPrint, onClose }: InvoiceDocumentPr
                   <Badge variant="secondary" className="text-[10px] font-medium">
                     {invoice.rank}
                   </Badge>
-  
+
                   {invoice.vessel && (
                     <span className="text-[10px] text-primary flex items-center gap-1 font-semibold">
                       <Ship className="size-3" /> {invoice.vessel}

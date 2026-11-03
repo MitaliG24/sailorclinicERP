@@ -207,19 +207,47 @@ export function PatientDetailModal({
 
             {/* Medical & Diagnostic Details */}
             <div className="rounded-lg border border-border bg-card p-4 space-y-2.5">
-              <div className="flex items-center gap-1.5 font-semibold text-foreground border-b border-border/60 pb-2">
-                <Stethoscope className="size-3.5 text-primary" />
-                Medical & Diagnostics
+              <div className="flex items-center justify-between border-b border-border/60 pb-2">
+                <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                  <Stethoscope className="size-3.5 text-primary" />
+                  Medical & Diagnostics
+                </div>
+                <Badge
+                  variant={patient.fitnessStatus === "Unfit" ? "destructive" : "default"}
+                  className="text-[10px] font-semibold"
+                >
+                  {patient.fitnessStatus === "Unfit"
+                    ? `UNFIT (${patient.unfitType || "TEMPORARY"})`
+                    : "FIT"}
+                </Badge>
               </div>
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Type of Medical:</span>
                   <span className="font-semibold text-foreground">{patient.typeOfMedical}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">USG / XRay:</span>
-                  <span className="font-medium text-accent-foreground">{patient.usgXray}</span>
+                <div className="flex justify-between gap-2">
+                  <span className="text-muted-foreground shrink-0">Test / Medical:</span>
+                  <span className="font-medium text-foreground text-right">{patient.testMedical || patient.usgXray}</span>
                 </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Fitness Assessment:</span>
+                  <span className={`font-semibold ${patient.fitnessStatus === "Unfit" ? "text-destructive" : "text-emerald-600"}`}>
+                    {patient.fitnessStatus === "Unfit" ? `Unfit (${patient.unfitType || "Temporary"})` : "Fit for Sea Duty"}
+                  </span>
+                </div>
+                {patient.fitnessStatus === "Unfit" && patient.unfitReason && (
+                  <div className="flex justify-between gap-2 rounded bg-destructive/5 p-1.5 border border-destructive/20">
+                    <span className="text-destructive font-semibold shrink-0">Reason of Unfit:</span>
+                    <span className="font-medium text-destructive text-right">{patient.unfitReason}</span>
+                  </div>
+                )}
+                {patient.examinationRemark && (
+                  <div className="flex justify-between gap-2 rounded bg-muted/40 p-1.5 border border-border">
+                    <span className="text-muted-foreground shrink-0">Exam Remark:</span>
+                    <span className="font-medium text-foreground text-right">{patient.examinationRemark}</span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Time In:</span>
                   <span className="font-medium text-foreground">{patient.timeIn}</span>
@@ -227,10 +255,6 @@ export function PatientDetailModal({
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Time Out:</span>
                   <span className="font-medium text-foreground">{patient.timeOut}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Fitness Condition:</span>
-                  <span className="font-medium text-foreground">{patient.condition}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Record Status:</span>
