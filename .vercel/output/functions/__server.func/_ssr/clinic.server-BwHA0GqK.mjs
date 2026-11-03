@@ -1,6 +1,6 @@
+import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-Ca2SpTC3.mjs";
 import { a as TSS_SERVER_FUNCTION, l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
-import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-jEig8d49.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-CScDC1af.js
+//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-BwHA0GqK.js
 var __defProp = Object.defineProperty;
 var __exportAll = (all, no_symbols) => {
 	let target = {};

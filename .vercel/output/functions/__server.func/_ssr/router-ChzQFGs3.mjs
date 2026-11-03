@@ -1,17 +1,17 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { _ as createFileRoute, b as useRouter, d as Scripts, f as HeadContent, g as lazyRouteComponent, h as Outlet, m as createRouter, v as createRootRouteWithContext, y as Link } from "../_libs/@tanstack/react-router+[...].mjs";
+import { p as submitFeedbackServer } from "./clinic.server-BwHA0GqK.mjs";
 import { a as ratingOptions, n as feedbackQuestions } from "./feedback-Clu2AqVp.mjs";
-import { p as submitFeedbackServer } from "./clinic.server-CScDC1af.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { f as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { n as ClinicLogo, t as Button } from "./ClinicLogo-vQhzZWTZ.mjs";
 import { t as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
-import { Z as CircleCheck, ft as ArrowLeft, v as Send, w as Printer, x as RotateCcw } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-OcXBpJrf.js
+import { Q as CircleCheck, _ as Send, b as RotateCcw, ft as ArrowLeft, w as Printer } from "../_libs/lucide-react.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-ChzQFGs3.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-dUg28igB.css";
+var styles_default = "/assets/styles-Cq1EVB9P.css";
 function NotFoundComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "flex min-h-screen items-center justify-center bg-background px-4",
@@ -149,7 +149,7 @@ function RootComponent() {
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {})
 	});
 }
-var $$splitComponentImporter$1 = () => import("./routes-DBivm53y.mjs");
+var $$splitComponentImporter$1 = () => import("./routes-BFocCYvV.mjs");
 var Route$2 = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Sailors Medical Clinic | Centre for Marine Medical Examinations" },
@@ -176,7 +176,7 @@ var Route$2 = createFileRoute("/")({
 	] }),
 	component: lazyRouteComponent($$splitComponentImporter$1, "component")
 });
-var $$splitComponentImporter = () => import("./db-test-B7gLTiGI.mjs");
+var $$splitComponentImporter = () => import("./db-test-yxoT4Mhx.mjs");
 var Route$1 = createFileRoute("/db-test")({ component: lazyRouteComponent($$splitComponentImporter, "component") });
 var Route = createFileRoute("/feedback")({
 	head: () => ({ meta: [{ title: "Feedback Form | Sailor's Medical Clinic - Centre for Marine Medical Examinations" }, {
@@ -465,7 +465,7 @@ function SailorFeedbackFormPage() {
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Mob.: +91 95614 50104" }),
 								" |",
 								" ",
-								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Email : medical@sailorsmedical.com" })
+								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "Email : medical@sailorsmedicalclinic.com" })
 							]
 						})]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {

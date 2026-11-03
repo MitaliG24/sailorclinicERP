@@ -1,5 +1,5 @@
 import { a as objectType, i as numberType, n as enumType, o as stringType, r as literalType, t as arrayType } from "../_libs/zod.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/staff-D45nO_Ee.js
+//#region node_modules/.nitro/vite/services/ssr/assets/staff-B5unLMAV.js
 var clinicSections = [
 	{
 		id: "dashboard",
@@ -13,12 +13,7 @@ var clinicSections = [
 	},
 	{
 		id: "invoices",
-		label: "Invoices",
-		group: "Workspace"
-	},
-	{
-		id: "payments",
-		label: "Payments",
+		label: "Payment Records",
 		group: "Workspace"
 	},
 	{
@@ -51,7 +46,6 @@ var staffSections = [
 	"dashboard",
 	"patients",
 	"invoices",
-	"payments",
 	"reports"
 ];
 function getVisibleSections(role) {

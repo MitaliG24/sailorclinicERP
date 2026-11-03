@@ -2,7 +2,7 @@ import { t as getDatabase } from "./mongodb.server-DjK6AyEN.mjs";
 import { n as createMiddleware, t as createCsrfMiddleware } from "./createCsrfMiddleware-B2To0gPJ.mjs";
 import { t as renderErrorPage } from "./ssr.mjs";
 import crypto from "node:crypto";
-//#region node_modules/.nitro/vite/services/ssr/assets/start-1ILI8HJS.js
+//#region node_modules/.nitro/vite/services/ssr/assets/start-s3t6_DMM.js
 function dedupeSerializationAdapters(deduped, serializationAdapters) {
 	for (let i = 0, len = serializationAdapters.length; i < len; i++) {
 		const current = serializationAdapters[i];
@@ -87,7 +87,7 @@ async function getSession(request) {
 	}
 }
 async function bootstrapUsers(users) {
-	const adminEmail = (process.env.CLINIC_ADMIN_EMAIL || "medical@sailorsmedical.com").toLowerCase().trim();
+	const adminEmail = (process.env.CLINIC_ADMIN_EMAIL || "medical@sailorsmedicalclinic.com").toLowerCase().trim();
 	const adminPassword = process.env.CLINIC_ADMIN_PASSWORD || "Admin@123";
 	const staffEmail = (process.env.CLINIC_STAFF_EMAIL || "info@sailorsmedical.com").toLowerCase().trim();
 	const staffPassword = process.env.CLINIC_STAFF_PASSWORD || "Staff@1";
@@ -253,7 +253,7 @@ var authMiddleware = createMiddleware({ type: "request" }).server(async ({ reque
 	if (authResponse) return authResponse;
 	if (pathname === "/api/feedback/submit" && request.method === "POST") try {
 		const body = await request.json();
-		const { submitFeedbackServer } = await import("./clinic.server-CScDC1af.mjs").then((n) => n.t);
+		const { submitFeedbackServer } = await import("./clinic.server-BwHA0GqK.mjs").then((n) => n.t);
 		const res = await submitFeedbackServer({ data: body });
 		return Response.json(res, { status: res.success ? 200 : 400 });
 	} catch (err) {
