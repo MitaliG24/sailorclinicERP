@@ -7,9 +7,11 @@ import {
   ArrowRight,
   ArrowUpRight,
   Bell,
+  Building2,
   CalendarDays,
   Check,
   CheckCircle2,
+  CheckSquare,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -43,6 +45,7 @@ import {
   Settings,
   ShieldCheck,
   Ship,
+  Square,
   Stethoscope,
   Trash2,
   UserRound,
@@ -63,6 +66,7 @@ import { InvoiceModule } from "@/components/clinic/InvoiceModule";
 import { PatientDetailModal } from "@/components/clinic/PatientDetailModal";
 import { PatientModal } from "@/components/clinic/PatientModal";
 import { StaffManagementModule } from "@/components/clinic/StaffManagementModule";
+import { CompanyManagementModule } from "@/components/clinic/CompanyManagementModule";
 import { ReportsModule } from "@/components/clinic/ReportsModule";
 import {
   deleteInvoiceServer,
@@ -72,6 +76,7 @@ import {
   saveInvoiceServer,
   savePatientServer,
 } from "@/lib/clinic.server";
+import { exportPatientsToExcel } from "@/lib/excel-export";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +105,7 @@ import {
   clinicSections,
   formatINR,
   getVisibleSections,
+  initialCompanies,
   initialPatients,
   invoiceRecords,
   staffRecords,
@@ -107,6 +113,7 @@ import {
   type ClinicSection,
   type InvoiceRecord,
   type PatientRecord,
+  type ShippingCompany,
 } from "@/lib/clinic";
 
 export const Route = createFileRoute("/")({
@@ -135,6 +142,7 @@ const navIcons: Record<ClinicSection, typeof LayoutDashboard> = {
   invoices: CreditCard,
   feedback: ClipboardList,
   staff: UserRound,
+  companies: Building2,
   reports: FileChartColumnIncreasing,
   activity: Activity,
   settings: Settings,
@@ -147,6 +155,8 @@ const sectionDescriptions: Record<ClinicSection, string> = {
   feedback:
     "Review patient complaints, grievance redressal logs, and reviews. Download compliance reports in Excel (.xlsx) per government medical rules.",
   staff: "Manage your clinical team and day-to-day coverage.",
+  companies:
+    "Register and manage shipping companies. Registered companies appear automatically in the candidate registration dropdown.",
   reports: "Track clinic performance and financial health.",
   activity: "A secure timeline of changes across your clinic.",
   settings: "Manage your clinic details and workspace preferences.",
@@ -155,8 +165,8 @@ const sectionDescriptions: Record<ClinicSection, string> = {
 function ClinicApp() {
   const [role, setRole] = useState<ClinicRole | null>(null);
   const [currentUser, setCurrentUser] = useState<UserProfileData>({
-    name: "Mitali Gadge",
-    email: "medical@sailorsmedicalclinic.com",
+    name: "Dr. Mitali Gadge",
+    email: "medical@sailorsmedical.com",
     role: "admin",
     phone: "+91 95614 50104",
     designation: "Chief Medical Administrator & Director",
@@ -182,6 +192,39 @@ function ClinicApp() {
 
   // Invoice Modal State
   const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = useState(false);
+
+  // Shipping Companies State (synced to localStorage)
+  const [companies, setCompanies] = useState<ShippingCompany[]>(() => {
+    try {
+      const stored = localStorage.getItem("sailor_clinic_companies");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {}
+    return initialCompanies;
+  });
+
+  const handleSaveCompany = (newCompany: ShippingCompany) => {
+    setCompanies((prev) => {
+      const updated = [newCompany, ...prev];
+      try {
+        localStorage.setItem("sailor_clinic_companies", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
+  const handleDeleteCompany = (id: string, name: string) => {
+    setCompanies((prev) => {
+      const updated = prev.filter((c) => c.id !== id);
+      try {
+        localStorage.setItem("sailor_clinic_companies", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+    setNotice(`"${name}" removed from company directory.`);
+  };
 
   // Calendar & Schedule States
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date>(new Date());
@@ -214,11 +257,13 @@ function ClinicApp() {
         const user = (await response.json()) as UserProfileData;
         let finalUser = user;
         try {
-          const stored = localStorage.getItem("marine_clinic_admin_profile");
-          if (stored) {
-            const parsed = JSON.parse(stored) as UserProfileData;
-            if (parsed?.name) {
-              finalUser = { ...user, ...parsed };
+          if (user.role === "admin") {
+            const stored = localStorage.getItem("marine_clinic_admin_profile");
+            if (stored) {
+              const parsed = JSON.parse(stored) as UserProfileData;
+              if (parsed?.name) {
+                finalUser = { ...user, ...parsed, role: user.role };
+              }
             }
           }
         } catch {}
@@ -265,6 +310,14 @@ function ClinicApp() {
     return patients.reduce((max, p) => Math.max(max, p.srNo || 0), 0) + 1;
   }, [patients]);
 
+  const nextPatientId = useMemo(() => {
+    const highestNum = patients.reduce((max, p) => {
+      const match = p.id?.match(/^PT-(\d+)$/);
+      return match ? Math.max(max, parseInt(match[1], 10)) : max;
+    }, 2408);
+    return `PT-${highestNum + 1}`;
+  }, [patients]);
+
   const openAddModal = () => {
     setSelectedPatientForEdit(null);
     setPatientModalOpen(true);
@@ -281,68 +334,96 @@ function ClinicApp() {
   };
 
   const handleSavePatient = async (saved: PatientRecord) => {
+    const highestInvNum = invoices.reduce((max, inv) => {
+      const match = inv.id?.match(/^INV-2026-(\d+)$/) || inv.id?.match(/^REC-2026-(\d+)$/);
+      return match ? Math.max(max, parseInt(match[1], 10)) : max;
+    }, 84);
+
+    const invId = saved.invoiceNo || `INV-2026-${String(highestInvNum + 1).padStart(3, "0")}`;
+    const totalFeeNum = saved.totalFee !== undefined && saved.totalFee > 0 ? saved.totalFee : 3500;
+    const isPaidStatus = saved.paymentStatus === "Paid" || saved.paymentStatus === "Own";
+    const isPartialStatus = saved.paymentStatus === "Partial";
+    const isPendingStatus = saved.paymentStatus === "Pending";
+
+    const rawAmt = Number(saved.paymentAmount?.replace(/[^0-9.]/g, "")) || 0;
+    const paidAmt = isPaidStatus
+      ? totalFeeNum
+      : isPendingStatus
+        ? 0
+        : Math.min(totalFeeNum, Math.max(0, rawAmt));
+    const duesAmt = isPaidStatus
+      ? 0
+      : isPendingStatus
+        ? totalFeeNum
+        : (saved.balanceDue ?? Math.max(0, totalFeeNum - paidAmt));
+
+    const patientWithInvoice: PatientRecord = {
+      ...saved,
+      invoiceNo: invId,
+      totalFee: totalFeeNum,
+      balanceDue: duesAmt,
+      paymentAmount: `₹${paidAmt.toLocaleString("en-IN")}.00`,
+    };
+
     if (selectedPatientForEdit) {
       setPatients((current) =>
-        current.map((item) => (item.id === saved.id ? saved : item))
+        current.map((item) => (item.id === patientWithInvoice.id ? patientWithInvoice : item))
       );
-      setNotice(`${saved.name}'s marine record was updated and saved to MongoDB.`);
+      setNotice(`${patientWithInvoice.name}'s marine record was updated and saved to MongoDB.`);
     } else {
-      setPatients((current) => [saved, ...current]);
-      setNotice(`${saved.name} was added to patient records in MongoDB (Sr. #${saved.srNo}).`);
+      setPatients((current) => [patientWithInvoice, ...current]);
+      setNotice(`${patientWithInvoice.name} was added to patient records in MongoDB (Sr. #${patientWithInvoice.srNo}).`);
     }
 
-    // Automatically sync candidate payment record to Payment Records module and MongoDB
-    const invId = saved.invoiceNo || `REC-2026-${String(saved.srNo || 1).padStart(3, "0")}`;
-    const rawAmt = Number(saved.paymentAmount?.replace(/[^0-9.]/g, "")) || (saved.paymentStatus === "Pending" ? 0 : 3500);
-    const totalFeeNum = saved.totalFee || 3500;
-    const isPaidStatus = saved.paymentStatus === "Paid" || saved.paymentStatus === "Own";
     const paymentRecordEntry: InvoiceRecord = {
       id: invId,
-      patient: saved.name,
-      patientId: saved.id,
-      date: saved.date || new Date().toISOString().slice(0, 10),
-      dueDate: isPaidStatus ? (saved.date || new Date().toISOString().slice(0, 10)) : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+      patient: patientWithInvoice.name,
+      patientId: patientWithInvoice.id,
+      date: patientWithInvoice.date || new Date().toISOString().slice(0, 10),
+      dueDate: isPaidStatus
+        ? (patientWithInvoice.date || new Date().toISOString().slice(0, 10))
+        : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
       amount: formatINR(totalFeeNum),
       total: totalFeeNum,
       subtotal: totalFeeNum,
       tax: 0,
       discount: 0,
       status: isPaidStatus ? "Paid" : "Pending",
-      company: saved.companyName || "Independent / Agency",
-      rank: saved.rank,
-      vessel: saved.vesselName || saved.vessel,
-      indosNo: saved.indosNo,
-      cdcNo: saved.cdcNo,
-      certificateNo: saved.certificateNo,
-      paymentMethod: saved.paymentMode || "UPI",
-      transactionRef: saved.transactionId,
-      paidDate: (isPaidStatus || saved.paymentStatus === "Partial")
-        ? (saved.date ? new Date(saved.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Today")
+      company: patientWithInvoice.companyName || "Independent / Agency",
+      rank: patientWithInvoice.rank,
+      vessel: patientWithInvoice.vesselName || patientWithInvoice.vessel,
+      indosNo: patientWithInvoice.indosNo,
+      cdcNo: patientWithInvoice.cdcNo,
+      certificateNo: patientWithInvoice.certificateNo,
+      paymentMethod: patientWithInvoice.paymentMode || "UPI",
+      transactionRef: patientWithInvoice.transactionId || (isPaidStatus ? "Cleared" : "Pending clearance"),
+      paidDate: (isPaidStatus || isPartialStatus)
+        ? (patientWithInvoice.date ? new Date(patientWithInvoice.date).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "Today")
         : undefined,
       items: [
         {
           id: "item-1",
-          description: saved.typeOfMedical || "Marine Medical Fitness Examination",
+          description: patientWithInvoice.typeOfMedical || "Marine Medical Fitness Examination",
           sacCode: "999312",
           qty: 1,
           rate: totalFeeNum,
           amount: totalFeeNum,
         },
       ],
-      amountPaid: rawAmt,
-      balanceDue: saved.balanceDue ?? (saved.paymentStatus === "Partial" ? Math.max(0, totalFeeNum - rawAmt) : saved.paymentStatus === "Pending" ? totalFeeNum : 0),
-      paymentStatus: saved.paymentStatus,
+      amountPaid: paidAmt,
+      balanceDue: duesAmt,
+      paymentStatus: patientWithInvoice.paymentStatus,
     };
 
     setInvoices((prev) => {
-      const exists = prev.some((inv) => inv.patientId === saved.id || inv.id === invId);
+      const exists = prev.some((inv) => inv.patientId === patientWithInvoice.id || inv.id === invId);
       return exists
-        ? prev.map((inv) => (inv.patientId === saved.id || inv.id === invId ? { ...inv, ...paymentRecordEntry } : inv))
+        ? prev.map((inv) => (inv.patientId === patientWithInvoice.id || inv.id === invId ? { ...inv, ...paymentRecordEntry } : inv))
         : [paymentRecordEntry, ...prev];
     });
 
     try {
-      await savePatientServer({ data: saved });
+      await savePatientServer({ data: patientWithInvoice });
       await saveInvoiceServer({ data: paymentRecordEntry });
     } catch (err) {
       console.error("Failed to save patient or payment record to MongoDB Atlas:", err);
@@ -351,11 +432,23 @@ function ClinicApp() {
 
   const handleDeletePatient = async (id: string, name: string) => {
     setPatients((current) => current.filter((item) => item.id !== id));
+    setInvoices((current) => current.filter((inv) => inv.patientId !== id && inv.patient !== name));
     setNotice(`${name}'s record has been removed.`);
     try {
       await deletePatientServer({ data: { id, name } });
     } catch (err) {
       console.error("Failed to remove patient from MongoDB Atlas:", err);
+    }
+  };
+
+  const handleDeleteMultiplePatients = async (ids: string[]) => {
+    setPatients((current) => current.filter((item) => !ids.includes(item.id)));
+    setInvoices((current) => current.filter((inv) => !ids.includes(inv.patientId || "") && !ids.includes(inv.id)));
+    setNotice(`${ids.length} candidate record(s) removed.`);
+    try {
+      await Promise.all(ids.map((id) => deletePatientServer({ data: { id, name: id } })));
+    } catch (err) {
+      console.error("Failed to remove patients from MongoDB Atlas:", err);
     }
   };
 
@@ -610,6 +703,9 @@ function ClinicApp() {
                 aria-label="Sign out"
                 title="Sign out of clinic workspace"
                 onClick={async () => {
+                  try {
+                    localStorage.removeItem("marine_clinic_admin_profile");
+                  } catch {}
                   await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
                   window.location.assign("/");
                 }}
@@ -623,6 +719,9 @@ function ClinicApp() {
               className="hidden"
 
               onClick={async () => {
+                try {
+                  localStorage.removeItem("marine_clinic_admin_profile");
+                } catch {}
                 await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
                 window.location.assign("/");
               }}
@@ -687,6 +786,7 @@ function ClinicApp() {
                   onEdit={openEditModal}
                   onView={openViewModal}
                   onDelete={handleDeletePatient}
+                  onDeleteMultiple={handleDeleteMultiplePatients}
                   onNotice={setNotice}
                 />
               )}
@@ -704,6 +804,15 @@ function ClinicApp() {
               )}
               {section === "feedback" && <FeedbackAdminModule onNotice={setNotice} />}
               {section === "staff" && <StaffManagementModule onNotice={setNotice} />}
+              {section === "companies" && (
+                <CompanyManagementModule
+                  companies={companies}
+                  patients={patients}
+                  onAddCompany={handleSaveCompany}
+                  onDeleteCompany={handleDeleteCompany}
+                  onNotice={setNotice}
+                />
+              )}
               {section === "reports" && (
                 <ReportsModule
                   patients={patients}
@@ -763,6 +872,8 @@ function ClinicApp() {
         onOpenChange={setPatientModalOpen}
         patientToEdit={selectedPatientForEdit}
         nextSrNo={nextSrNo}
+        nextPatientId={nextPatientId}
+        companyList={companies.map((c) => c.name)}
         onSave={handleSavePatient}
       />
 
@@ -972,7 +1083,7 @@ function SignIn() {
             Centre for Marine Medical Examinations.
           </h1>
           <p className="mt-5 max-w-[430px] text-base leading-7 text-muted-foreground">
-            CBD Belapur, Navi Mumbai • Tel: +91 95614 50104 • Email: medical@sailorsmedicalclinic.com
+            CBD Belapur, Navi Mumbai • Tel: +91 95614 50104 • Email: medical@sailorsmedical.com
           </p>
           <div className="mt-10 flex items-center gap-3 border-t border-border pt-6">
             <div className="flex -space-x-2">
@@ -1017,7 +1128,7 @@ function SignIn() {
                 id="clinic-email"
                 type="email"
                 autoComplete="username"
-                placeholder="medical@sailorsmedicalclinic.com"
+                placeholder="medical@sailorsmedical.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -1053,6 +1164,52 @@ function SignIn() {
               {!loading && <ArrowRight className="size-4" />}
             </Button>
           </form>
+
+          <div className="mt-4 rounded-lg border border-border/80 bg-muted/40 p-3.5">
+            <div className="mb-2 flex items-center justify-between text-xs">
+              <span className="font-semibold text-foreground">Clinic Access Credentials:</span>
+              <span className="text-[10px] text-muted-foreground">Click to fill</span>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("medical@sailorsmedical.com");
+                  setPassword("Admin@123");
+                  setError("");
+                }}
+                className="group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-semibold text-primary">Clinic Admin</span>
+                  <Badge variant="outline" className="text-[9px] px-1 py-0">Full Access</Badge>
+                </div>
+                <span className="mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground">
+                  medical@sailorsmedical.com
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">Pass: Admin@123</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail("info@sailorsmedical.com");
+                  setPassword("Staff@1");
+                  setError("");
+                }}
+                className="group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40"
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span className="text-xs font-semibold text-primary">Clinic Staff</span>
+                  <Badge variant="outline" className="text-[9px] px-1 py-0">Frontdesk</Badge>
+                </div>
+                <span className="mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground">
+                  info@sailorsmedical.com
+                </span>
+                <span className="text-[10px] font-mono text-muted-foreground">Pass: Staff@1</span>
+              </button>
+            </div>
+          </div>
 
           <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-3 text-center">
             <Link
@@ -1163,47 +1320,146 @@ function Dashboard({
   role?: ClinicRole | null;
 }) {
   const isStaff = role === "staff";
+  const [seafarerPeriod, setSeafarerPeriod] = useState<"day" | "month" | "year">("month");
+  const [paymentPeriod, setPaymentPeriod] = useState<"day" | "month" | "year">("month");
   const todayStr = new Date().toISOString().slice(0, 10);
-  const todayPayments = patients.filter((p) => {
-    const isToday =
-      p.date === todayStr ||
-      (p.lastVisit && p.lastVisit.includes(todayStr)) ||
-      (p.date && new Date(p.date).toISOString().slice(0, 10) === todayStr);
-    return isToday && (p.paymentStatus === "Paid" || p.paymentStatus === "Own" || p.paymentStatus === "Partial");
+  const thisMonthStr = todayStr.slice(0, 7);
+
+  const latestPatientDate = patients.reduce((latest, p) => {
+    if (!p.date) return latest;
+    const d = p.date.slice(0, 10);
+    return d > latest ? d : latest;
+  }, "");
+  const activeDay = patients.some((p) => p.date === todayStr)
+    ? todayStr
+    : (latestPatientDate || todayStr);
+  const activeMonth = activeDay.slice(0, 7);
+  const activeYear = activeDay.slice(0, 4);
+
+  const dayPayments = patients.filter((p) => {
+    const d = p.date || "";
+    const isDay =
+      d === activeDay ||
+      d === todayStr ||
+      (p.lastVisit && (p.lastVisit.includes(activeDay) || p.lastVisit.includes(todayStr)));
+    return isDay && p.paymentStatus !== "Pending";
   });
-  const todayAmountReceived = todayPayments.reduce((sum, p) => {
+
+  const dayAmountReceived = dayPayments.reduce((sum, p) => {
+    const rawAmt = Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) || 0;
+    const fee = p.totalFee || (rawAmt > 0 ? rawAmt : 3500);
     const amt =
-      Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) ||
-      (p.paymentStatus === "Pending" ? 0 : 3500);
+      p.paymentStatus === "Paid" || p.paymentStatus === "Own"
+        ? fee
+        : p.paymentStatus === "Partial"
+          ? rawAmt
+          : 0;
     return sum + amt;
   }, 0);
 
+  const monthPayments = patients.filter((p) => {
+    const d = p.date || "";
+    const isMonth =
+      d.startsWith(activeMonth) ||
+      d.startsWith(thisMonthStr) ||
+      (p.lastVisit && (p.lastVisit.includes(activeMonth) || p.lastVisit.includes("Oct")));
+    return isMonth && p.paymentStatus !== "Pending";
+  });
+
+  const monthAmountReceived = monthPayments.reduce((sum, p) => {
+    const rawAmt = Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) || 0;
+    const fee = p.totalFee || (rawAmt > 0 ? rawAmt : 3500);
+    const amt =
+      p.paymentStatus === "Paid" || p.paymentStatus === "Own"
+        ? fee
+        : p.paymentStatus === "Partial"
+          ? rawAmt
+          : 0;
+    return sum + amt;
+  }, 0);
+
+  const yearPayments = patients.filter((p) => {
+    const d = p.date || "";
+    const isYear =
+      d.startsWith(activeYear) ||
+      d.startsWith(todayStr.slice(0, 4));
+    return isYear && p.paymentStatus !== "Pending";
+  });
+
+  const yearAmountReceived = (yearPayments.length > 0 ? yearPayments : patients.filter(p => p.paymentStatus !== "Pending")).reduce((sum, p) => {
+    const rawAmt = Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) || 0;
+    const fee = p.totalFee || (rawAmt > 0 ? rawAmt : 3500);
+    const amt =
+      p.paymentStatus === "Paid" || p.paymentStatus === "Own"
+        ? fee
+        : p.paymentStatus === "Partial"
+          ? rawAmt
+          : 0;
+    return sum + amt;
+  }, 0);
+
+  const dayCandidateCount = patients.filter((p) => {
+    const d = p.date || "";
+    return d === activeDay || d === todayStr;
+  }).length;
+
+  const monthCandidateCount = patients.filter((p) => {
+    const d = p.date || "";
+    return d.startsWith(activeMonth) || d.startsWith(thisMonthStr);
+  }).length;
+
+  const yearCandidateCount = patients.length;
+
+  const seafarerMetricValue =
+    seafarerPeriod === "day"
+      ? String(dayCandidateCount)
+      : seafarerPeriod === "month"
+        ? String(monthCandidateCount)
+        : String(yearCandidateCount);
+
+  const seafarerMetricDetail =
+    seafarerPeriod === "day"
+      ? `${dayCandidateCount} registered today`
+      : seafarerPeriod === "month"
+        ? `${monthCandidateCount} examined this month`
+        : `${yearCandidateCount} verified this year`;
+
+  const paymentMetricValue =
+    paymentPeriod === "day"
+      ? formatINR(dayAmountReceived)
+      : paymentPeriod === "month"
+        ? formatINR(monthAmountReceived)
+        : formatINR(yearAmountReceived);
+
+  const paymentMetricDetail =
+    paymentPeriod === "day"
+      ? `${dayPayments.length} receipt(s) collected today`
+      : paymentPeriod === "month"
+        ? `${monthPayments.length} cleared this month`
+        : `${patients.filter((p) => p.paymentStatus !== "Pending").length} total settlements`;
+
   const metricCards = [
-    { label: "Total seafarers", value: `${2480 + patients.length}`, detail: "+14 registered today", positive: true, icon: Users, shade: "bg-secondary text-secondary-foreground", trend: "M0 18 L10 15 L20 17 L30 8 L40 11 L50 4 L60 7" },
+    {
+      label: "Total seafarers",
+      value: seafarerMetricValue,
+      detail: seafarerMetricDetail,
+      positive: true,
+      icon: Users,
+      shade: "bg-secondary text-secondary-foreground",
+      trend: "M0 18 L10 15 L20 17 L30 8 L40 11 L50 4 L60 7",
+      isSeafarerCard: true,
+    },
+    {
+      label: "Total collection",
+      value: paymentMetricValue,
+      detail: paymentMetricDetail,
+      positive: true,
+      icon: WalletCards,
+      shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground",
+      trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2",
+      isPaymentCard: true,
+    },
     { label: "Medicals today", value: "38", detail: "USG & X-Ray active", positive: true, icon: CalendarDays, shade: "bg-accent text-accent-foreground", trend: "M0 16 L10 13 L20 15 L30 7 L40 10 L50 2 L60 5" },
-    ...(isStaff
-      ? [
-          {
-            label: "Daily payments received",
-            value: formatINR(todayAmountReceived > 0 ? todayAmountReceived : 14000),
-            detail: `${todayPayments.length > 0 ? todayPayments.length : 4} receipts settled today`,
-            positive: true,
-            icon: WalletCards,
-            shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground",
-            trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2",
-          },
-        ]
-      : [
-          {
-            label: "Revenue this month",
-            value: "₹4,82,900",
-            detail: "All records date-wise",
-            positive: true,
-            icon: WalletCards,
-            shade: "bg-[color:color-mix(in_oklab,var(--chart-3)_14%,white)] text-foreground",
-            trend: "M0 19 L10 16 L20 12 L30 15 L40 8 L50 7 L60 2",
-          },
-        ]),
     { label: "Pending medicals", value: "6", detail: "Awaiting USG / Lab", positive: false, icon: FileText, shade: "bg-[color:color-mix(in_oklab,var(--chart-4)_12%,white)] text-foreground", trend: "M0 5 L10 9 L20 4 L30 11 L40 8 L50 15 L60 13" },
   ];
 
@@ -1267,9 +1523,47 @@ function Dashboard({
           const Icon = metric.icon;
           return (
             <section key={metric.label} className="rounded-md border border-border bg-card p-4 sm:p-[18px]">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-[13px] font-medium text-muted-foreground">{metric.label}</p>
-                <span className={`grid size-8 place-items-center rounded ${metric.shade}`}>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <p className="text-[13px] font-medium text-muted-foreground">{metric.label}</p>
+                  {metric.isSeafarerCard && (
+                    <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
+                      {(["day", "month", "year"] as const).map((period) => (
+                        <button
+                          key={period}
+                          type="button"
+                          onClick={() => setSeafarerPeriod(period)}
+                          className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
+                            seafarerPeriod === period
+                              ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {period}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  {metric.isPaymentCard && (
+                    <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
+                      {(["day", "month", "year"] as const).map((period) => (
+                        <button
+                          key={period}
+                          type="button"
+                          onClick={() => setPaymentPeriod(period)}
+                          className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
+                            paymentPeriod === period
+                              ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {period}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <span className={`grid size-8 place-items-center rounded shrink-0 ${metric.shade}`}>
                   <Icon className="size-[17px]" />
                 </span>
               </div>
@@ -1441,6 +1735,7 @@ function PatientRecords({
   onEdit,
   onView,
   onDelete,
+  onDeleteMultiple,
   onNotice,
 }: {
   patients: PatientRecord[];
@@ -1450,17 +1745,70 @@ function PatientRecords({
   onEdit: (patient: PatientRecord) => void;
   onView: (patient: PatientRecord) => void;
   onDelete: (id: string, name: string) => void;
+  onDeleteMultiple?: (ids: string[]) => void;
   onNotice: (message: string) => void;
 }) {
-  const filtered = useMemo(
-    () =>
-      patients.filter((patient) =>
-        `${patient.name} ${patient.id} ${patient.rank || ""} ${patient.companyName || ""} ${patient.vesselName || patient.vessel || ""} ${patient.certificateNo || ""} ${patient.indosNo || ""} ${patient.cdcNo || ""} ${patient.typeOfMedical || ""} ${patient.paymentStatus || ""} ${patient.condition || ""}`
-          .toLowerCase()
-          .includes(search.toLowerCase()),
-      ),
-    [patients, search],
-  );
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const filtered = useMemo(() => {
+    return patients.filter((patient) => {
+      const textMatch = `${patient.name} ${patient.id} ${patient.rank || ""} ${patient.companyName || ""} ${patient.vesselName || patient.vessel || ""} ${patient.certificateNo || ""} ${patient.indosNo || ""} ${patient.cdcNo || ""} ${patient.passportNo || ""} ${patient.typeOfMedical || ""} ${patient.paymentStatus || ""} ${patient.condition || ""}`
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+      if (!textMatch) return false;
+
+      // Date to date range filter
+      if (startDate || endDate) {
+        const rawDate = patient.date || "";
+        let pDate = "";
+        if (/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+          pDate = rawDate;
+        } else if (rawDate) {
+          const parsed = new Date(rawDate);
+          if (!isNaN(parsed.getTime())) {
+            pDate = parsed.toISOString().slice(0, 10);
+          }
+        }
+
+        if (pDate) {
+          if (startDate && pDate < startDate) return false;
+          if (endDate && pDate > endDate) return false;
+        }
+      }
+
+      return true;
+    });
+  }, [patients, search, startDate, endDate]);
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedIds.length === filtered.length && filtered.length > 0) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filtered.map((p) => p.id));
+    }
+  };
+
+  const handleDeleteSelected = () => {
+    if (!selectedIds.length) return;
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${selectedIds.length} selected seafarer record(s)?`
+      )
+    ) {
+      onDeleteMultiple?.(selectedIds);
+      onNotice(`Deleted ${selectedIds.length} candidate record(s).`);
+      setSelectedIds([]);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -1480,11 +1828,11 @@ function PatientRecords({
               </Badge>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Includes INDoS, CDC, Certificate, USG/X-Ray, Time In/Out & Payment Status (Paid / Own)
+              Includes INDoS, CDC, Passport, Certificate, USG/X-Ray, Time In/Out & Payment Status
             </p>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <div className="relative sm:w-[260px]">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
+            <div className="relative sm:w-[240px]">
               <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
               <Input
                 aria-label="Search patient records"
@@ -1494,9 +1842,92 @@ function PatientRecords({
                 className="h-9 pl-9 text-xs"
               />
             </div>
-            <Button variant="outline" size="sm" onClick={() => onNotice("Filtered by all active statuses.")}>
-              <Filter className="size-3.5 mr-1" /> Filter
+
+            {/* Date-to-Date range filter */}
+            <div className="flex items-center gap-1.5 rounded-md border border-border bg-muted/40 px-2 py-1">
+              <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">From:</span>
+              <Input
+                type="date"
+                aria-label="Filter from date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="h-7 w-[125px] px-1 text-[11px] bg-background"
+              />
+              <span className="text-[11px] font-medium text-muted-foreground whitespace-nowrap">To:</span>
+              <Input
+                type="date"
+                aria-label="Filter to date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="h-7 w-[125px] px-1 text-[11px] bg-background"
+              />
+              {(startDate || endDate) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setStartDate("");
+                    setEndDate("");
+                    onNotice("Date filter reset.");
+                  }}
+                  className="h-7 px-1.5 text-[11px] text-muted-foreground hover:text-destructive"
+                  title="Clear date filter"
+                >
+                  <X className="size-3 mr-0.5" /> Clear
+                </Button>
+              )}
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                exportPatientsToExcel(filtered);
+                onNotice(`Exported ${filtered.length} seafarer patient records to Excel.`);
+              }}
+              className="gap-1.5 text-xs border-emerald-600/30 text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+              title="Download full candidate examination records in Excel (.xlsx)"
+            >
+              <FileSpreadsheet className="size-3.5 text-emerald-600" /> Export Excel
             </Button>
+
+            {/* Select All / Deselect All Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleToggleSelectAll}
+              className="h-8 gap-1.5 text-xs font-medium border-border hover:bg-muted/60"
+              title={selectedIds.length === filtered.length && filtered.length > 0 ? "Deselect all records" : "Select all filtered records"}
+            >
+              {selectedIds.length === filtered.length && filtered.length > 0 ? (
+                <>
+                  <CheckSquare className="size-3.5 text-primary" /> Deselect All
+                </>
+              ) : (
+                <>
+                  <Square className="size-3.5 text-muted-foreground" /> Select All ({filtered.length})
+                </>
+              )}
+            </Button>
+
+            {selectedIds.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="h-8 px-2.5 font-medium text-xs gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  {selectedIds.length} selected
+                </Badge>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeleteSelected}
+                  className="h-8 gap-1.5 text-xs shadow-xs font-medium"
+                  title={`Delete ${selectedIds.length} selected record(s)`}
+                >
+                  <Trash2 className="size-3.5" /> Delete Selected ({selectedIds.length})
+                </Button>
+              </div>
+            )}
             <Button size="sm" onClick={onAdd} className="gap-1.5 shadow-sm">
               <UserRoundPlus className="size-4" /> Add patient
             </Button>
@@ -1506,6 +1937,9 @@ function PatientRecords({
         {filtered.length ? (
           <PatientTable
             patients={filtered}
+            selectedIds={selectedIds}
+            onToggleSelect={handleToggleSelect}
+            onToggleSelectAll={handleToggleSelectAll}
             onEdit={onEdit}
             onView={onView}
             onDelete={onDelete}
@@ -1534,7 +1968,7 @@ function PatientRecords({
             <div>
               <h3 className="text-sm font-semibold text-foreground">Examine & Register New Marine Candidate</h3>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Opens complete popup form: Candidate Details (with Rank, Company, Vessel Name, INDoS & CDC Credentials), Medical & Timing, Payment & Invoice.
+                Opens complete popup form: Candidate Details (with Rank, Company, Vessel Name, INDoS, CDC & Passport Credentials), Medical & Timing, Fee Settlement & Payment Details.
               </p>
             </div>
           </div>
@@ -1550,12 +1984,18 @@ function PatientRecords({
 function PatientTable({
   patients,
   compact = false,
+  selectedIds = [],
+  onToggleSelect,
+  onToggleSelectAll,
   onEdit,
   onView,
   onDelete,
 }: {
   patients: PatientRecord[];
   compact?: boolean;
+  selectedIds?: string[];
+  onToggleSelect?: (id: string) => void;
+  onToggleSelectAll?: () => void;
   onEdit?: (patient: PatientRecord) => void;
   onView?: (patient: PatientRecord) => void;
   onDelete?: (id: string, name: string) => void;
@@ -1660,7 +2100,25 @@ function PatientTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="w-[55px] pl-5 text-xs">Sr.</TableHead>
+            <TableHead className="w-[45px] pl-4 text-center">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={patients.length > 0 && selectedIds.length === patients.length}
+                aria-label="Select all candidate records"
+                onClick={onToggleSelectAll}
+                className={`size-4.5 rounded-[4px] border flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                  patients.length > 0 && selectedIds.length === patients.length
+                    ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                    : "border-muted-foreground/40 bg-background hover:border-primary/80"
+                }`}
+              >
+                {patients.length > 0 && selectedIds.length === patients.length && (
+                  <Check className="size-3.5 stroke-[3]" />
+                )}
+              </button>
+            </TableHead>
+            <TableHead className="w-[55px] pl-2 text-xs">Sr.</TableHead>
             <TableHead className="min-w-[200px] text-xs">Candidate & Rank</TableHead>
             <TableHead className="min-w-[170px] text-xs">Credentials (INDoS / CDC / Cert)</TableHead>
             <TableHead className="min-w-[180px] text-xs">Medical & Company</TableHead>
@@ -1672,84 +2130,108 @@ function PatientTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {patients.map((patient) => (
-            <TableRow key={patient.id} className="hover:bg-muted/40 transition-colors">
-              {/* 1. Sr. No */}
-              <TableCell className="pl-5">
-                <Badge variant="outline" className="font-mono text-xs font-bold bg-muted/60">
-                  #{patient.srNo}
-                </Badge>
-              </TableCell>
+          {patients.map((patient) => {
+            const isSelected = selectedIds.includes(patient.id);
+            return (
+              <TableRow
+                key={patient.id}
+                className={`transition-colors ${isSelected ? "bg-primary/10 hover:bg-primary/15" : "hover:bg-muted/40"}`}
+              >
+                {/* Checkbox column */}
+                <TableCell className="pl-4 text-center">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={isSelected}
+                    aria-label={`Select record for ${patient.name}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleSelect?.(patient.id);
+                    }}
+                    className={`size-4.5 rounded-[4px] border flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                      isSelected
+                        ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                        : "border-muted-foreground/40 bg-background hover:border-primary/80"
+                    }`}
+                  >
+                    {isSelected && <Check className="size-3.5 stroke-[3]" />}
+                  </button>
+                </TableCell>
 
-              {/* 2. Candidate Name, DOB, Contact & Rank */}
-              <TableCell>
-                <div className="flex items-center gap-2.5">
-                  <Avatar className="size-9 border border-primary/20">
-                    <AvatarFallback className="bg-primary/10 text-[11px] font-bold text-primary">
-                      {patient.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={() => onView?.(patient)}
-                      className="text-left font-semibold text-xs text-foreground hover:text-primary transition-colors hover:underline block"
-                    >
-                      {patient.name}
-                    </button>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="rounded bg-secondary/80 px-1 py-0.2 text-[10px] font-medium text-secondary-foreground">
-                        {patient.rank}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {patient.age}y · {patient.dob}
-                      </span>
+                {/* 1. Sr. No */}
+                <TableCell className="pl-2">
+                  <Badge variant="outline" className="font-mono text-xs font-bold bg-muted/60">
+                    #{patient.srNo}
+                  </Badge>
+                </TableCell>
+
+                {/* 2. Candidate Name, DOB, Contact & Rank */}
+                <TableCell>
+                  <div className="flex items-center gap-2.5">
+                    <Avatar className="size-9 border border-primary/20">
+                      <AvatarFallback className="bg-primary/10 text-[11px] font-bold text-primary">
+                        {patient.initials}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <button
+                        type="button"
+                        onClick={() => onView?.(patient)}
+                        className="text-left font-semibold text-xs text-foreground hover:text-primary transition-colors hover:underline block"
+                      >
+                        {patient.name}
+                      </button>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="rounded bg-secondary/80 px-1 py-0.2 text-[10px] font-medium text-secondary-foreground">
+                          {patient.rank}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground">
+                          {patient.age}y · {patient.dob}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground mt-0.5">{patient.phone}</div>
                     </div>
-                    <div className="text-[10px] text-muted-foreground mt-0.5">{patient.phone}</div>
                   </div>
-                </div>
-              </TableCell>
+                </TableCell>
 
-              {/* 3. Credentials: Cert No, INDoS No, CDC No */}
-              <TableCell>
-                <div className="space-y-0.5 font-mono text-[11px]">
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-muted-foreground font-sans">Cert:</span>
-                    <span className="font-semibold text-foreground tracking-wide">{patient.certificateNo || "—"}</span>
+                {/* 3. Credentials: Cert No, INDoS No, CDC No, Passport */}
+                <TableCell>
+                  <div className="space-y-0.5 font-mono text-[11px]">
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground font-sans">Cert:</span>
+                      <span className="font-semibold text-foreground tracking-wide">{patient.certificateNo || "—"}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground font-sans">INDoS:</span>
+                      <span className="text-muted-foreground">{patient.indosNo || "—"}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[10px] text-muted-foreground font-sans">CDC:</span>
+                      <span className="text-muted-foreground">{patient.cdcNo || "—"}</span>
+                    </div>
+                    {patient.passportNo && (
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-muted-foreground font-sans">Pass:</span>
+                        <span className="text-primary font-semibold">{patient.passportNo}</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-muted-foreground font-sans">INDoS:</span>
-                    <span className="text-muted-foreground">{patient.indosNo || "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span className="text-[10px] text-muted-foreground font-sans">CDC:</span>
-                    <span className="text-muted-foreground">{patient.cdcNo || "—"}</span>
-                  </div>
-                </div>
-              </TableCell>
+                </TableCell>
 
-              {/* 4. Company & Medical Type */}
-              <TableCell>
-                <div className="text-xs font-semibold text-foreground truncate max-w-[170px]" title={patient.companyName}>
-                  {patient.companyName}
-                </div>
-                {(patient.vesselName || patient.vessel) && (
-                  <div className="text-[10px] text-primary flex items-center gap-1 font-medium truncate max-w-[170px]" title={patient.vesselName || patient.vessel}>
-                    <Ship className="size-3" /> {patient.vesselName || patient.vessel}
+                {/* 4. Company & Medical Type */}
+                <TableCell>
+                  <div className="text-xs font-semibold text-foreground truncate max-w-[170px]" title={patient.companyName}>
+                    {patient.companyName}
                   </div>
-                )}
-                <div className="hidden">
-                  {patient.companyName}
-                </div>
-                <div className="text-[11px] text-muted-foreground truncate max-w-[170px]" title={patient.typeOfMedical}>
-                  {patient.typeOfMedical}
-                </div>
-                {patient.invoiceNo && (
-                  <div className="font-mono text-[10px] text-primary/80 mt-0.5">
-                    Inv: {patient.invoiceNo}
+                  {(patient.vesselName || patient.vessel) && (
+                    <div className="text-[10px] text-primary flex items-center gap-1 font-medium truncate max-w-[170px]" title={patient.vesselName || patient.vessel}>
+                      <Ship className="size-3" /> {patient.vesselName || patient.vessel}
+                    </div>
+                  )}
+                  <div className="text-[11px] text-muted-foreground truncate max-w-[170px]" title={patient.typeOfMedical}>
+                    {patient.typeOfMedical}
                   </div>
-                )}
-              </TableCell>
+                </TableCell>
 
               {/* 5. Test / Medical & Fitness */}
               <TableCell>
@@ -1838,7 +2320,8 @@ function PatientTable({
                 </div>
               </TableCell>
             </TableRow>
-          ))}
+          );
+        })}
         </TableBody>
       </Table>
     </div>
@@ -2156,7 +2639,7 @@ function SettingsView({
                 <Input id="setting-clinic-name" defaultValue="Sailor's Medical Clinic" />
               </Field>
               <Field label="Contact email" htmlFor="setting-clinic-email">
-                <Input id="setting-clinic-email" defaultValue="medical@sailorsmedicalclinic.com" />
+                <Input id="setting-clinic-email" defaultValue="medical@sailorsmedical.com" />
               </Field>
               <Field label="Phone number" htmlFor="setting-clinic-phone">
                 <Input id="setting-clinic-phone" defaultValue="+91 95614 50104" />

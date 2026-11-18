@@ -1,5 +1,6 @@
 import * as XLSX from "xlsx";
 import type { FeedbackRecord } from "@/lib/feedback";
+import type { PatientRecord } from "@/lib/clinic";
 
 /**
  * Generates and downloads a standardized Microsoft Excel (.xlsx) file
@@ -247,4 +248,80 @@ export function exportStaffToExcel(
     `Sailors_Medical_Clinic_Staff_Register_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(workbook, finalName);
 }
+
+/**
+ * Generates and downloads a standardized Microsoft Excel (.xlsx) file
+ * containing all Seafarer Patient Examination Records.
+ */
+export function exportPatientsToExcel(
+  patients: PatientRecord[],
+  filename?: string,
+): void {
+  const rows = patients.map((p, index) => ({
+    "Sr. No.": p.srNo || index + 1,
+    "Candidate ID": p.id,
+    "Examination Date": p.date || "N/A",
+    "Candidate Name": p.name,
+    "Rank / Category": p.rank || "N/A",
+    "INDoS No.": p.indosNo || "N/A",
+    "CDC No.": p.cdcNo || "N/A",
+    "Passport No.": p.passportNo || "N/A",
+    "Certificate No.": p.certificateNo || "N/A",
+    "Shipping Company": p.companyName || "N/A",
+    "Vessel Name": p.vesselName || p.vessel || "N/A",
+    "Age": p.age ?? "N/A",
+    "Gender": p.gender || "N/A",
+    "Mobile Phone": p.phone || "N/A",
+    "Email Address": p.email || "N/A",
+    "Medical Type": p.typeOfMedical || "Pre-Sea / Periodic",
+    "Medical Fitness": p.condition || "Fit for Sea Service",
+    "USG Findings": p.usgFindings || "Normal",
+    "Chest X-Ray": p.chestXRay || "Normal",
+    "Payment Status": p.paymentStatus || "Paid",
+    "Payment Mode": p.paymentMode || "UPI",
+    "Total Fee (₹)": p.totalFee || 3500,
+    "Amount Paid": p.paymentAmount || "₹3,500.00",
+    "Balance Due (₹)": p.balanceDue || 0,
+    "Time In": p.timeIn || "09:30 AM",
+    "Time Out": p.timeOut || "11:45 AM",
+  }));
+
+  const worksheet = XLSX.utils.json_to_sheet(rows);
+  worksheet["!cols"] = [
+    { wch: 8 },  // Sr. No.
+    { wch: 16 }, // Candidate ID
+    { wch: 16 }, // Examination Date
+    { wch: 24 }, // Candidate Name
+    { wch: 20 }, // Rank / Category
+    { wch: 16 }, // INDoS No.
+    { wch: 16 }, // CDC No.
+    { wch: 20 }, // Certificate No.
+    { wch: 26 }, // Shipping Company
+    { wch: 20 }, // Vessel Name
+    { wch: 8 },  // Age
+    { wch: 10 }, // Gender
+    { wch: 16 }, // Mobile Phone
+    { wch: 26 }, // Email Address
+    { wch: 24 }, // Medical Type
+    { wch: 22 }, // Medical Fitness
+    { wch: 18 }, // USG Findings
+    { wch: 18 }, // Chest X-Ray
+    { wch: 16 }, // Payment Status
+    { wch: 16 }, // Payment Mode
+    { wch: 14 }, // Total Fee (₹)
+    { wch: 14 }, // Amount Paid
+    { wch: 14 }, // Balance Due (₹)
+    { wch: 12 }, // Time In
+    { wch: 12 }, // Time Out
+  ];
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Seafarer Candidates");
+
+  const finalName =
+    filename ||
+    `Sailors_Medical_Clinic_Patients_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  XLSX.writeFile(workbook, finalName);
+}
+
 

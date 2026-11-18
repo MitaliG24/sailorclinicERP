@@ -5,6 +5,7 @@ import {
   CalendarDays,
   Check,
   CheckCircle2,
+  CheckSquare,
   Clock3,
   CreditCard,
   Download,
@@ -14,6 +15,7 @@ import {
   FileText,
   Receipt,
   Search,
+  Square,
   Trash2,
   TrendingUp,
   User,
@@ -74,6 +76,8 @@ export function InvoiceModule({
 }: InvoiceModuleProps) {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [collectionPeriod, setCollectionPeriod] = useState<"day" | "month" | "year" | "all">("all");
+  const [selectedRecordIds, setSelectedRecordIds] = useState<string[]>([]);
   const [selectedReceiptPayment, setSelectedReceiptPayment] = useState<PaymentRecord | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
 
@@ -89,102 +93,126 @@ export function InvoiceModule({
   const isStaff = role === "staff";
   const todayIso = new Date().toISOString().slice(0, 10);
 
-  // Derive combined payment records from invoices & patients so ALL patients (including newly added) are 100% visible
+  // Derive combined payment records from patients & invoices so all patient payment details are 100% synchronized
   const allRecords = useMemo(() => {
-    const list: (InvoiceRecord & { patientRecord?: PatientRecord | undefined })[] = invoices.map((inv) => {
-      const p = patients.find(
-        (pt) => pt.id === inv.patientId || (pt.name && pt.name.toLowerCase() === inv.patient.toLowerCase())
+    // 1. Primary records derived directly from patients list - guarantees 100% parity with Patient Records
+    const list: (InvoiceRecord & { patientRecord?: PatientRecord | undefined })[] = patients
+      .filter((p) => {
+        // If an invoice was explicitly deleted from invoices list, don't show it
+        if (p.invoiceNo) {
+          return invoices.some((inv) => inv.id === p.invoiceNo || inv.patientId === p.id);
+        }
+        return true;
+      })
+      .map((p) => {
+      const matchingInv = invoices.find(
+        (inv) => (inv.patientId && inv.patientId === p.id) || (inv.id && p.invoiceNo && inv.id === p.invoiceNo) || (inv.patient && p.name && inv.patient.toLowerCase() === p.name.toLowerCase())
       );
-      const fee = inv.total || p?.totalFee || 3500;
-      const effectivePaymentStatus = p?.paymentStatus || (inv.status === "Paid" ? "Paid" : "Pending");
-      const effectivePaidAmt =
-        p?.paymentStatus === "Partial"
-          ? (Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) || 2000)
-          : p?.paymentStatus === "Pending"
-            ? 0
-            : (inv.amountPaid ?? (inv.status === "Paid" ? fee : 0));
-      const dues =
-        p?.balanceDue ??
-        (effectivePaymentStatus === "Partial"
-          ? Math.max(0, fee - effectivePaidAmt)
-          : effectivePaymentStatus === "Pending"
-            ? fee
-            : 0);
+
+      const rawAmt =
+        p.paymentAmount !== undefined && p.paymentAmount !== ""
+          ? Number(p.paymentAmount.replace(/[^0-9.]/g, "")) || 0
+          : (matchingInv?.amountPaid ?? (p.paymentStatus === "Pending" ? 0 : (p.totalFee || 3500)));
+      const fee = p.totalFee || matchingInv?.total || (rawAmt > 0 ? rawAmt : 3500);
+
+      // Status resolution matching patient record payment details exactly
+      const pStatus = p.paymentStatus || matchingInv?.paymentStatus || (matchingInv?.status === "Paid" ? "Paid" : "Pending");
+      const isPaid = pStatus === "Paid" || pStatus === "Own";
+      const isPartial = pStatus === "Partial";
+      const isPending = pStatus === "Pending";
+
+      let amountPaid = 0;
+      let dues = 0;
+
+      if (isPaid) {
+        amountPaid = fee;
+        dues = 0;
+      } else if (isPending) {
+        amountPaid = 0;
+        dues = p.balanceDue ?? fee;
+      } else if (isPartial) {
+        amountPaid = Math.min(fee, Math.max(0, rawAmt));
+        dues = p.balanceDue ?? Math.max(0, fee - amountPaid);
+      } else {
+        amountPaid = fee;
+        dues = 0;
+      }
+
+      const recordId = matchingInv?.id || p.invoiceNo || `INV-2026-${String(p.srNo || 1).padStart(3, "0")}`;
 
       return {
-        ...inv,
+        id: recordId,
+        patient: p.name,
+        patientId: p.id,
+        date: p.date || todayIso,
+        dueDate: isPaid ? (p.date || todayIso) : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
+        amount: formatINR(fee),
         total: fee,
-        amountPaid: effectivePaidAmt,
+        subtotal: fee,
+        tax: 0,
+        discount: 0,
+        status: isPaid ? ("Paid" as const) : ("Pending" as const),
+        paymentStatus: pStatus as "Paid" | "Own" | "Partial" | "Pending",
+        amountPaid,
         balanceDue: dues,
-        paymentStatus: effectivePaymentStatus,
-        ...(p !== undefined ? { patientRecord: p } : {}),
-      };
-    });
-
-    // Add any patient who does not have an invoice entry yet
-    patients.forEach((p) => {
-      const exists = list.some(
-        (item) => item.patientId === p.id || (item.patient && item.patient.toLowerCase() === p.name.toLowerCase())
-      );
-      if (!exists) {
-        const fee = p.totalFee || 3500;
-        const rawAmt =
-          Number(p.paymentAmount?.replace(/[^0-9.]/g, "")) ||
-          (p.paymentStatus === "Pending" ? 0 : 3500);
-        const dues =
-          p.balanceDue ??
-          (p.paymentStatus === "Partial"
-            ? Math.max(0, fee - rawAmt)
-            : p.paymentStatus === "Pending"
-              ? fee
-              : 0);
-        const isPaid = p.paymentStatus === "Paid" || p.paymentStatus === "Own";
-        const invId = p.invoiceNo || `REC-2026-${String(p.srNo || 1).padStart(3, "0")}`;
-
-        list.push({
-          id: invId,
-          patient: p.name,
-          patientId: p.id,
-          date: p.date || todayIso,
-          dueDate: isPaid ? (p.date || todayIso) : new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
-          amount: formatINR(fee),
-          total: fee,
-          subtotal: fee,
-          tax: 0,
-          discount: 0,
-          status: isPaid ? "Paid" : "Pending",
-          paymentStatus: p.paymentStatus,
-          amountPaid: rawAmt,
-          balanceDue: dues,
-          company: p.companyName || "Independent / Agency",
-          rank: p.rank,
-          vessel: p.vesselName || p.vessel,
-          indosNo: p.indosNo,
-          cdcNo: p.cdcNo,
-          certificateNo: p.certificateNo,
-          paymentMethod: p.paymentMode || "UPI",
-          transactionRef: p.transactionId,
-          paidDate:
-            isPaid || p.paymentStatus === "Partial"
-              ? p.date
-                ? new Date(p.date).toLocaleDateString("en-IN", {
+        company: p.companyName || "Independent / Agency",
+        rank: p.rank,
+        vessel: p.vesselName || p.vessel,
+        indosNo: p.indosNo,
+        cdcNo: p.cdcNo,
+        certificateNo: p.certificateNo,
+        paymentMethod: p.paymentMode || matchingInv?.paymentMethod || "UPI",
+        transactionRef: p.transactionId || p.paymentProof || matchingInv?.transactionRef || (isPaid ? "Cleared" : "Pending clearance"),
+        paidDate:
+          isPaid || isPartial
+            ? p.date
+              ? new Date(p.date).toLocaleDateString("en-IN", {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
                 })
-                : "Today"
-              : undefined,
-          items: [
-            {
-              id: "item-1",
-              description: p.typeOfMedical || "Marine Medical Fitness Examination",
-              sacCode: "999312",
-              qty: 1,
-              rate: fee,
-              amount: fee,
-            },
-          ],
-          patientRecord: p,
+              : "Today"
+            : undefined,
+        items: matchingInv?.items || [
+          {
+            id: "item-1",
+            description: p.typeOfMedical || "Marine Medical Fitness Examination",
+            sacCode: "999312",
+            qty: 1,
+            rate: fee,
+            amount: fee,
+          },
+        ],
+        patientRecord: p,
+      };
+    });
+
+    // 2. Add standalone invoices that don't belong to any patient in the patients list
+    invoices.forEach((inv) => {
+      const exists = list.some(
+        (item) => item.id === inv.id || (inv.patientId && item.patientId === inv.patientId) || (inv.patient && item.patient.toLowerCase() === inv.patient.toLowerCase())
+      );
+      if (!exists) {
+        const isPaid = inv.status === "Paid";
+        const isPending = inv.status === "Pending" || inv.status === "Overdue";
+        const fee = inv.total || 0;
+        const paid = inv.amountPaid !== undefined
+          ? inv.amountPaid
+          : isPaid
+            ? fee
+            : 0;
+        const dues = inv.balanceDue !== undefined
+          ? inv.balanceDue
+          : isPending
+            ? Math.max(0, fee - paid)
+            : 0;
+
+        list.push({
+          ...inv,
+          total: fee,
+          amountPaid: paid,
+          balanceDue: dues,
+          paymentStatus: (inv.paymentStatus || (isPaid ? "Paid" : "Pending")) as any,
         });
       }
     });
@@ -192,72 +220,109 @@ export function InvoiceModule({
     return list;
   }, [invoices, patients, todayIso]);
 
-  // Statistics calculation: Daily view for staff; all records date-wise for admin
+  // Statistics calculation: Day/Month/Year/All-wise collections, invoiced fees, and outstanding dues
   const stats = useMemo(() => {
+    const thisMonthStr = todayIso.slice(0, 7);
+    const thisYearStr = todayIso.slice(0, 4);
+
+    // Dynamic resolution of the active recording date
+    const latestRecordDate = allRecords.reduce((latest, r) => {
+      if (!r.date) return latest;
+      const dStr = r.date.slice(0, 10);
+      return dStr > latest ? dStr : latest;
+    }, "");
+
+    const activeDay = allRecords.some((r) => r.date === todayIso)
+      ? todayIso
+      : (latestRecordDate || todayIso);
+    const activeMonth = activeDay.slice(0, 7);
+    const activeYear = activeDay.slice(0, 4);
+
+    // Records filtered strictly for the selected period
+    const periodRecords =
+      collectionPeriod === "all"
+        ? allRecords
+        : collectionPeriod === "day"
+          ? allRecords.filter((rec) => {
+              const d = rec.date || "";
+              return (
+                d === activeDay ||
+                d === todayIso ||
+                rec.paidDate?.includes("Today") ||
+                rec.paidDate?.includes(activeDay)
+              );
+            })
+          : collectionPeriod === "month"
+            ? allRecords.filter((rec) => {
+                const d = rec.date || "";
+                return (
+                  d.startsWith(activeMonth) ||
+                  d.startsWith(thisMonthStr) ||
+                  rec.paidDate?.includes(activeMonth)
+                );
+              })
+            : allRecords.filter((rec) => {
+                const d = rec.date || "";
+                return (
+                  d.startsWith(activeYear) ||
+                  d.startsWith(thisYearStr) ||
+                  rec.paidDate?.includes(activeYear)
+                );
+              });
+
+    // Exact sums for the active period
+    const periodInvoiced = periodRecords.reduce((sum, rec) => sum + (rec.total || 0), 0);
+    const periodCollected = periodRecords.reduce((sum, rec) => sum + (rec.amountPaid || 0), 0);
+    const periodOutstanding = periodRecords.reduce((sum, rec) => sum + (rec.balanceDue || 0), 0);
+    const periodSettledCount = periodRecords.filter(
+      (rec) => (rec.balanceDue || 0) === 0 && (rec.amountPaid || 0) > 0
+    ).length;
+    const periodPartialCount = periodRecords.filter(
+      (rec) => (rec.balanceDue || 0) > 0
+    ).length;
+
+    // Exact sums across all records (All-time totals)
+    const totalInvoicedAll = allRecords.reduce((sum, rec) => sum + (rec.total || 0), 0);
+    const totalCollectedAll = allRecords.reduce((sum, rec) => sum + (rec.amountPaid || 0), 0);
+    const totalOutstandingAll = allRecords.reduce((sum, rec) => sum + (rec.balanceDue || 0), 0);
+
+    const periodLabel =
+      collectionPeriod === "day"
+        ? "Today"
+        : collectionPeriod === "month"
+          ? "This Month"
+          : collectionPeriod === "year"
+            ? "This Year"
+            : "All Time";
+
     if (isStaff) {
-      // Staff view: only daily payment records received today
-      const todayRecords = allRecords.filter((rec) => {
-        const isToday =
-          rec.date === todayIso ||
-          rec.paidDate?.includes("Today") ||
-          (rec.date && new Date(rec.date).toISOString().slice(0, 10) === todayIso);
-        return isToday;
-      });
-
-      const todayCollected = todayRecords.reduce((sum, rec) => {
-        return sum + (rec.amountPaid ?? (rec.status === "Paid" ? rec.total : 0));
-      }, 0);
-
-      const todaySettledCount = todayRecords.filter(
-        (rec) => rec.status === "Paid" || rec.paymentStatus === "Paid" || rec.paymentStatus === "Own"
-      ).length;
-
-      const todayPartialCount = todayRecords.filter(
-        (rec) => rec.paymentStatus === "Partial" || (rec.balanceDue ?? 0) > 0
-      ).length;
-
       return {
         isStaff: true,
-        primaryLabel: "Daily Payments Received",
-        primaryValue: formatINR(todayCollected > 0 ? todayCollected : 14000),
-        primaryNote: `${todaySettledCount > 0 ? todaySettledCount : 4} receipts received today`,
-        secondaryLabel: "Today's Settled Records",
-        secondaryValue: `${todaySettledCount > 0 ? todaySettledCount : 4}`,
+        primaryLabel: "Total collection",
+        primaryValue: formatINR(periodCollected),
+        primaryNote: `${periodSettledCount} receipt(s) collected (${periodLabel})`,
+        secondaryLabel: `${periodLabel} Settled Records`,
+        secondaryValue: String(periodSettledCount),
         secondaryNote: "Candidates cleared full fee",
-        tertiaryLabel: "Today's Partial / Dues",
-        tertiaryValue: `${todayPartialCount > 0 ? todayPartialCount : 1}`,
+        tertiaryLabel: `${periodLabel} Partial / Dues`,
+        tertiaryValue: String(periodPartialCount),
         tertiaryNote: "Awaiting balance completion",
       };
     }
 
-    // Admin view: All records date-wise
-    const totalInvoiced = allRecords.reduce((sum, inv) => sum + inv.total, 0);
-    const totalCollected = allRecords.reduce((sum, inv) => {
-      return sum + (inv.amountPaid ?? (inv.status === "Paid" ? inv.total : 0));
-    }, 0);
-    const totalOutstanding = allRecords.reduce((sum, inv) => {
-      return sum + (inv.balanceDue ?? (inv.status === "Pending" ? inv.total : 0));
-    }, 0);
-    const paidCount = allRecords.filter(
-      (inv) => inv.status === "Paid" || inv.paymentStatus === "Paid" || inv.paymentStatus === "Own"
-    ).length;
-    const partialCount = allRecords.filter(
-      (inv) => inv.paymentStatus === "Partial" || ((inv.balanceDue ?? 0) > 0 && (inv.amountPaid ?? 0) > 0)
-    ).length;
-
     return {
       isStaff: false,
-      primaryLabel: "Total Fees Invoiced",
-      primaryValue: formatINR(totalInvoiced),
-      primaryNote: `${allRecords.length} candidate examination records`,
-      secondaryLabel: "Total Collected (Date-wise)",
-      secondaryValue: formatINR(totalCollected),
-      secondaryNote: `${paidCount} settled full • ${partialCount} partial`,
+      primaryLabel: "Total collection",
+      primaryValue: formatINR(periodCollected),
+      primaryNote: `${periodSettledCount} receipt(s) collected • All-time: ${formatINR(totalCollectedAll)}`,
+      secondaryLabel: "Total Fees Invoiced",
+      secondaryValue: formatINR(periodInvoiced),
+      secondaryNote: `${periodRecords.length} record(s) in ${periodLabel.toLowerCase()} • All-time: ${formatINR(totalInvoicedAll)}`,
       tertiaryLabel: "Total Outstanding Dues",
-      tertiaryValue: formatINR(totalOutstanding),
-      tertiaryNote: "Balance fees awaiting clearance",
+      tertiaryValue: formatINR(periodOutstanding),
+      tertiaryNote: `${periodPartialCount} record(s) with dues • All-time: ${formatINR(totalOutstandingAll)}`,
     };
-  }, [allRecords, isStaff, todayIso]);
+  }, [allRecords, collectionPeriod, isStaff, todayIso]);
 
   // Filtered payment records based on search and status
   const filtered = useMemo(() => {
@@ -403,19 +468,66 @@ export function InvoiceModule({
     setEditingRecord(null);
   };
 
+  const handleToggleSelectRecord = (id: string) => {
+    setSelectedRecordIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAllRecords = () => {
+    if (selectedRecordIds.length === filtered.length && filtered.length > 0) {
+      setSelectedRecordIds([]);
+    } else {
+      setSelectedRecordIds(filtered.map((r) => r.id));
+    }
+  };
+
+  const handleDeleteSelectedRecords = () => {
+    if (!selectedRecordIds.length) return;
+    if (
+      window.confirm(
+        `Are you sure you want to delete ${selectedRecordIds.length} selected payment record(s)?`
+      )
+    ) {
+      selectedRecordIds.forEach((id) => {
+        onDeleteInvoice(id);
+      });
+      onNotice(`Deleted ${selectedRecordIds.length} payment record(s).`);
+      setSelectedRecordIds([]);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Metric Cards in INR: Daily payments received for staff, date-wise all records for admin */}
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1: Primary revenue metric */}
+      <div className="grid gap-3 sm:grid-cols-3">
+        {/* Card 1: Primary revenue metric - Total collection */}
         <div className="rounded-lg border border-border bg-card p-4 sm:p-5 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">{stats.primaryLabel}</span>
-            <span className="grid size-8 place-items-center rounded bg-primary/10 text-primary">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-semibold text-muted-foreground">{stats.primaryLabel}</span>
+              <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
+                {(["day", "month", "year", "all"] as const).map((period) => (
+                  <button
+                    key={period}
+                    type="button"
+                    onClick={() => setCollectionPeriod(period)}
+                    className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
+                      collectionPeriod === period
+                        ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {period}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <span className="grid size-8 place-items-center rounded bg-emerald-500/10 text-emerald-600 shrink-0">
               <WalletCards className="size-4" />
             </span>
           </div>
-          <p className="mt-3 text-2xl font-bold font-mono text-foreground">
+          <p className="mt-3 text-2xl font-bold font-mono text-emerald-600">
             {stats.primaryValue}
           </p>
           <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
@@ -423,19 +535,19 @@ export function InvoiceModule({
           </p>
         </div>
 
-        {/* Card 2: Settled / Collected */}
+        {/* Card 2: Total Fees Invoiced / Settled */}
         <div className="rounded-lg border border-border bg-card p-4 sm:p-5 shadow-xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-muted-foreground">{stats.secondaryLabel}</span>
-            <span className="grid size-8 place-items-center rounded bg-emerald-500/10 text-emerald-600">
+            <span className="grid size-8 place-items-center rounded bg-primary/10 text-primary">
               <CheckCircle2 className="size-4" />
             </span>
           </div>
-          <p className="mt-3 text-2xl font-bold font-mono text-emerald-600">
+          <p className="mt-3 text-2xl font-bold font-mono text-foreground">
             {stats.secondaryValue}
           </p>
-          <p className="mt-1 flex items-center gap-1 text-[11px] text-emerald-600">
-            <ArrowUpRight className="size-3" />
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
+            <ArrowUpRight className="size-3 text-primary" />
             <span>{stats.secondaryNote}</span>
           </p>
         </div>
@@ -454,20 +566,6 @@ export function InvoiceModule({
           <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
             <span>{stats.tertiaryNote}</span>
           </p>
-        </div>
-
-        {/* Card 4: Standard DG Shipping Rate */}
-        <div className="rounded-lg border border-border bg-card p-4 sm:p-5 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Standard Fee Rate</span>
-            <span className="grid size-8 place-items-center rounded bg-secondary text-secondary-foreground">
-              <TrendingUp className="size-4" />
-            </span>
-          </div>
-          <p className="mt-3 text-2xl font-bold font-mono text-foreground">
-            ₹3,500.00
-          </p>
-          <p className="mt-1 text-[11px] text-muted-foreground">Default D.G. Shipping medical rate</p>
         </div>
       </div>
 
@@ -511,6 +609,44 @@ export function InvoiceModule({
               <option value="pending">Pending / Due</option>
             </select>
 
+            {/* Select All / Deselect All Toggle Button */}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleToggleSelectAllRecords}
+              className="h-9 gap-1.5 text-xs font-medium border-border hover:bg-muted/60"
+              title={selectedRecordIds.length === filtered.length && filtered.length > 0 ? "Deselect all payment records" : "Select all filtered payment records"}
+            >
+              {selectedRecordIds.length === filtered.length && filtered.length > 0 ? (
+                <>
+                  <CheckSquare className="size-3.5 text-primary" /> Deselect All
+                </>
+              ) : (
+                <>
+                  <Square className="size-3.5 text-muted-foreground" /> Select All ({filtered.length})
+                </>
+              )}
+            </Button>
+
+            {selectedRecordIds.length > 0 && (
+              <div className="flex items-center gap-1.5">
+                <Badge variant="secondary" className="h-9 px-2.5 font-medium text-xs gap-1.5">
+                  <CheckCircle2 className="size-3.5 text-primary" />
+                  {selectedRecordIds.length} selected
+                </Badge>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeleteSelectedRecords}
+                  className="h-9 gap-1.5 shadow-xs text-xs font-medium"
+                  title={`Delete ${selectedRecordIds.length} selected record(s)`}
+                >
+                  <Trash2 className="size-3.5" /> Delete Selected ({selectedRecordIds.length})
+                </Button>
+              </div>
+            )}
+
             <Button
               size="sm"
               onClick={() => setCreateModalOpen(true)}
@@ -526,7 +662,25 @@ export function InvoiceModule({
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent bg-muted/30">
-                <TableHead className="pl-6 w-32 text-xs font-semibold">Receipt / Record #</TableHead>
+                <TableHead className="w-12 pl-5 text-center">
+                  <button
+                    type="button"
+                    role="checkbox"
+                    aria-checked={filtered.length > 0 && selectedRecordIds.length === filtered.length}
+                    aria-label="Select all payment records"
+                    onClick={handleToggleSelectAllRecords}
+                    className={`size-4.5 rounded-[4px] border flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                      filtered.length > 0 && selectedRecordIds.length === filtered.length
+                        ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                        : "border-muted-foreground/40 bg-background hover:border-primary/80"
+                    }`}
+                  >
+                    {filtered.length > 0 && selectedRecordIds.length === filtered.length && (
+                      <Check className="size-3.5 stroke-[3]" />
+                    )}
+                  </button>
+                </TableHead>
+                <TableHead className="pl-2 w-32 text-xs font-semibold">Receipt / Record #</TableHead>
                 <TableHead className="min-w-[190px] text-xs font-semibold">Candidate / Seafarer</TableHead>
                 <TableHead className="min-w-[150px] text-xs font-semibold">Company / Agency</TableHead>
                 <TableHead className="text-xs font-semibold">Date</TableHead>
@@ -546,11 +700,40 @@ export function InvoiceModule({
                   const totalFee = record.total || 3500;
                   const amountPaid = record.amountPaid ?? (isPaid ? totalFee : isPartial ? 2000 : 0);
                   const balanceDue = record.balanceDue ?? (isPartial ? Math.max(0, totalFee - amountPaid) : isPending ? totalFee : 0);
+                  const isSelected = selectedRecordIds.includes(record.id);
 
                   return (
-                    <TableRow key={record.id} className="hover:bg-muted/30 transition-colors">
+                    <TableRow
+                      key={record.id}
+                      className={`transition-colors ${
+                        isSelected
+                          ? "bg-primary/10 hover:bg-primary/15"
+                          : "hover:bg-muted/30"
+                      }`}
+                    >
+                      {/* Checkbox */}
+                      <TableCell className="pl-5 text-center">
+                        <button
+                          type="button"
+                          role="checkbox"
+                          aria-checked={isSelected}
+                          aria-label={`Select payment record ${record.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleSelectRecord(record.id);
+                          }}
+                          className={`size-4.5 rounded-[4px] border flex items-center justify-center transition-all cursor-pointer mx-auto ${
+                            isSelected
+                              ? "bg-primary border-primary text-primary-foreground shadow-2xs"
+                              : "border-muted-foreground/40 bg-background hover:border-primary/80"
+                          }`}
+                        >
+                          {isSelected && <Check className="size-3.5 stroke-[3]" />}
+                        </button>
+                      </TableCell>
+
                       {/* Record ID / Receipt No */}
-                      <TableCell className="pl-6 font-mono text-xs font-bold text-primary whitespace-nowrap">
+                      <TableCell className="pl-2 font-mono text-xs font-bold text-primary whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
                           <Receipt className="size-3.5 shrink-0 text-primary" />
                           <span>{record.id}</span>
@@ -697,7 +880,7 @@ export function InvoiceModule({
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={8} className="py-12 text-center text-muted-foreground text-xs">
+                  <TableCell colSpan={9} className="py-12 text-center text-muted-foreground text-xs">
                     No matching payment records found.
                   </TableCell>
                 </TableRow>

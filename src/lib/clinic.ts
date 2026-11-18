@@ -6,6 +6,7 @@ export type ClinicSection =
   | "invoices"
   | "feedback"
   | "staff"
+  | "companies"
   | "reports"
   | "activity"
   | "settings";
@@ -16,8 +17,8 @@ export const clinicSections: Array<{ id: ClinicSection; label: string; group: st
   { id: "invoices", label: "Payment Records", group: "Workspace" },
   { id: "feedback", label: "Grievances & Reviews", group: "Clinic administration" },
   { id: "staff", label: "Staff Management", group: "Clinic administration" },
+  { id: "companies", label: "Add Company", group: "Clinic administration" },
   { id: "reports", label: "Reports", group: "Clinic administration" },
-  { id: "activity", label: "Activity Logs", group: "Clinic administration" },
   { id: "settings", label: "Settings", group: "Clinic administration" },
 ];
 
@@ -62,14 +63,20 @@ export type PatientRecord = {
   paymentAmount: string;
   totalFee?: number | undefined;
   balanceDue?: number | undefined;
-  paymentMode: "Cash" | "Trans. ID" | "UPI" | "Bank Transfer";
-  paymentProof: string;
+  paymentMode: "Cash" | "Trans. ID" | "UPI" | "Bank Transfer" | "Split (Cash + Online)";
+  paymentProof?: string | undefined;
   transactionId: string;
+  isSplitPayment?: boolean | undefined;
+  cashAmount?: number | undefined;
+  onlineAmount?: number | undefined;
+  onlineMode?: string | undefined;
+  onlineTransId?: string | undefined;
   timeIn: string;
   timeOut: string;
   certificateNo: string;
   indosNo: string;
   cdcNo: string;
+  passportNo?: string | undefined;
   invoiceNo?: string;
   candidateName?: string;
   lastVisit: string;
@@ -77,6 +84,116 @@ export type PatientRecord = {
   condition: string;
   status: "Active" | "Follow-up" | "New";
 };
+
+export type ShippingCompany = {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  contactPerson?: string;
+  address?: string;
+  gstin?: string;
+  vessels?: string[];
+  createdAt?: string;
+};
+
+export const initialCompanies: ShippingCompany[] = [
+  {
+    id: "CMP-01",
+    name: "Maersk Marine Services",
+    email: "crewing.india@maersk.com",
+    phone: "+91 22 6650 0000",
+    contactPerson: "Capt. Rajesh Varma",
+    address: "Peninsula Business Park, Lower Parel, Mumbai 400013",
+    gstin: "27AAACM0124P1Z4",
+    vessels: ["MV Maersk Mc-Kinney", "MV Maersk Edinburgh"],
+  },
+  {
+    id: "CMP-02",
+    name: "Synergy Maritime",
+    email: "info@synergymarine.com",
+    phone: "+91 44 4567 8900",
+    contactPerson: "Suresh Menon",
+    address: "Apex Chambers, Chennai 600017",
+    gstin: "33AABCS8891Q1Z8",
+    vessels: ["MT Synergy Tide", "MT Synergy Ruby"],
+  },
+  {
+    id: "CMP-03",
+    name: "Anglo-Eastern Shipping",
+    email: "crewing.in@angloeastern.com",
+    phone: "+91 22 6112 4444",
+    contactPerson: "Arun Kulkarni",
+    address: "Anglo-Eastern House, MIDC, Andheri East, Mumbai 400093",
+    gstin: "27AABCA3319L1ZP",
+    vessels: ["MV Eastern Glory", "MV Eastern Highway"],
+  },
+  {
+    id: "CMP-04",
+    name: "Fleet Management Ltd",
+    email: "mumbai@fleetship.com",
+    phone: "+91 22 6690 1000",
+    contactPerson: "Vikram Malhotra",
+    address: "Enterprise Hub, Andheri East, Mumbai 400069",
+    gstin: "27AACCF1209M1ZG",
+    vessels: ["MV Pacific Pioneer", "MT Pacific Wave"],
+  },
+  {
+    id: "CMP-05",
+    name: "MSC Mediterranean",
+    email: "msc-crew.in@msc.com",
+    phone: "+91 22 6637 8000",
+    contactPerson: "Sunil Shenoy",
+    address: "MSC House, Andheri Kurla Rd, Mumbai 400059",
+    gstin: "27AABCM7712E1Z2",
+    vessels: ["MSC Oscar", "MSC Gülsün"],
+  },
+  {
+    id: "CMP-06",
+    name: "Teekay Tankers",
+    email: "marine.in@teekay.com",
+    phone: "+91 22 6704 2200",
+    contactPerson: "Pooja Hegde",
+    address: "Solitaire Corporate Park, Mumbai 400093",
+    gstin: "27AABCT9918F1ZU",
+    vessels: ["MT Nordic Voyager", "MT Teekay Spirit"],
+  },
+  {
+    id: "CMP-07",
+    name: "Bernhard Schulte (BSM)",
+    email: "in-smc-man@bs-shipmanagement.com",
+    phone: "+91 22 4001 7000",
+    contactPerson: "Capt. Alok Sharma",
+    address: "Kaledonia, Sahar Rd, Andheri East, Mumbai 400069",
+    vessels: ["MT BSM Stralsund"],
+  },
+  {
+    id: "CMP-08",
+    name: "V.Group / V.Ships",
+    email: "vships.india@vgroup.com",
+    phone: "+91 22 6754 5000",
+    contactPerson: "David D'Souza",
+    address: "Hiranandani Business Park, Powai, Mumbai 400076",
+  },
+  {
+    id: "CMP-09",
+    name: "Great Eastern Shipping",
+    email: "shipping@greatship.com",
+    phone: "+91 22 6661 3000",
+    contactPerson: "Rohan Deshmukh",
+    address: "Ocean House, Worli, Mumbai 400018",
+    vessels: ["MV Jag Anand"],
+  },
+  {
+    id: "CMP-10",
+    name: "Executive Ship Management",
+    email: "esm.in@executiveship.com",
+    phone: "+91 22 6758 8888",
+    contactPerson: "Amitabh Banerjee",
+    address: "Bandra Kurla Complex, Mumbai 400051",
+    vessels: ["MT Ridgebury Pioneer"],
+  },
+];
 
 export const initialPatients: PatientRecord[] = [
   {
@@ -98,6 +215,8 @@ export const initialPatients: PatientRecord[] = [
     companyName: "Maersk Marine Services",
     paymentStatus: "Paid",
     paymentAmount: "₹4,500.00",
+    totalFee: 4500,
+    balanceDue: 0,
     paymentMode: "Trans. ID",
     paymentProof: "TXN-PR-88219",
     transactionId: "TXN-50941",
@@ -130,11 +249,13 @@ export const initialPatients: PatientRecord[] = [
     typeOfMedical: "Flag State Medical",
     usgXray: "Chest X-Ray Done",
     companyName: "Synergy Maritime",
-    paymentStatus: "Own",
-    paymentAmount: "₹8,200.00",
+    paymentStatus: "Pending",
+    paymentAmount: "₹0.00",
+    totalFee: 8200,
+    balanceDue: 8200,
     paymentMode: "Cash",
-    paymentProof: "Cash Voucher #441",
-    transactionId: "CSH-2026-018",
+    paymentProof: "Pending clearance",
+    transactionId: "",
     timeIn: "09:00 AM",
     timeOut: "01:30 PM",
     certificateNo: "MC-2026-9040",
@@ -166,6 +287,8 @@ export const initialPatients: PatientRecord[] = [
     companyName: "Fleet Management Ltd",
     paymentStatus: "Paid",
     paymentAmount: "₹3,800.00",
+    totalFee: 3800,
+    balanceDue: 0,
     paymentMode: "Trans. ID",
     paymentProof: "Receipt #0982",
     transactionId: "TXN-50940",
@@ -198,8 +321,10 @@ export const initialPatients: PatientRecord[] = [
     typeOfMedical: "Periodic Maritime Medical",
     usgXray: "Pending USG",
     companyName: "Anglo-Eastern Shipping",
-    paymentStatus: "Own",
-    paymentAmount: "₹6,500.00",
+    paymentStatus: "Partial",
+    paymentAmount: "₹3,000.00",
+    totalFee: 6500,
+    balanceDue: 3500,
     paymentMode: "Cash",
     paymentProof: "Cash Memo #829",
     transactionId: "CSH-2026-015",
@@ -234,6 +359,8 @@ export const initialPatients: PatientRecord[] = [
     companyName: "MSC Mediterranean",
     paymentStatus: "Paid",
     paymentAmount: "₹2,500.00",
+    totalFee: 2500,
+    balanceDue: 0,
     paymentMode: "Trans. ID",
     paymentProof: "Online Conf #7712",
     transactionId: "TXN-50935",
@@ -268,6 +395,8 @@ export const initialPatients: PatientRecord[] = [
     companyName: "Teekay Tankers",
     paymentStatus: "Paid",
     paymentAmount: "₹9,800.00",
+    totalFee: 9800,
+    balanceDue: 0,
     paymentMode: "Trans. ID",
     paymentProof: "Company Voucher #662",
     transactionId: "TXN-50939",
@@ -424,6 +553,9 @@ export const invoiceRecords: InvoiceRecord[] = [
     discount: 0,
     total: 4500,
     amount: "₹4,500.00",
+    amountPaid: 4500,
+    balanceDue: 0,
+    paymentStatus: "Paid",
     paymentMethod: "UPI / Trans. ID",
     transactionRef: "TXN-50941 / UTR-882190",
     paidDate: "Oct 21, 2026",
@@ -454,8 +586,11 @@ export const invoiceRecords: InvoiceRecord[] = [
     discount: 0,
     total: 8200,
     amount: "₹8,200.00",
+    amountPaid: 0,
+    balanceDue: 8200,
+    paymentStatus: "Pending",
     paymentMethod: "Cash / Pending",
-    transactionRef: "CSH-2026-018",
+    transactionRef: "Pending Verification",
     paidDate: "Pending Verification",
     notes: "Flag state medical with Cardiology review protocol.",
     items: [
@@ -484,6 +619,9 @@ export const invoiceRecords: InvoiceRecord[] = [
     discount: 0,
     total: 3800,
     amount: "₹3,800.00",
+    amountPaid: 3800,
+    balanceDue: 0,
+    paymentStatus: "Paid",
     paymentMethod: "HDFC Bank IMPS",
     transactionRef: "TXN-50940 / IMPS-90172",
     paidDate: "Oct 20, 2026",
@@ -508,15 +646,19 @@ export const invoiceRecords: InvoiceRecord[] = [
     company: "Anglo-Eastern Ship Management India",
     companyGstin: "27AABCA3319L1ZP",
     companyAddress: "Anglo-Eastern House, MIDC, Andheri East, Mumbai 400093",
-    status: "Overdue",
+    status: "Pending",
     subtotal: 6500,
     tax: 0,
     discount: 0,
     total: 6500,
     amount: "₹6,500.00",
-    paymentMethod: "Corporate Billing / Due",
-    transactionRef: "INV-REF-081",
-    notes: "USG pending; follow-up payment overdue.",
+    amountPaid: 3000,
+    balanceDue: 3500,
+    paymentStatus: "Partial",
+    paymentMethod: "Cash Memo",
+    transactionRef: "CSH-2026-015",
+    paidDate: "Oct 20, 2026",
+    notes: "USG pending; partial payment cleared, balance ₹3,500 due.",
     items: [
       { id: "1", description: "Periodic Maritime Medical Checkup (Chief Engineer)", sacCode: "999312", qty: 1, rate: 2800, amount: 2800 },
       { id: "2", description: "Whole Abdomen & Pelvis Ultrasonography (USG)", sacCode: "999312", qty: 1, rate: 2200, amount: 2200 },
@@ -537,14 +679,18 @@ export const invoiceRecords: InvoiceRecord[] = [
     company: "MSC Mediterranean Shipping Co. India",
     companyGstin: "27AABCM7712E1Z2",
     companyAddress: "MSC House, Andheri Kurla Road, Mumbai 400059",
-    status: "Pending",
+    status: "Paid",
     subtotal: 2500,
     tax: 0,
     discount: 0,
     total: 2500,
     amount: "₹2,500.00",
+    amountPaid: 2500,
+    balanceDue: 0,
+    paymentStatus: "Paid",
     paymentMethod: "Trans. ID / Online",
     transactionRef: "TXN-50935",
+    paidDate: "Oct 19, 2026",
     notes: "New deck cadet joining examination.",
     items: [
       { id: "1", description: "Deck Cadet Pre-Sea Medical Examination", sacCode: "999312", qty: 1, rate: 1800, amount: 1800 },
@@ -571,6 +717,9 @@ export const invoiceRecords: InvoiceRecord[] = [
     discount: 0,
     total: 9800,
     amount: "₹9,800.00",
+    amountPaid: 9800,
+    balanceDue: 0,
+    paymentStatus: "Paid",
     paymentMethod: "Teekay Corporate NEFT",
     transactionRef: "TXN-50939 / NEFT-66219",
     paidDate: "Oct 19, 2026",

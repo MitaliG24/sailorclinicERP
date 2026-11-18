@@ -123,8 +123,8 @@ export function PatientDetailModal({
               </p>
             </div>
             <div className="rounded-lg border border-border/80 bg-card p-2.5">
-              <span className="text-[10px] font-medium text-muted-foreground">Invoice Ref</span>
-              <p className="mt-0.5 font-mono font-semibold text-primary">{patient.invoiceNo || "INV-2026-084"}</p>
+              <span className="text-[10px] font-medium text-muted-foreground">Rank & Position</span>
+              <p className="mt-0.5 font-semibold text-foreground truncate">{patient.rank || "Seafarer"}</p>
             </div>
           </div>
 
@@ -139,13 +139,7 @@ export function PatientDetailModal({
                 Char A-Z, 0-9
               </Badge>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="rounded bg-background p-2.5 border border-border/60">
-                <span className="text-[10px] text-muted-foreground">Certificate No.</span>
-                <p className="mt-0.5 font-mono font-semibold tracking-wide text-foreground">
-                  {patient.certificateNo || "—"}
-                </p>
-              </div>
+            <div className="grid gap-3 sm:grid-cols-4">
               <div className="rounded bg-background p-2.5 border border-border/60">
                 <span className="text-[10px] text-muted-foreground">INDoS No. (DG Shipping)</span>
                 <p className="mt-0.5 font-mono font-semibold tracking-wide text-foreground">
@@ -156,6 +150,18 @@ export function PatientDetailModal({
                 <span className="text-[10px] text-muted-foreground">CDC No. (Seaman’s Book)</span>
                 <p className="mt-0.5 font-mono font-semibold tracking-wide text-foreground">
                   {patient.cdcNo || "—"}
+                </p>
+              </div>
+              <div className="rounded bg-background p-2.5 border border-border/60">
+                <span className="text-[10px] text-muted-foreground">Passport No.</span>
+                <p className="mt-0.5 font-mono font-semibold tracking-wide text-foreground">
+                  {patient.passportNo || "—"}
+                </p>
+              </div>
+              <div className="rounded bg-background p-2.5 border border-border/60">
+                <span className="text-[10px] text-muted-foreground">Certificate No.</span>
+                <p className="mt-0.5 font-mono font-semibold tracking-wide text-foreground">
+                  {patient.certificateNo || "—"}
                 </p>
               </div>
             </div>
@@ -268,23 +274,34 @@ export function PatientDetailModal({
           <div className="rounded-lg border border-border bg-card p-4 space-y-2.5">
             <div className="flex items-center gap-1.5 font-semibold text-foreground border-b border-border/60 pb-2">
               <CreditCard className="size-3.5 text-primary" />
-              Financial & Invoice Statement
+              Fee Settlement & Payment Record
             </div>
-            <div className="grid gap-3 sm:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-5">
               <div>
                 <span className="text-[10px] text-muted-foreground">Payment Status</span>
                 <p className="mt-0.5 font-semibold text-foreground">{patient.paymentStatus}</p>
               </div>
               <div>
-                <span className="text-[10px] text-muted-foreground">Amount (Amt)</span>
+                <span className="text-[10px] text-muted-foreground">Amount Paid</span>
                 <p className="mt-0.5 font-semibold text-foreground">{patient.paymentAmount}</p>
+              </div>
+              <div>
+                <span className="text-[10px] text-muted-foreground">Total Fee & Due</span>
+                <p className="mt-0.5 font-semibold text-foreground">
+                  ₹{(patient.totalFee || 3500).toLocaleString("en-IN")}.00
+                  {(patient.balanceDue ?? 0) > 0 && (
+                    <span className="text-amber-600 block text-[11px] font-normal">
+                      Due: ₹{(patient.balanceDue ?? 0).toLocaleString("en-IN")}.00
+                    </span>
+                  )}
+                </p>
               </div>
               <div>
                 <span className="text-[10px] text-muted-foreground">Payment Mode</span>
                 <p className="mt-0.5 font-semibold text-foreground">{patient.paymentMode}</p>
               </div>
               <div>
-                <span className="text-[10px] text-muted-foreground">Trans. ID / Proof</span>
+                <span className="text-[10px] text-muted-foreground">Trans. ID / Ref</span>
                 <p className="mt-0.5 font-mono text-[11px] text-foreground truncate">
                   {patient.transactionId || patient.paymentProof || "—"}
                 </p>

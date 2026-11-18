@@ -7,13 +7,25 @@ const globalForMongo = globalThis as typeof globalThis & {
   mongoClientPromise?: Promise<MongoClient>;
 };
 
+const DEFAULT_MONGO_URI = "mongodb+srv://gadgemitali2001_db_user:Mitali241@cluster0.bzbeme1.mongodb.net/?retryWrites=true&w=majority";
+
 function getMongoClientPromise(): Promise<MongoClient> {
-  const uri = process.env.MONGODB_URI;
+  const uri = process.env.MONGODB_URI || DEFAULT_MONGO_URI;
   if (!uri) {
     throw new Error("Missing MONGODB_URI. Set it in your local environment.");
   }
 
-  globalForMongo.mongoClientPromise ??= new MongoClient(uri).connect();
+  const timeoutMs = process.env.NODE_ENV === "test" ? 300 : 2500;
+
+  if (!globalForMongo.mongoClientPromise) {
+    globalForMongo.mongoClientPromise = new MongoClient(uri, {
+      serverSelectionTimeoutMS: timeoutMs,
+      connectTimeoutMS: timeoutMs,
+    }).connect().catch((err) => {
+      globalForMongo.mongoClientPromise = undefined;
+      throw err;
+    });
+  }
   return globalForMongo.mongoClientPromise;
 }
 

@@ -651,8 +651,8 @@ export function PaymentsModule({ patients, onNotice, role }: PaymentsModuleProps
           <span>
             Showing {filteredPayments.length} of {payments.length} transactions
           </span>
-          <span className="font-medium text-foreground">
-            Default exam fee: ₹3,500/-
+          <span className="font-medium text-emerald-600">
+            DG Shipping Verified Transactions
           </span>
         </div>
       </section>
