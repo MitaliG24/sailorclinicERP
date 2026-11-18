@@ -25,6 +25,7 @@ import {
   EyeOff,
   FileBadge,
   FileChartColumnIncreasing,
+  FilePlus2,
   FileSpreadsheet,
   FileText,
   Filter,
@@ -312,7 +313,7 @@ function ClinicApp() {
   const nextPatientId = useMemo(() => {
     const highestNum = patients.reduce((max, p) => {
       const match = p.id?.match(/^PT-(\d+)$/);
-      return match ? Math.max(max, parseInt(match[1], 10)) : max;
+      return match && match[1] ? Math.max(max, parseInt(match[1], 10)) : max;
     }, 2408);
     return `PT-${highestNum + 1}`;
   }, [patients]);
@@ -335,7 +336,7 @@ function ClinicApp() {
   const handleSavePatient = async (saved: PatientRecord) => {
     const highestInvNum = invoices.reduce((max, inv) => {
       const match = inv.id?.match(/^INV-2026-(\d+)$/) || inv.id?.match(/^REC-2026-(\d+)$/);
-      return match ? Math.max(max, parseInt(match[1], 10)) : max;
+      return match && match[1] ? Math.max(max, parseInt(match[1], 10)) : max;
     }, 84);
 
     const invId = saved.invoiceNo || `INV-2026-${String(highestInvNum + 1).padStart(3, "0")}`;
