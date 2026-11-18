@@ -58,6 +58,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AdminProfileModal, type UserProfileData } from "@/components/clinic/AdminProfileModal";
 import { AppointmentScheduleModal } from "@/components/clinic/AppointmentScheduleModal";
 import { ClinicLogo } from "@/components/clinic/ClinicLogo";
+import { CreateInvoiceModal } from "@/components/clinic/CreateInvoiceModal";
 import { FeedbackAdminModule } from "@/components/clinic/FeedbackAdminModule";
 import { InvoiceModal } from "@/components/clinic/InvoiceModal";
 import { InvoiceModule } from "@/components/clinic/InvoiceModule";
