@@ -11,7 +11,6 @@ import {
   Download,
   Edit3,
   FileCheck2,
-  FilePlus2,
   FileText,
   Receipt,
   Search,
@@ -48,7 +47,6 @@ import {
   type PatientRecord,
 } from "@/lib/clinic";
 import type { PaymentRecord } from "@/lib/payments";
-import { CreateInvoiceModal } from "./CreateInvoiceModal";
 import { PaymentReceiptModal } from "./PaymentReceiptModal";
 
 interface InvoiceModuleProps {
@@ -79,7 +77,6 @@ export function InvoiceModule({
   const [collectionPeriod, setCollectionPeriod] = useState<"day" | "month" | "year" | "all">("all");
   const [selectedRecordIds, setSelectedRecordIds] = useState<string[]>([]);
   const [selectedReceiptPayment, setSelectedReceiptPayment] = useState<PaymentRecord | null>(null);
-  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   // Edit Payment Modal state for partial payment / pending payment updates
   const [editingRecord, setEditingRecord] = useState<ExtendedInvoiceRecord | null>(null);
@@ -238,11 +235,12 @@ export function InvoiceModule({
     const activeMonth = activeDay.slice(0, 7);
     const activeYear = activeDay.slice(0, 4);
 
-    // Records filtered strictly for the selected period
+    // Records filtered strictly for the selected period (Staff only sees daily payments)
+    const effectivePeriod = isStaff ? "day" : collectionPeriod;
     const periodRecords =
-      collectionPeriod === "all"
+      effectivePeriod === "all"
         ? allRecords
-        : collectionPeriod === "day"
+        : effectivePeriod === "day"
           ? allRecords.filter((rec) => {
               const d = rec.date || "";
               return (
@@ -252,7 +250,7 @@ export function InvoiceModule({
                 rec.paidDate?.includes(activeDay)
               );
             })
-          : collectionPeriod === "month"
+          : effectivePeriod === "month"
             ? allRecords.filter((rec) => {
                 const d = rec.date || "";
                 return (
@@ -287,24 +285,24 @@ export function InvoiceModule({
     const totalOutstandingAll = allRecords.reduce((sum, rec) => sum + (rec.balanceDue || 0), 0);
 
     const periodLabel =
-      collectionPeriod === "day"
+      effectivePeriod === "day"
         ? "Today"
-        : collectionPeriod === "month"
+        : effectivePeriod === "month"
           ? "This Month"
-          : collectionPeriod === "year"
+          : effectivePeriod === "year"
             ? "This Year"
             : "All Time";
 
     if (isStaff) {
       return {
         isStaff: true,
-        primaryLabel: "Total collection",
+        primaryLabel: "Today's Collection",
         primaryValue: formatINR(periodCollected),
-        primaryNote: `${periodSettledCount} receipt(s) collected (${periodLabel})`,
-        secondaryLabel: `${periodLabel} Settled Records`,
+        primaryNote: `${periodSettledCount} receipt(s) collected today`,
+        secondaryLabel: "Today's Settled Records",
         secondaryValue: String(periodSettledCount),
-        secondaryNote: "Candidates cleared full fee",
-        tertiaryLabel: `${periodLabel} Partial / Dues`,
+        secondaryNote: "Candidates cleared full fee today",
+        tertiaryLabel: "Today's Partial / Dues",
         tertiaryValue: String(periodPartialCount),
         tertiaryNote: "Awaiting balance completion",
       };
@@ -506,22 +504,28 @@ export function InvoiceModule({
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-semibold text-muted-foreground">{stats.primaryLabel}</span>
-              <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
-                {(["day", "month", "year", "all"] as const).map((period) => (
-                  <button
-                    key={period}
-                    type="button"
-                    onClick={() => setCollectionPeriod(period)}
-                    className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
-                      collectionPeriod === period
-                        ? "bg-primary text-primary-foreground font-bold shadow-2xs"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
+              {!isStaff ? (
+                <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
+                  {(["day", "month", "year", "all"] as const).map((period) => (
+                    <button
+                      key={period}
+                      type="button"
+                      onClick={() => setCollectionPeriod(period)}
+                      className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
+                        collectionPeriod === period
+                          ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {period}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                  Today
+                </span>
+              )}
             </div>
             <span className="grid size-8 place-items-center rounded bg-emerald-500/10 text-emerald-600 shrink-0">
               <WalletCards className="size-4" />
@@ -646,14 +650,6 @@ export function InvoiceModule({
                 </Button>
               </div>
             )}
-
-            <Button
-              size="sm"
-              onClick={() => setCreateModalOpen(true)}
-              className="gap-1.5 shadow-sm text-xs"
-            >
-              <FilePlus2 className="size-3.5" /> Record Payment
-            </Button>
           </div>
         </div>
 
@@ -789,13 +785,18 @@ export function InvoiceModule({
                       <TableCell>
                         {isPaid ? (
                           <div className="text-xs space-y-0.5">
-                            <div className="flex items-center gap-1 font-semibold text-emerald-700">
-                              <CheckCircle2 className="size-3 text-emerald-600" />
-                              <span>Paid ({record.paymentMethod || "UPI / Digital Clearance"})</span>
+                            <div className="flex items-center gap-1.5 font-semibold">
+                              <span className="inline-flex items-center gap-1 rounded bg-emerald-100 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 shadow-2xs">
+                                <CheckCircle2 className="size-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" />
+                                PAID
+                              </span>
+                              <span className="text-muted-foreground text-xs font-normal">
+                                ({record.paymentMethod || "UPI / Digital Clearance"})
+                              </span>
                             </div>
                             <div className="text-[10px] text-muted-foreground font-mono">
                               {record.paidDate ? `Date: ${record.paidDate}` : ""}
-                              {record.transactionRef ? ` • ${record.transactionRef}` : ""}
+                              {record.transactionRef && record.transactionRef !== "Cleared" ? ` • ${record.transactionRef}` : ""}
                             </div>
                           </div>
                         ) : isPartial ? (
@@ -825,8 +826,13 @@ export function InvoiceModule({
                       <TableCell className="text-center whitespace-nowrap">
                         <Badge
                           variant={isPaid ? "default" : isPartial ? "secondary" : "outline"}
-                          className={`text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide ${isPartial ? "bg-amber-100 text-amber-800 border-amber-300" : ""
-                            }`}
+                          className={`text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide ${
+                            isPaid
+                              ? "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
+                              : isPartial
+                              ? "bg-amber-100 text-amber-800 border-amber-300"
+                              : ""
+                          }`}
                         >
                           {isPaid ? "Paid" : isPartial ? "Partial" : "Pending"}
                         </Badge>
@@ -1086,18 +1092,6 @@ export function InvoiceModule({
         payment={selectedReceiptPayment}
         open={!!selectedReceiptPayment}
         onOpenChange={(open) => !open && setSelectedReceiptPayment(null)}
-      />
-
-      {/* Create Record / Invoice Modal */}
-      <CreateInvoiceModal
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        patients={patients}
-        nextInvoiceNum={allRecords.length + 85}
-        onSave={(newInv) => {
-          onAddInvoice(newInv);
-          onNotice(`Payment record ${newInv.id} created for ${newInv.patient}.`);
-        }}
       />
     </div>
   );

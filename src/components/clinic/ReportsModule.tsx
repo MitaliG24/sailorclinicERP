@@ -37,13 +37,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatINR, type PatientRecord, type InvoiceRecord } from "@/lib/clinic";
+import { formatINR, type PatientRecord, type InvoiceRecord, type ClinicRole } from "@/lib/clinic";
 
 interface ReportsModuleProps {
   patients: PatientRecord[];
   invoices: InvoiceRecord[];
   dateFilter: string;
   onDateFilter: (val: string) => void;
+  role?: ClinicRole | null;
 }
 
 export function ReportsModule({
@@ -51,7 +52,9 @@ export function ReportsModule({
   invoices,
   dateFilter,
   onDateFilter,
+  role,
 }: ReportsModuleProps) {
+  const isStaff = role === "staff";
   const [activeTab, setActiveTab] = useState<"overview" | "categories" | "companies" | "payments">("overview");
 
   // Security protection for confidential Total Revenue section
@@ -59,6 +62,7 @@ export function ReportsModule({
   const [revenuePassword, setRevenuePassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [revenuePeriod, setRevenuePeriod] = useState<"day" | "month" | "year">("day");
+  const effectiveRevenuePeriod = isStaff ? "day" : revenuePeriod;
 
   const handleUnlockRevenue = (e: React.FormEvent) => {
     e.preventDefault();
@@ -447,29 +451,35 @@ export function ReportsModule({
                   </Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Real-time financial performance: {revenueStats[revenuePeriod].period}
+                  Real-time financial performance: {revenueStats[effectiveRevenuePeriod].period}
                 </p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               {/* Day / Month / Year Switcher */}
-              <div className="flex items-center rounded-lg border border-border bg-muted/70 p-0.5 text-xs">
-                {(["day", "month", "year"] as const).map((period) => (
-                  <button
-                    key={period}
-                    type="button"
-                    onClick={() => setRevenuePeriod(period)}
-                    className={`rounded-md px-3 py-1 text-xs font-semibold capitalize transition-all ${
-                      revenuePeriod === period
-                        ? "bg-primary text-primary-foreground shadow-2xs font-bold"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {period === "day" ? "Day-wise (Today)" : period === "month" ? "Month-wise" : "Year-wise"}
-                  </button>
-                ))}
-              </div>
+              {!isStaff ? (
+                <div className="flex items-center rounded-lg border border-border bg-muted/70 p-0.5 text-xs">
+                  {(["day", "month", "year"] as const).map((period) => (
+                    <button
+                      key={period}
+                      type="button"
+                      onClick={() => setRevenuePeriod(period)}
+                      className={`rounded-md px-3 py-1 text-xs font-semibold capitalize transition-all ${
+                        revenuePeriod === period
+                          ? "bg-primary text-primary-foreground shadow-2xs font-bold"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {period === "day" ? "Day-wise (Today)" : period === "month" ? "Month-wise" : "Year-wise"}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                  Day-wise (Today)
+                </span>
+              )}
 
               <Button
                 variant="outline"
@@ -496,10 +506,10 @@ export function ReportsModule({
                 </span>
               </div>
               <p className="mt-3 text-2xl font-bold font-mono text-emerald-600">
-                {formatINR(revenueStats[revenuePeriod].collected)}
+                {formatINR(revenueStats[effectiveRevenuePeriod].collected)}
               </p>
               <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{revenueStats[revenuePeriod].efficiency}% collection rate</span>
+                <span>{revenueStats[effectiveRevenuePeriod].efficiency}% collection rate</span>
                 <span className="text-emerald-600 font-semibold flex items-center gap-0.5">
                   <ArrowUpRight className="size-3" /> Settled
                 </span>
@@ -517,10 +527,10 @@ export function ReportsModule({
                 </span>
               </div>
               <p className="mt-3 text-2xl font-bold font-mono text-foreground">
-                {formatINR(revenueStats[revenuePeriod].billed)}
+                {formatINR(revenueStats[effectiveRevenuePeriod].billed)}
               </p>
               <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{revenueStats[revenuePeriod].label}</span>
+                <span>{revenueStats[effectiveRevenuePeriod].label}</span>
                 <span className="text-primary font-semibold">100% Audited</span>
               </div>
             </div>
@@ -536,7 +546,7 @@ export function ReportsModule({
                 </span>
               </div>
               <p className="mt-3 text-2xl font-bold font-mono text-amber-600">
-                {formatINR(revenueStats[revenuePeriod].pending)}
+                {formatINR(revenueStats[effectiveRevenuePeriod].pending)}
               </p>
               <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>Awaiting settlement</span>

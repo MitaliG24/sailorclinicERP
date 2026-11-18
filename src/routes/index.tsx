@@ -25,7 +25,6 @@ import {
   EyeOff,
   FileBadge,
   FileChartColumnIncreasing,
-  FilePlus2,
   FileSpreadsheet,
   FileText,
   Filter,
@@ -59,7 +58,6 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { AdminProfileModal, type UserProfileData } from "@/components/clinic/AdminProfileModal";
 import { AppointmentScheduleModal } from "@/components/clinic/AppointmentScheduleModal";
 import { ClinicLogo } from "@/components/clinic/ClinicLogo";
-import { CreateInvoiceModal } from "@/components/clinic/CreateInvoiceModal";
 import { FeedbackAdminModule } from "@/components/clinic/FeedbackAdminModule";
 import { InvoiceModal } from "@/components/clinic/InvoiceModal";
 import { InvoiceModule } from "@/components/clinic/InvoiceModule";
@@ -819,6 +817,7 @@ function ClinicApp() {
                   invoices={invoices}
                   dateFilter={dateFilter}
                   onDateFilter={setDateFilter}
+                  role={role}
                 />
               )} 
               {section === "activity" && <ActivityView />}
@@ -1128,7 +1127,7 @@ function SignIn() {
                 id="clinic-email"
                 type="email"
                 autoComplete="username"
-                placeholder="medical@sailorsmedical.com"
+                placeholder="Enter email address"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 required
@@ -1164,52 +1163,6 @@ function SignIn() {
               {!loading && <ArrowRight className="size-4" />}
             </Button>
           </form>
-
-          <div className="mt-4 rounded-lg border border-border/80 bg-muted/40 p-3.5">
-            <div className="mb-2 flex items-center justify-between text-xs">
-              <span className="font-semibold text-foreground">Clinic Access Credentials:</span>
-              <span className="text-[10px] text-muted-foreground">Click to fill</span>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail("medical@sailorsmedical.com");
-                  setPassword("Admin@123");
-                  setError("");
-                }}
-                className="group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-xs font-semibold text-primary">Clinic Admin</span>
-                  <Badge variant="outline" className="text-[9px] px-1 py-0">Full Access</Badge>
-                </div>
-                <span className="mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground">
-                  medical@sailorsmedical.com
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">Pass: Admin@123</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setEmail("info@sailorsmedical.com");
-                  setPassword("Staff@1");
-                  setError("");
-                }}
-                className="group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span className="text-xs font-semibold text-primary">Clinic Staff</span>
-                  <Badge variant="outline" className="text-[9px] px-1 py-0">Frontdesk</Badge>
-                </div>
-                <span className="mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground">
-                  info@sailorsmedical.com
-                </span>
-                <span className="text-[10px] font-mono text-muted-foreground">Pass: Staff@1</span>
-              </button>
-            </div>
-          </div>
 
           <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-3 text-center">
             <Link
@@ -1271,13 +1224,6 @@ function PageActions({
           New patient
         </Button>
       </div>
-    );
-  }
-  if (section === "invoices") {
-    return (
-      <Button onClick={onCreateInvoice} className="gap-2">
-        <FilePlus2 className="size-4" /> New payment record
-      </Button>
     );
   }
   if (section === "staff") {
@@ -1424,17 +1370,19 @@ function Dashboard({
         ? `${monthCandidateCount} examined this month`
         : `${yearCandidateCount} verified this year`;
 
+  const activePaymentPeriod = isStaff ? "day" : paymentPeriod;
+
   const paymentMetricValue =
-    paymentPeriod === "day"
+    activePaymentPeriod === "day"
       ? formatINR(dayAmountReceived)
-      : paymentPeriod === "month"
+      : activePaymentPeriod === "month"
         ? formatINR(monthAmountReceived)
         : formatINR(yearAmountReceived);
 
   const paymentMetricDetail =
-    paymentPeriod === "day"
+    activePaymentPeriod === "day"
       ? `${dayPayments.length} receipt(s) collected today`
-      : paymentPeriod === "month"
+      : activePaymentPeriod === "month"
         ? `${monthPayments.length} cleared this month`
         : `${patients.filter((p) => p.paymentStatus !== "Pending").length} total settlements`;
 
@@ -1450,7 +1398,7 @@ function Dashboard({
       isSeafarerCard: true,
     },
     {
-      label: "Total collection",
+      label: isStaff ? "Today's collection" : "Total collection",
       value: paymentMetricValue,
       detail: paymentMetricDetail,
       positive: true,
@@ -1545,22 +1493,28 @@ function Dashboard({
                     </div>
                   )}
                   {metric.isPaymentCard && (
-                    <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
-                      {(["day", "month", "year"] as const).map((period) => (
-                        <button
-                          key={period}
-                          type="button"
-                          onClick={() => setPaymentPeriod(period)}
-                          className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
-                            paymentPeriod === period
-                              ? "bg-primary text-primary-foreground font-bold shadow-2xs"
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {period}
-                        </button>
-                      ))}
-                    </div>
+                    isStaff ? (
+                      <span className="rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary">
+                        Today
+                      </span>
+                    ) : (
+                      <div className="flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]">
+                        {(["day", "month", "year"] as const).map((period) => (
+                          <button
+                            key={period}
+                            type="button"
+                            onClick={() => setPaymentPeriod(period)}
+                            className={`rounded px-1.5 py-0.5 capitalize transition-colors ${
+                              paymentPeriod === period
+                                ? "bg-primary text-primary-foreground font-bold shadow-2xs"
+                                : "text-muted-foreground hover:text-foreground"
+                            }`}
+                          >
+                            {period}
+                          </button>
+                        ))}
+                      </div>
+                    )
                   )}
                 </div>
                 <span className={`grid size-8 place-items-center rounded shrink-0 ${metric.shade}`}>

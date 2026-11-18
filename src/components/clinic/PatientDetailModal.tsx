@@ -279,7 +279,15 @@ export function PatientDetailModal({
             <div className="grid gap-3 sm:grid-cols-5">
               <div>
                 <span className="text-[10px] text-muted-foreground">Payment Status</span>
-                <p className="mt-0.5 font-semibold text-foreground">{patient.paymentStatus}</p>
+                <p className="mt-0.5 font-semibold text-foreground">
+                  {patient.paymentStatus === "Paid" || patient.paymentStatus === "Own" ? (
+                    <span className="inline-flex items-center gap-1 font-bold text-emerald-600">
+                      <CheckCircle2 className="size-3.5 stroke-[2.5]" /> PAID
+                    </span>
+                  ) : (
+                    patient.paymentStatus
+                  )}
+                </p>
               </div>
               <div>
                 <span className="text-[10px] text-muted-foreground">Amount Paid</span>
