@@ -7,13 +7,13 @@ import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { f as require_jsx_runtime, n as AvatarFallback$1, r as AvatarImage$1, t as Avatar$1 } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
 import { i as cn, n as ClinicLogo, r as buttonVariants, t as Button } from "./ClinicLogo-vQhzZWTZ.mjs";
-import { $ as Download, A as PanelLeftOpen, B as KeyRound, C as RefreshCw, D as Plus, E as Printer, F as Mail, G as FilePlusCorner, H as Funnel, I as LogOut, J as FileChartColumnIncreasing, K as FileCheck, L as Lock, M as MessageSquare, N as Menu, O as Phone, P as MapPin, Q as Ellipsis, R as LockOpen, T as Receipt, U as FileText, V as HeartPulse, W as FileSpreadsheet, X as Eye, Y as FileBadge, Z as ExternalLink, _ as ShieldAlert, _t as ArrowUpRight, a as UserX, at as CircleAlert, b as Search, bt as ArrowDownRight, c as UserPlus, ct as ChevronDown, d as Stethoscope, dt as Calendar, et as CreditCard, f as Square, ft as CalendarDays, g as ShieldCheck, gt as Bell, h as Ship, ht as Briefcase, i as User, it as CircleCheck, j as PanelLeftClose, k as PenLine, l as Upload, lt as Check, m as SquareCheckBig, mt as Building2, n as WalletCards, nt as Clock3, o as UserRound, ot as ChevronRight, p as SquarePen, pt as Building, q as FileCheckCorner, r as Users, rt as ClipboardList, s as UserRoundPlus, st as ChevronLeft, t as X, tt as Clock, u as Trash2, ut as ChartColumn, v as Settings, vt as ArrowRight, w as ReceiptText, x as Save, xt as Activity, z as LayoutDashboard } from "../_libs/lucide-react.mjs";
+import { $ as CreditCard, A as PanelLeftOpen, B as KeyRound, C as RefreshCw, D as Plus, E as Printer, F as Mail, G as FileCheck, H as Funnel, I as LogOut, J as FileBadge, K as FileCheckCorner, L as Lock, M as MessageSquare, N as Menu, O as Phone, P as MapPin, Q as Download, R as LockOpen, T as Receipt, U as FileText, V as HeartPulse, W as FileSpreadsheet, X as ExternalLink, Y as Eye, Z as Ellipsis, _ as ShieldAlert, _t as ArrowRight, a as UserX, at as ChevronRight, b as Search, bt as Activity, c as UserPlus, ct as Check, d as Stethoscope, dt as CalendarDays, et as Clock, f as Square, ft as Building, g as ShieldCheck, gt as ArrowUpRight, h as Ship, ht as Bell, i as User, it as CircleAlert, j as PanelLeftClose, k as PenLine, l as Upload, lt as ChartColumn, m as SquareCheckBig, mt as Briefcase, n as WalletCards, nt as ClipboardList, o as UserRound, ot as ChevronLeft, p as SquarePen, pt as Building2, q as FileChartColumnIncreasing, r as Users, rt as CircleCheck, s as UserRoundPlus, st as ChevronDown, t as X, tt as Clock3, u as Trash2, ut as Calendar, v as Settings, w as ReceiptText, x as Save, yt as ArrowDownRight, z as LayoutDashboard } from "../_libs/lucide-react.mjs";
 import { a as DialogOverlay$1, i as DialogDescription$1, n as DialogClose, o as DialogPortal$1, r as DialogContent$1, s as DialogTitle$1, t as Dialog$1 } from "../_libs/@radix-ui/react-dialog+[...].mjs";
 import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
 import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
 import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-Ca_3AooX.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-DuVlY_Nw.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {
@@ -823,632 +823,6 @@ function AppointmentScheduleModal({ open, onOpenChange, selectedDate, onSelectDa
 					})
 				})
 			]
-		})
-	});
-}
-var COMMON_SERVICES = [
-	{
-		description: "DG Shipping Comprehensive Medical Fitness Examination",
-		sacCode: "999312",
-		rate: 2500
-	},
-	{
-		description: "Digital Chest X-Ray (PA View with Radiologist Report)",
-		sacCode: "999312",
-		rate: 1200
-	},
-	{
-		description: "Whole Abdomen & Pelvis Ultrasonography (USG)",
-		sacCode: "999312",
-		rate: 2200
-	},
-	{
-		description: "Pathology Diagnostics (Complete Haemogram, Blood Sugar, LFT, KFT)",
-		sacCode: "999312",
-		rate: 1200
-	},
-	{
-		description: "Audiometry & Ishihara 38 Plates Color Vision Test",
-		sacCode: "999312",
-		rate: 800
-	},
-	{
-		description: "Cardiology Evaluation & 12-Lead Resting ECG",
-		sacCode: "999312",
-		rate: 2500
-	},
-	{
-		description: "Urine Routine & Drug / Alcohol Screening Panel",
-		sacCode: "999312",
-		rate: 900
-	}
-];
-function CreateInvoiceModal({ open, onOpenChange, patients, nextInvoiceNum, onSave }) {
-	const [selectedPatientId, setSelectedPatientId] = (0, import_react.useState)("");
-	const [invoiceId, setInvoiceId] = (0, import_react.useState)(`INV-2026-${String(nextInvoiceNum).padStart(3, "0")}`);
-	const [date, setDate] = (0, import_react.useState)((/* @__PURE__ */ new Date()).toISOString().slice(0, 10));
-	const [dueDate, setDueDate] = (0, import_react.useState)(new Date(Date.now() + 1296e6).toISOString().slice(0, 10));
-	const [candidateName, setCandidateName] = (0, import_react.useState)("");
-	const [rank, setRank] = (0, import_react.useState)("Chief Officer");
-	const [vessel, setVessel] = (0, import_react.useState)("");
-	const [indosNo, setIndosNo] = (0, import_react.useState)("");
-	const [cdcNo, setCdcNo] = (0, import_react.useState)("");
-	const [certificateNo, setCertificateNo] = (0, import_react.useState)("");
-	const [company, setCompany] = (0, import_react.useState)("Maersk Marine Services India Pvt Ltd");
-	const [companyGstin, setCompanyGstin] = (0, import_react.useState)("27AAACM0124P1Z4");
-	const [companyAddress, setCompanyAddress] = (0, import_react.useState)("Peninsula Business Park, Lower Parel, Mumbai");
-	const [status, setStatus] = (0, import_react.useState)("Paid");
-	const [paymentMethod, setPaymentMethod] = (0, import_react.useState)("UPI / Digital Transfer");
-	const [transactionRef, setTransactionRef] = (0, import_react.useState)(`TXN-${Math.floor(1e4 + Math.random() * 9e4)}`);
-	const [notes, setNotes] = (0, import_react.useState)("DG Shipping maritime examination fee receipt.");
-	const [items, setItems] = (0, import_react.useState)([
-		{
-			id: "1",
-			description: "DG Shipping Comprehensive Medical Fitness Examination",
-			sacCode: "999312",
-			qty: 1,
-			rate: 2500,
-			amount: 2500
-		},
-		{
-			id: "2",
-			description: "Digital Chest X-Ray (PA View with Radiologist Report)",
-			sacCode: "999312",
-			qty: 1,
-			rate: 1200,
-			amount: 1200
-		},
-		{
-			id: "3",
-			description: "Pathology Diagnostics (Complete Haemogram & Glucose)",
-			sacCode: "999312",
-			qty: 1,
-			rate: 800,
-			amount: 800
-		}
-	]);
-	const handlePatientSelect = (patientId) => {
-		setSelectedPatientId(patientId);
-		const found = patients.find((p) => p.id === patientId);
-		if (found) {
-			setCandidateName(found.name);
-			setRank(found.rank || "Seafarer");
-			setVessel(found.vesselName || found.vessel || "");
-			setIndosNo(found.indosNo || "");
-			setCdcNo(found.cdcNo || "");
-			setCertificateNo(found.certificateNo || "");
-			setCompany(found.companyName || "Maersk Marine Services");
-			if (found.invoiceNo) setInvoiceId(found.invoiceNo);
-		}
-	};
-	const handleAddItem = (presetIndex) => {
-		const preset = presetIndex !== void 0 ? COMMON_SERVICES[presetIndex] : COMMON_SERVICES[0];
-		const newItem = {
-			id: String(Date.now()),
-			description: preset.description,
-			sacCode: preset.sacCode,
-			qty: 1,
-			rate: preset.rate,
-			amount: preset.rate
-		};
-		setItems((prev) => [...prev, newItem]);
-	};
-	const handleItemChange = (index, field, val) => {
-		setItems((prev) => {
-			const copy = [...prev];
-			const target = { ...copy[index] };
-			if (field === "rate" || field === "qty") {
-				target[field] = Number(val) || 0;
-				target.amount = target.qty * target.rate;
-			} else target[field] = val;
-			copy[index] = target;
-			return copy;
-		});
-	};
-	const handleRemoveItem = (index) => {
-		setItems((prev) => prev.filter((_, i) => i !== index));
-	};
-	const subtotal = items.reduce((sum, item) => sum + item.amount, 0);
-	const total = subtotal;
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		if (!candidateName.trim() || !company.trim()) return;
-		const formattedDate = new Date(date).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric"
-		});
-		const formattedDue = new Date(dueDate).toLocaleDateString("en-US", {
-			month: "short",
-			day: "numeric",
-			year: "numeric"
-		});
-		onSave({
-			id: invoiceId.trim() || `INV-2026-${String(nextInvoiceNum).padStart(3, "0")}`,
-			date: formattedDate,
-			dueDate: formattedDue,
-			patient: candidateName.trim(),
-			patientId: selectedPatientId || void 0,
-			rank,
-			vessel: vessel.trim() || void 0,
-			indosNo: indosNo.toUpperCase().trim(),
-			cdcNo: cdcNo.toUpperCase().trim(),
-			certificateNo: certificateNo.toUpperCase().trim(),
-			company: company.trim(),
-			companyGstin: companyGstin.trim() || "27AAACM0124P1Z4",
-			companyAddress: companyAddress.trim() || "Mumbai Corporate Office",
-			status,
-			items,
-			subtotal,
-			tax: 0,
-			discount: 0,
-			total,
-			amount: formatINR(total),
-			paymentMethod,
-			transactionRef,
-			paidDate: status === "Paid" ? formattedDate : void 0,
-			notes
-		});
-		onOpenChange(false);
-	};
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
-		open,
-		onOpenChange,
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
-			className: "max-h-[92vh] w-full max-w-3xl overflow-y-auto p-0 sm:rounded-xl",
-			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogHeader, {
-				className: "border-b border-border bg-muted/40 p-5 sm:px-6",
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-					className: "flex items-center gap-3",
-					children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-						className: "grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground shadow-sm",
-						children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePlusCorner, { className: "size-5" })
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, {
-						className: "text-lg font-semibold tracking-tight",
-						children: "Create Standard Maritime Tax Invoice"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, {
-						className: "mt-0.5 text-xs text-muted-foreground",
-						children: "Issue a compliant DG Shipping seafarer medical bill in Indian Rupees (INR)"
-					})] })]
-				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
-				onSubmit: handleSubmit,
-				className: "p-5 sm:p-6 space-y-5 text-xs",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "rounded-lg border border-border/80 bg-card p-4 space-y-3",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "flex items-center justify-between border-b border-border/60 pb-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "font-semibold text-foreground uppercase tracking-wider text-[11px]",
-									children: "Invoice Details & Candidate Selection"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-primary font-mono font-bold text-xs",
-									children: invoiceId
-								})]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "grid gap-3 sm:grid-cols-3",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Select Candidate (Pre-fill)"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-											value: selectedPatientId,
-											onChange: (e) => handlePatientSelect(e.target.value),
-											className: "h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "",
-												children: "— Or enter custom details —"
-											}), patients.map((p) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("option", {
-												value: p.id,
-												children: [
-													p.name,
-													" (",
-													p.rank,
-													" · ",
-													p.companyName,
-													")"
-												]
-											}, p.id))]
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Invoice Number"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											value: invoiceId,
-											onChange: (e) => setInvoiceId(e.target.value),
-											className: "h-9 text-xs font-mono font-semibold uppercase",
-											required: true
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Invoice Date"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											type: "date",
-											value: date,
-											onChange: (e) => setDate(e.target.value),
-											className: "h-9 text-xs",
-											required: true
-										})]
-									})
-								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "grid gap-3 sm:grid-cols-4 pt-1",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
-											className: "font-medium text-foreground",
-											children: ["Candidate Name ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-destructive",
-												children: "*"
-											})]
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. Captain Rajesh Kumar",
-											value: candidateName,
-											onChange: (e) => setCandidateName(e.target.value),
-											className: "h-9 text-xs",
-											required: true
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Rank / Designation"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. Chief Officer",
-											value: rank,
-											onChange: (e) => setRank(e.target.value),
-											className: "h-9 text-xs"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Vessel Name"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. MV Maersk Mc-Kinney",
-											value: vessel,
-											onChange: (e) => setVessel(e.target.value),
-											className: "h-9 text-xs"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground",
-											children: "Due Date"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											type: "date",
-											value: dueDate,
-											onChange: (e) => setDueDate(e.target.value),
-											className: "h-9 text-xs"
-										})]
-									})
-								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "grid gap-3 sm:grid-cols-3 pt-1 font-mono",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground font-sans",
-											children: "INDoS No."
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. 12NL8492",
-											value: indosNo,
-											onChange: (e) => setIndosNo(e.target.value.toUpperCase()),
-											className: "h-9 text-xs uppercase"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground font-sans",
-											children: "CDC No."
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. MUM 248910",
-											value: cdcNo,
-											onChange: (e) => setCdcNo(e.target.value.toUpperCase()),
-											className: "h-9 text-xs uppercase"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "space-y-1.5",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-											className: "font-medium text-foreground font-sans",
-											children: "Certificate No."
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-											placeholder: "e.g. MC-2026-9041",
-											value: certificateNo,
-											onChange: (e) => setCertificateNo(e.target.value.toUpperCase()),
-											className: "h-9 text-xs uppercase"
-										})]
-									})
-								]
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "rounded-lg border border-border/80 bg-card p-4 space-y-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "font-semibold text-foreground uppercase tracking-wider text-[11px] block border-b border-border/60 pb-2",
-							children: "Billed To (Shipping Company / Agency)"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid gap-3 sm:grid-cols-3",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-1.5 sm:col-span-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-									className: "font-medium text-foreground",
-									children: "Company Name"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									placeholder: "e.g. Maersk Marine Services India Pvt Ltd",
-									value: company,
-									onChange: (e) => setCompany(e.target.value),
-									className: "h-9 text-xs",
-									required: true
-								})]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "space-y-1.5",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-									className: "font-medium text-foreground",
-									children: "Company GSTIN"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-									placeholder: "27AAACM0124P1Z4",
-									value: companyGstin,
-									onChange: (e) => setCompanyGstin(e.target.value.toUpperCase()),
-									className: "h-9 text-xs font-mono uppercase"
-								})]
-							})]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "rounded-lg border border-border/80 bg-card p-4 space-y-3",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-2",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "font-semibold text-foreground uppercase tracking-wider text-[11px]",
-									children: "Clinical Examination & Laboratory Services"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-[10px] text-muted-foreground block",
-									children: "All rates and subtotals calculated in INR (₹)"
-								})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									type: "button",
-									variant: "outline",
-									size: "sm",
-									className: "gap-1 text-xs h-7",
-									onClick: () => handleAddItem(),
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-3.5" }), " Add Service Row"]
-								})]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-								className: "space-y-2",
-								children: items.map((item, idx) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "grid grid-cols-12 gap-2 items-center bg-muted/40 p-2 rounded-md border border-border/60",
-									children: [
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "col-span-6 space-y-1",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-[10px] text-muted-foreground",
-												children: "Description"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												value: item.description,
-												onChange: (e) => handleItemChange(idx, "description", e.target.value),
-												className: "h-8 text-xs bg-background",
-												required: true
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "col-span-2 space-y-1",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-[10px] text-muted-foreground font-mono",
-												children: "SAC Code"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												value: item.sacCode,
-												onChange: (e) => handleItemChange(idx, "sacCode", e.target.value),
-												className: "h-8 text-xs font-mono bg-background text-center"
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "col-span-1 space-y-1",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-[10px] text-muted-foreground",
-												children: "Qty"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												type: "number",
-												min: "1",
-												value: item.qty,
-												onChange: (e) => handleItemChange(idx, "qty", e.target.value),
-												className: "h-8 text-xs bg-background text-center"
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "col-span-2 space-y-1",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-												className: "text-[10px] text-muted-foreground",
-												children: "Rate (₹)"
-											}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-												type: "number",
-												min: "0",
-												step: "50",
-												value: item.rate,
-												onChange: (e) => handleItemChange(idx, "rate", e.target.value),
-												className: "h-8 text-xs bg-background font-mono text-right"
-											})]
-										}),
-										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-											className: "col-span-1 flex items-end justify-center pt-3",
-											children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-												type: "button",
-												variant: "ghost",
-												size: "icon",
-												className: "size-7 text-muted-foreground hover:text-destructive",
-												onClick: () => handleRemoveItem(idx),
-												disabled: items.length <= 1,
-												children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Trash2, { className: "size-3.5" })
-											})
-										})
-									]
-								}, item.id))
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "pt-2 flex flex-wrap items-center gap-1.5 text-[11px]",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-muted-foreground",
-										children: "Quick Add:"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-										type: "button",
-										onClick: () => handleAddItem(1),
-										className: "rounded bg-muted px-2 py-0.5 text-primary hover:bg-primary/10 transition-colors",
-										children: "+ Digital X-Ray (₹1,200)"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-										type: "button",
-										onClick: () => handleAddItem(2),
-										className: "rounded bg-muted px-2 py-0.5 text-primary hover:bg-primary/10 transition-colors",
-										children: "+ USG Screening (₹2,200)"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-										type: "button",
-										onClick: () => handleAddItem(5),
-										className: "rounded bg-muted px-2 py-0.5 text-primary hover:bg-primary/10 transition-colors",
-										children: "+ Cardiology ECG (₹2,500)"
-									})
-								]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-								className: "pt-3 border-t border-border flex justify-between items-center bg-primary/5 p-3 rounded-lg",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-[10px] uppercase font-bold text-primary block",
-									children: "Taxable Subtotal (INR)"
-								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-									className: "text-[11px] text-muted-foreground",
-									children: "Healthcare exemption applies (0% GST)"
-								})] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-									className: "text-right",
-									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-base font-mono font-bold text-foreground",
-										children: formatINR(total)
-									})
-								})]
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "rounded-lg border border-border/80 bg-card p-4 space-y-3",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-							className: "font-semibold text-foreground uppercase tracking-wider text-[11px] block border-b border-border/60 pb-2",
-							children: "Payment Status & Transaction Particulars"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid gap-3 sm:grid-cols-3",
-							children: [
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-1.5",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-										className: "font-medium text-foreground",
-										children: "Payment Status"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-										value: status,
-										onChange: (e) => setStatus(e.target.value),
-										className: "h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs font-semibold",
-										children: [
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "Paid",
-												children: "Paid (Settled)"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "Pending",
-												children: "Pending (Awaiting payment)"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "Overdue",
-												children: "Overdue (Payment delayed)"
-											})
-										]
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-1.5",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-										className: "font-medium text-foreground",
-										children: "Payment Mode"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-										value: paymentMethod,
-										onChange: (e) => setPaymentMethod(e.target.value),
-										className: "h-9 w-full rounded-md border border-input bg-background px-2.5 text-xs",
-										children: [
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "UPI / Digital Transfer",
-												children: "UPI / Digital Transfer"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "HDFC Bank IMPS",
-												children: "HDFC Bank IMPS"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "NEFT / RTGS Corporate",
-												children: "NEFT / RTGS Corporate"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "Cash Receipt",
-												children: "Cash Receipt"
-											}),
-											/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-												value: "Company Invoice Credit",
-												children: "Company Invoice Credit"
-											})
-										]
-									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-									className: "space-y-1.5",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("label", {
-										className: "font-medium text-foreground",
-										children: "Transaction / UTR Ref"
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Input, {
-										value: transactionRef,
-										onChange: (e) => setTransactionRef(e.target.value),
-										className: "h-9 text-xs font-mono",
-										placeholder: "e.g. TXN-50941"
-									})]
-								})
-							]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogFooter, {
-						className: "border-t border-border pt-4 flex items-center justify-between",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Button, {
-							type: "button",
-							variant: "outline",
-							size: "sm",
-							onClick: () => onOpenChange(false),
-							children: "Cancel"
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-							type: "submit",
-							size: "sm",
-							className: "gap-1.5",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FileCheckCorner, { className: "size-4" }), " Generate & Save Invoice"]
-						})]
-					})
-				]
-			})]
 		})
 	});
 }
@@ -2804,7 +2178,6 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 	const [collectionPeriod, setCollectionPeriod] = (0, import_react.useState)("all");
 	const [selectedRecordIds, setSelectedRecordIds] = (0, import_react.useState)([]);
 	const [selectedReceiptPayment, setSelectedReceiptPayment] = (0, import_react.useState)(null);
-	const [createModalOpen, setCreateModalOpen] = (0, import_react.useState)(false);
 	const [editingRecord, setEditingRecord] = (0, import_react.useState)(null);
 	const [editStatus, setEditStatus] = (0, import_react.useState)("Paid");
 	const [editTotalFee, setEditTotalFee] = (0, import_react.useState)(3500);
@@ -2913,10 +2286,11 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 		const activeDay = allRecords.some((r) => r.date === todayIso) ? todayIso : latestRecordDate || todayIso;
 		const activeMonth = activeDay.slice(0, 7);
 		const activeYear = activeDay.slice(0, 4);
-		const periodRecords = collectionPeriod === "all" ? allRecords : collectionPeriod === "day" ? allRecords.filter((rec) => {
+		const effectivePeriod = isStaff ? "day" : collectionPeriod;
+		const periodRecords = effectivePeriod === "all" ? allRecords : effectivePeriod === "day" ? allRecords.filter((rec) => {
 			const d = rec.date || "";
 			return d === activeDay || d === todayIso || rec.paidDate?.includes("Today") || rec.paidDate?.includes(activeDay);
-		}) : collectionPeriod === "month" ? allRecords.filter((rec) => {
+		}) : effectivePeriod === "month" ? allRecords.filter((rec) => {
 			const d = rec.date || "";
 			return d.startsWith(activeMonth) || d.startsWith(thisMonthStr) || rec.paidDate?.includes(activeMonth);
 		}) : allRecords.filter((rec) => {
@@ -2931,16 +2305,16 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 		const totalInvoicedAll = allRecords.reduce((sum, rec) => sum + (rec.total || 0), 0);
 		const totalCollectedAll = allRecords.reduce((sum, rec) => sum + (rec.amountPaid || 0), 0);
 		const totalOutstandingAll = allRecords.reduce((sum, rec) => sum + (rec.balanceDue || 0), 0);
-		const periodLabel = collectionPeriod === "day" ? "Today" : collectionPeriod === "month" ? "This Month" : collectionPeriod === "year" ? "This Year" : "All Time";
+		const periodLabel = effectivePeriod === "day" ? "Today" : effectivePeriod === "month" ? "This Month" : effectivePeriod === "year" ? "This Year" : "All Time";
 		if (isStaff) return {
 			isStaff: true,
-			primaryLabel: "Total collection",
+			primaryLabel: "Today's Collection",
 			primaryValue: formatINR(periodCollected),
-			primaryNote: `${periodSettledCount} receipt(s) collected (${periodLabel})`,
-			secondaryLabel: `${periodLabel} Settled Records`,
+			primaryNote: `${periodSettledCount} receipt(s) collected today`,
+			secondaryLabel: "Today's Settled Records",
 			secondaryValue: String(periodSettledCount),
-			secondaryNote: "Candidates cleared full fee",
-			tertiaryLabel: `${periodLabel} Partial / Dues`,
+			secondaryNote: "Candidates cleared full fee today",
+			tertiaryLabel: "Today's Partial / Dues",
 			tertiaryValue: String(periodPartialCount),
 			tertiaryNote: "Awaiting balance completion"
 		};
@@ -3093,7 +2467,7 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: "text-xs font-semibold text-muted-foreground",
 										children: stats.primaryLabel
-									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									}), !isStaff ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 										className: "flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]",
 										children: [
 											"day",
@@ -3106,6 +2480,9 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 											className: `rounded px-1.5 py-0.5 capitalize transition-colors ${collectionPeriod === period ? "bg-primary text-primary-foreground font-bold shadow-2xs" : "text-muted-foreground hover:text-foreground"}`,
 											children: period
 										}, period))
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary",
+										children: "Today"
 									})]
 								}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 									className: "grid size-8 place-items-center rounded bg-emerald-500/10 text-emerald-600 shrink-0",
@@ -3265,12 +2642,6 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 											")"
 										]
 									})]
-								}),
-								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-									size: "sm",
-									onClick: () => setCreateModalOpen(true),
-									className: "gap-1.5 shadow-sm text-xs",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePlusCorner, { className: "size-3.5" }), " Record Payment"]
 								})
 							]
 						})]
@@ -3398,15 +2769,21 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, { children: isPaid ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "text-xs space-y-0.5",
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-											className: "flex items-center gap-1 font-semibold text-emerald-700",
-											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "size-3 text-emerald-600" }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [
-												"Paid (",
-												record.paymentMethod || "UPI / Digital Clearance",
-												")"
-											] })]
+											className: "flex items-center gap-1.5 font-semibold",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "inline-flex items-center gap-1 rounded bg-emerald-100 dark:bg-emerald-950/50 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800 shadow-2xs",
+												children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "size-3.5 text-emerald-600 dark:text-emerald-400 stroke-[2.5]" }), "PAID"]
+											}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+												className: "text-muted-foreground text-xs font-normal",
+												children: [
+													"(",
+													record.paymentMethod || "UPI / Digital Clearance",
+													")"
+												]
+											})]
 										}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 											className: "text-[10px] text-muted-foreground font-mono",
-											children: [record.paidDate ? `Date: ${record.paidDate}` : "", record.transactionRef ? ` • ${record.transactionRef}` : ""]
+											children: [record.paidDate ? `Date: ${record.paidDate}` : "", record.transactionRef && record.transactionRef !== "Cleared" ? ` • ${record.transactionRef}` : ""]
 										})]
 									}) : isPartial ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "text-xs space-y-0.5",
@@ -3441,7 +2818,7 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 										className: "text-center whitespace-nowrap",
 										children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
 											variant: isPaid ? "default" : isPartial ? "secondary" : "outline",
-											className: `text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide ${isPartial ? "bg-amber-100 text-amber-800 border-amber-300" : ""}`,
+											className: `text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide ${isPaid ? "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent" : isPartial ? "bg-amber-100 text-amber-800 border-amber-300" : ""}`,
 											children: isPaid ? "Paid" : isPartial ? "Partial" : "Pending"
 										})
 									}),
@@ -3754,16 +3131,6 @@ function InvoiceModule({ invoices, patients, onAddInvoice, onUpdateInvoice, onDe
 				payment: selectedReceiptPayment,
 				open: !!selectedReceiptPayment,
 				onOpenChange: (open) => !open && setSelectedReceiptPayment(null)
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CreateInvoiceModal, {
-				open: createModalOpen,
-				onOpenChange: setCreateModalOpen,
-				patients,
-				nextInvoiceNum: allRecords.length + 85,
-				onSave: (newInv) => {
-					onAddInvoice(newInv);
-					onNotice(`Payment record ${newInv.id} created for ${newInv.patient}.`);
-				}
 			})
 		]
 	});
@@ -4149,7 +3516,10 @@ function PatientDetailModal({ patient, open, onOpenChange, onEdit, onPrintNotice
 										children: "Payment Status"
 									}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 										className: "mt-0.5 font-semibold text-foreground",
-										children: patient.paymentStatus
+										children: patient.paymentStatus === "Paid" || patient.paymentStatus === "Own" ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+											className: "inline-flex items-center gap-1 font-bold text-emerald-600",
+											children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(CircleCheck, { className: "size-3.5 stroke-[2.5]" }), " PAID"]
+										}) : patient.paymentStatus
 									})] }),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: "text-[10px] text-muted-foreground",
@@ -9149,12 +8519,14 @@ function CompanyManagementModule({ companies, patients = [], onAddCompany, onDel
 		})]
 	});
 }
-function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
+function ReportsModule({ patients, invoices, dateFilter, onDateFilter, role }) {
+	const isStaff = role === "staff";
 	const [activeTab, setActiveTab] = (0, import_react.useState)("overview");
 	const [isRevenueUnlocked, setIsRevenueUnlocked] = (0, import_react.useState)(false);
 	const [revenuePassword, setRevenuePassword] = (0, import_react.useState)("");
 	const [passwordError, setPasswordError] = (0, import_react.useState)("");
 	const [revenuePeriod, setRevenuePeriod] = (0, import_react.useState)("day");
+	const effectiveRevenuePeriod = isStaff ? "day" : revenuePeriod;
 	const handleUnlockRevenue = (e) => {
 		e.preventDefault();
 		const pass = revenuePassword.trim();
@@ -9542,11 +8914,11 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 							})]
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 							className: "text-xs text-muted-foreground mt-0.5",
-							children: ["Real-time financial performance: ", revenueStats[revenuePeriod].period]
+							children: ["Real-time financial performance: ", revenueStats[effectiveRevenuePeriod].period]
 						})] })]
 					}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "flex flex-wrap items-center gap-2",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+						children: [!isStaff ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 							className: "flex items-center rounded-lg border border-border bg-muted/70 p-0.5 text-xs",
 							children: [
 								"day",
@@ -9558,6 +8930,9 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 								className: `rounded-md px-3 py-1 text-xs font-semibold capitalize transition-all ${revenuePeriod === period ? "bg-primary text-primary-foreground shadow-2xs font-bold" : "text-muted-foreground hover:text-foreground"}`,
 								children: period === "day" ? "Day-wise (Today)" : period === "month" ? "Month-wise" : "Year-wise"
 							}, period))
+						}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+							className: "rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary",
+							children: "Day-wise (Today)"
 						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 							variant: "outline",
 							size: "sm",
@@ -9585,11 +8960,11 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 									className: "mt-3 text-2xl font-bold font-mono text-emerald-600",
-									children: formatINR(revenueStats[revenuePeriod].collected)
+									children: formatINR(revenueStats[effectiveRevenuePeriod].collected)
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "mt-1 flex items-center justify-between text-[11px] text-muted-foreground",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [revenueStats[revenuePeriod].efficiency, "% collection rate"] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [revenueStats[effectiveRevenuePeriod].efficiency, "% collection rate"] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", {
 										className: "text-emerald-600 font-semibold flex items-center gap-0.5",
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowUpRight, { className: "size-3" }), " Settled"]
 									})]
@@ -9611,11 +8986,11 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 									className: "mt-3 text-2xl font-bold font-mono text-foreground",
-									children: formatINR(revenueStats[revenuePeriod].billed)
+									children: formatINR(revenueStats[effectiveRevenuePeriod].billed)
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "mt-1 flex items-center justify-between text-[11px] text-muted-foreground",
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: revenueStats[revenuePeriod].label }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: revenueStats[effectiveRevenuePeriod].label }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 										className: "text-primary font-semibold",
 										children: "100% Audited"
 									})]
@@ -9637,7 +9012,7 @@ function ReportsModule({ patients, invoices, dateFilter, onDateFilter }) {
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 									className: "mt-3 text-2xl font-bold font-mono text-amber-600",
-									children: formatINR(revenueStats[revenuePeriod].pending)
+									children: formatINR(revenueStats[effectiveRevenuePeriod].pending)
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "mt-1 flex items-center justify-between text-[11px] text-muted-foreground",
@@ -10723,7 +10098,8 @@ function ClinicApp() {
 											patients,
 											invoices,
 											dateFilter,
-											onDateFilter: setDateFilter
+											onDateFilter: setDateFilter,
+											role
 										}),
 										section === "activity" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ActivityView, {}),
 										section === "settings" && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(SettingsView, {
@@ -11084,7 +10460,7 @@ function SignIn() {
 									id: "clinic-email",
 									type: "email",
 									autoComplete: "username",
-									placeholder: "medical@sailorsmedical.com",
+									placeholder: "Enter email address",
 									value: email,
 									onChange: (event) => setEmail(event.target.value),
 									required: true,
@@ -11129,80 +10505,6 @@ function SignIn() {
 								children: [loading ? "Signing in…" : "Sign in", !loading && /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ArrowRight, { className: "size-4" })]
 							})
 						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "mt-4 rounded-lg border border-border/80 bg-muted/40 p-3.5",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "mb-2 flex items-center justify-between text-xs",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "font-semibold text-foreground",
-								children: "Clinic Access Credentials:"
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-								className: "text-[10px] text-muted-foreground",
-								children: "Click to fill"
-							})]
-						}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-							className: "grid grid-cols-1 gap-2 sm:grid-cols-2",
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								onClick: () => {
-									setEmail("medical@sailorsmedical.com");
-									setPassword("Admin@123");
-									setError("");
-								},
-								className: "group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between w-full",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "text-xs font-semibold text-primary",
-											children: "Clinic Admin"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-											variant: "outline",
-											className: "text-[9px] px-1 py-0",
-											children: "Full Access"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground",
-										children: "medical@sailorsmedical.com"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-[10px] font-mono text-muted-foreground",
-										children: "Pass: Admin@123"
-									})
-								]
-							}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								onClick: () => {
-									setEmail("info@sailorsmedical.com");
-									setPassword("Staff@1");
-									setError("");
-								},
-								className: "group flex flex-col rounded-md border border-border bg-card p-2 text-left transition hover:border-primary/60 hover:bg-accent/40",
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-										className: "flex items-center justify-between w-full",
-										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-											className: "text-xs font-semibold text-primary",
-											children: "Clinic Staff"
-										}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Badge, {
-											variant: "outline",
-											className: "text-[9px] px-1 py-0",
-											children: "Frontdesk"
-										})]
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "mt-0.5 truncate text-[11px] text-muted-foreground group-hover:text-foreground",
-										children: "info@sailorsmedical.com"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
-										className: "text-[10px] font-mono text-muted-foreground",
-										children: "Pass: Staff@1"
-									})
-								]
-							})]
-						})]
 					}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 						className: "mt-4 rounded-lg border border-primary/20 bg-primary/5 p-3 text-center",
@@ -11256,11 +10558,6 @@ function PageActions({ section, onSelect, onNotice, onAddPatient, onCreateInvoic
 			className: "gap-2",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { className: "size-4" }), "New patient"]
 		})]
-	});
-	if (section === "invoices") return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
-		onClick: onCreateInvoice,
-		className: "gap-2",
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FilePlusCorner, { className: "size-4" }), " New payment record"]
 	});
 	if (section === "staff") return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Button, {
 		onClick: () => onNotice("Invite link copied for a new team member."),
@@ -11321,8 +10618,9 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 	const yearCandidateCount = patients.length;
 	const seafarerMetricValue = seafarerPeriod === "day" ? String(dayCandidateCount) : seafarerPeriod === "month" ? String(monthCandidateCount) : String(yearCandidateCount);
 	const seafarerMetricDetail = seafarerPeriod === "day" ? `${dayCandidateCount} registered today` : seafarerPeriod === "month" ? `${monthCandidateCount} examined this month` : `${yearCandidateCount} verified this year`;
-	const paymentMetricValue = paymentPeriod === "day" ? formatINR(dayAmountReceived) : paymentPeriod === "month" ? formatINR(monthAmountReceived) : formatINR(yearAmountReceived);
-	const paymentMetricDetail = paymentPeriod === "day" ? `${dayPayments.length} receipt(s) collected today` : paymentPeriod === "month" ? `${monthPayments.length} cleared this month` : `${patients.filter((p) => p.paymentStatus !== "Pending").length} total settlements`;
+	const activePaymentPeriod = isStaff ? "day" : paymentPeriod;
+	const paymentMetricValue = activePaymentPeriod === "day" ? formatINR(dayAmountReceived) : activePaymentPeriod === "month" ? formatINR(monthAmountReceived) : formatINR(yearAmountReceived);
+	const paymentMetricDetail = activePaymentPeriod === "day" ? `${dayPayments.length} receipt(s) collected today` : activePaymentPeriod === "month" ? `${monthPayments.length} cleared this month` : `${patients.filter((p) => p.paymentStatus !== "Pending").length} total settlements`;
 	const metricCards = [
 		{
 			label: "Total seafarers",
@@ -11335,7 +10633,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 			isSeafarerCard: true
 		},
 		{
-			label: "Total collection",
+			label: isStaff ? "Today's collection" : "Total collection",
 			value: paymentMetricValue,
 			detail: paymentMetricDetail,
 			positive: true,
@@ -11440,7 +10738,10 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 											children: period
 										}, period))
 									}),
-									metric.isPaymentCard && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
+									metric.isPaymentCard && (isStaff ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
+										className: "rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary",
+										children: "Today"
+									}) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 										className: "flex items-center rounded-md border border-border bg-muted/60 p-0.5 text-[10px]",
 										children: [
 											"day",
@@ -11452,7 +10753,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 											className: `rounded px-1.5 py-0.5 capitalize transition-colors ${paymentPeriod === period ? "bg-primary text-primary-foreground font-bold shadow-2xs" : "text-muted-foreground hover:text-foreground"}`,
 											children: period
 										}, period))
-									})
+									}))
 								]
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {
 								className: `grid size-8 place-items-center rounded shrink-0 ${metric.shade}`,
@@ -11588,7 +10889,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 									onClick: onAddPatient
 								}),
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(QuickAction, {
-									icon: FilePlusCorner,
+									icon: FilePlus2,
 									title: "Payment records",
 									detail: "Candidate billing & receipts",
 									onClick: () => onSelect("invoices")

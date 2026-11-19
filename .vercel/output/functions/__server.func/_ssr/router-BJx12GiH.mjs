@@ -7,11 +7,11 @@ import { f as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].
 import { n as ClinicLogo, t as Button } from "./ClinicLogo-vQhzZWTZ.mjs";
 import { t as QueryClientProvider } from "../_libs/tanstack__react-query.mjs";
 import { t as QueryClient } from "../_libs/tanstack__query-core.mjs";
-import { E as Printer, S as RotateCcw, it as CircleCheck, y as Send, yt as ArrowLeft } from "../_libs/lucide-react.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/router-DE0OOTlM.js
+import { E as Printer, S as RotateCcw, rt as CircleCheck, vt as ArrowLeft, y as Send } from "../_libs/lucide-react.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/router-BJx12GiH.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
-var styles_default = "/assets/styles-BGsEmttF.css";
+var styles_default = "/assets/styles-DHICgR-u.css";
 function NotFoundComponent() {
 	return /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 		className: "flex min-h-screen items-center justify-center bg-background px-4",
@@ -149,7 +149,7 @@ function RootComponent() {
 		children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Outlet, {})
 	});
 }
-var $$splitComponentImporter$1 = () => import("./routes-Ca_3AooX.mjs");
+var $$splitComponentImporter$1 = () => import("./routes-DuVlY_Nw.mjs");
 var Route$2 = createFileRoute("/")({
 	head: () => ({ meta: [
 		{ title: "Sailors Medical Clinic | Centre for Marine Medical Examinations" },

@@ -740,30 +740,6 @@ var FileCheck = createLucideIcon("file-check", [
 * This source code is licensed under the ISC license.
 * See the LICENSE file in the root directory of this source tree.
 */
-var FilePlusCorner = createLucideIcon("file-plus-corner", [
-	["path", {
-		d: "M11.35 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5.35",
-		key: "17jvcc"
-	}],
-	["path", {
-		d: "M14 2v5a1 1 0 0 0 1 1h5",
-		key: "wfsgrz"
-	}],
-	["path", {
-		d: "M14 19h6",
-		key: "bvotb8"
-	}],
-	["path", {
-		d: "M17 16v6",
-		key: "18yu1i"
-	}]
-]);
-/**
-* @license lucide-react v0.575.0 - ISC
-*
-* This source code is licensed under the ISC license.
-* See the LICENSE file in the root directory of this source tree.
-*/
 var FileSpreadsheet = createLucideIcon("file-spreadsheet", [
 	["path", {
 		d: "M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z",
@@ -1630,4 +1606,4 @@ var X = createLucideIcon("x", [["path", {
 	key: "d8bk6v"
 }]]);
 //#endregion
-export { Download as $, PanelLeftOpen as A, KeyRound as B, RefreshCw as C, Plus as D, Printer as E, Mail as F, FilePlusCorner as G, Funnel as H, LogOut as I, FileChartColumnIncreasing as J, FileCheck as K, Lock as L, MessageSquare as M, Menu as N, Phone as O, MapPin as P, Ellipsis as Q, LockOpen as R, RotateCcw as S, Receipt as T, FileText as U, HeartPulse as V, FileSpreadsheet as W, Eye as X, FileBadge as Y, ExternalLink as Z, ShieldAlert as _, ArrowUpRight as _t, UserX as a, CircleAlert as at, Search as b, ArrowDownRight as bt, UserPlus as c, ChevronDown as ct, Stethoscope as d, Calendar as dt, CreditCard as et, Square as f, CalendarDays as ft, ShieldCheck as g, Bell as gt, Ship as h, Briefcase as ht, User as i, CircleCheck as it, PanelLeftClose as j, PenLine as k, Upload as l, Check as lt, SquareCheckBig as m, Building2 as mt, WalletCards as n, Clock3 as nt, UserRound as o, ChevronRight as ot, SquarePen as p, Building as pt, FileCheckCorner as q, Users as r, ClipboardList as rt, UserRoundPlus as s, ChevronLeft as st, X as t, Clock as tt, Trash2 as u, ChartColumn as ut, Settings as v, ArrowRight as vt, ReceiptText as w, Save as x, Activity as xt, Send as y, ArrowLeft as yt, LayoutDashboard as z };
+export { CreditCard as $, PanelLeftOpen as A, KeyRound as B, RefreshCw as C, Plus as D, Printer as E, Mail as F, FileCheck as G, Funnel as H, LogOut as I, FileBadge as J, FileCheckCorner as K, Lock as L, MessageSquare as M, Menu as N, Phone as O, MapPin as P, Download as Q, LockOpen as R, RotateCcw as S, Receipt as T, FileText as U, HeartPulse as V, FileSpreadsheet as W, ExternalLink as X, Eye as Y, Ellipsis as Z, ShieldAlert as _, ArrowRight as _t, UserX as a, ChevronRight as at, Search as b, Activity as bt, UserPlus as c, Check as ct, Stethoscope as d, CalendarDays as dt, Clock as et, Square as f, Building as ft, ShieldCheck as g, ArrowUpRight as gt, Ship as h, Bell as ht, User as i, CircleAlert as it, PanelLeftClose as j, PenLine as k, Upload as l, ChartColumn as lt, SquareCheckBig as m, Briefcase as mt, WalletCards as n, ClipboardList as nt, UserRound as o, ChevronLeft as ot, SquarePen as p, Building2 as pt, FileChartColumnIncreasing as q, Users as r, CircleCheck as rt, UserRoundPlus as s, ChevronDown as st, X as t, Clock3 as tt, Trash2 as u, Calendar as ut, Settings as v, ArrowLeft as vt, ReceiptText as w, Save as x, Send as y, ArrowDownRight as yt, LayoutDashboard as z };
