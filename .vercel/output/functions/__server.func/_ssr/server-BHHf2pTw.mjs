@@ -4,7 +4,7 @@ import { A as getStylesheetHref, E as toCrossJSONStream, F as isPromise, G as is
 import { n as createServerHistory } from "../_libs/tanstack__history.mjs";
 import { a as mergeHeaders, i as defaultSerovalDeserializerPlugins, n as getNormalizedURL, o as makeSerovalPlugin, r as createRawStreamRPCPlugin, s as createSerializationAdapter, t as attachRouterServerSsrUtils } from "../_libs/@tanstack/router-core+[...].mjs";
 import { a as TSS_SERVER_FUNCTION, c as createNullProtoObject, d as getStartContext, f as getStartOptions, i as TSS_FORMDATA_CONTEXT, m as safeObjectMerge, n as MAX_FRAME_PAYLOAD_SIZE, o as X_TSS_RAW_RESPONSE, p as runWithStartContext, r as TSS_CONTENT_TYPE_FRAMED_VERSIONED, s as X_TSS_SERIALIZED, t as MAX_FRAMED_STREAMS, u as flattenMiddlewares } from "./createServerFn-DDDJMFWM.mjs";
-import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-31ZJ4qCB.mjs";
+import { t as getServerFnById } from "../__23tanstack-start-server-fn-resolver-DeTjElT2.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { f as require_jsx_runtime } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { t as createCsrfMiddleware } from "./createCsrfMiddleware-B2To0gPJ.mjs";
@@ -100,7 +100,7 @@ var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-C-1rDYH5.mjs");
+	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-BtgWJrA0.mjs");
 	const startManifest = tsrStartManifest();
 	let routes = startManifest.routes;
 	routes[rootRouteId];
@@ -1186,8 +1186,8 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-CtYzIcbG.mjs"),
-		import("./start-CZLKrehl.mjs"),
+		import("./router-u3gXT9Ii.mjs"),
+		import("./start-CBMAtS-5.mjs"),
 		import("./empty-plugin-adapters-D9UWiqvJ.mjs")
 	]);
 	return {

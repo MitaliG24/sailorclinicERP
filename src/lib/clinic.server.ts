@@ -27,6 +27,12 @@ async function ensureCollectionsSeeded() {
   try {
     const db = await getDatabase();
 
+    const meta = await db.collection("clinic_meta").findOne({ id: "seed_status" });
+    if (meta) {
+      // Collections were already seeded. Never recreate or overwrite deleted records!
+      return;
+    }
+
     // 1. Seed Patients if collection is empty
     const patientCount = await db.collection("patients").countDocuments();
     if (patientCount === 0) {
@@ -85,6 +91,13 @@ async function ensureCollectionsSeeded() {
       const staffToInsert = initialStaffMembers.map((st) => ({ ...st }));
       await db.collection("staff").insertMany(staffToInsert);
     }
+
+    // Mark as seeded so future runs never recreate deleted data
+    await db.collection("clinic_meta").updateOne(
+      { id: "seed_status" },
+      { $set: { id: "seed_status", seeded: true, seededAt: new Date().toISOString() } },
+      { upsert: true }
+    );
   } catch (err) {
     console.warn("MongoDB initial seed check failed:", err);
   }
@@ -104,15 +117,11 @@ export const listPatientsServer = createServerFn({ method: "GET" }).handler(
         .sort({ srNo: 1 })
         .toArray();
 
-      if (!raw || raw.length === 0) {
-        return initialPatients;
-      }
-
       // Return clean plain objects guaranteed to be Seroval serializable
-      return JSON.parse(JSON.stringify(raw)) as PatientRecord[];
+      return JSON.parse(JSON.stringify(raw || [])) as PatientRecord[];
     } catch (error) {
       console.error("Failed to load patients from MongoDB:", error);
-      return initialPatients;
+      throw error;
     }
   },
 );
@@ -161,6 +170,13 @@ export const deletePatientServer = createServerFn({ method: "POST" })
       const db = await getDatabase();
       await db.collection("patients").deleteOne({ id: data.id });
 
+      // Clean up any corresponding invoices tied to this patient
+      const invoiceFilters: any[] = [{ patientId: data.id }, { id: data.id }];
+      if (data.name && data.name !== data.id) {
+        invoiceFilters.push({ patient: data.name });
+      }
+      await db.collection("invoices").deleteMany({ $or: invoiceFilters });
+
       try {
         await db.collection("activity_logs").insertOne({
           id: `ACT-${Date.now()}`,
@@ -197,14 +213,10 @@ export const listInvoicesServer = createServerFn({ method: "GET" }).handler(
         .sort({ date: -1 })
         .toArray();
 
-      if (!raw || raw.length === 0) {
-        return invoiceRecords;
-      }
-
-      return JSON.parse(JSON.stringify(raw)) as InvoiceRecord[];
+      return JSON.parse(JSON.stringify(raw || [])) as InvoiceRecord[];
     } catch (error) {
       console.error("Failed to load invoices from MongoDB:", error);
-      return invoiceRecords;
+      throw error;
     }
   },
 );
@@ -272,8 +284,8 @@ export const listFeedbackServer = createServerFn({ method: "GET" }).handler(
         .sort({ createdAt: -1 })
         .toArray();
 
-      if (!raw || raw.length === 0) {
-        return initialFeedbackRecords;
+      if (!raw) {
+        return [];
       }
 
       const sanitized = raw.map((item: any) => ({
@@ -305,7 +317,7 @@ export const listFeedbackServer = createServerFn({ method: "GET" }).handler(
       return JSON.parse(JSON.stringify(sanitized)) as FeedbackRecord[];
     } catch (error) {
       console.error("Failed to load feedback from MongoDB:", error);
-      return initialFeedbackRecords;
+      throw error;
     }
   },
 );
@@ -517,8 +529,8 @@ export const listStaffServer = createServerFn({ method: "GET" }).handler(
         .sort({ joiningDate: 1 })
         .toArray();
 
-      if (!raw || raw.length === 0) {
-        return initialStaffMembers;
+      if (!raw) {
+        return [];
       }
 
       const sanitized = raw.map((item: any) => ({
@@ -560,7 +572,7 @@ export const listStaffServer = createServerFn({ method: "GET" }).handler(
       return JSON.parse(JSON.stringify(sanitized)) as StaffMember[];
     } catch (error) {
       console.error("Failed to load staff members from MongoDB:", error);
-      return initialStaffMembers;
+      throw error;
     }
   },
 );

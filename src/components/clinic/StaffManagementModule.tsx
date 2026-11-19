@@ -80,7 +80,26 @@ interface StaffManagementModuleProps {
 }
 
 export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) {
-  const [staffList, setStaffList] = useState<StaffMember[]>(initialStaffMembers);
+  const [staffList, setRawStaffList] = useState<StaffMember[]>(() => {
+    try {
+      const stored = localStorage.getItem("sailor_clinic_staff");
+      if (stored !== null) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return initialStaffMembers;
+  });
+
+  const setStaffList = useCallback((updater: React.SetStateAction<StaffMember[]>) => {
+    setRawStaffList((prev) => {
+      const next = typeof updater === "function" ? (updater as (p: StaffMember[]) => StaffMember[])(prev) : updater;
+      try {
+        localStorage.setItem("sailor_clinic_staff", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState<string>("all");
@@ -157,7 +176,7 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
     setIsLoading(true);
     try {
       const data = await listStaffServer();
-      if (data && data.length > 0) {
+      if (Array.isArray(data)) {
         setStaffList(data);
       }
     } catch (err) {
@@ -165,7 +184,7 @@ export function StaffManagementModule({ onNotice }: StaffManagementModuleProps) 
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [setStaffList]);
 
   useEffect(() => {
     void loadStaff();

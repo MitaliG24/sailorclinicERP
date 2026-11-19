@@ -1,7 +1,7 @@
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
-import { t as getDatabase } from "./mongodb.server-DKHE0rbY.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/db-test-BUAsUBqL.js
+import { t as getDatabase } from "./mongodb.server-C_u4e3KP.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/db-test-D7xiNhHN.js
 var testMongoConnection_createServerFn_handler = createServerRpc({
 	id: "2dbbd49a26aa7ad8ec44dcfa3f1334d5c4bd99175bc0fc762cb847a41191e192",
 	name: "testMongoConnection",

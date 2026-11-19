@@ -177,8 +177,46 @@ function ClinicApp() {
   const [section, setSection] = useState<ClinicSection>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [patients, setPatients] = useState(initialPatients);
-  const [invoices, setInvoices] = useState<InvoiceRecord[]>(invoiceRecords);
+  const [patients, setRawPatients] = useState<PatientRecord[]>(() => {
+    try {
+      const stored = localStorage.getItem("sailor_clinic_patients");
+      if (stored !== null) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return initialPatients;
+  });
+  const [invoices, setRawInvoices] = useState<InvoiceRecord[]>(() => {
+    try {
+      const stored = localStorage.getItem("sailor_clinic_invoices");
+      if (stored !== null) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {}
+    return invoiceRecords;
+  });
+
+  const setPatients = useCallback((updater: React.SetStateAction<PatientRecord[]>) => {
+    setRawPatients((prev) => {
+      const next = typeof updater === "function" ? (updater as (p: PatientRecord[]) => PatientRecord[])(prev) : updater;
+      try {
+        localStorage.setItem("sailor_clinic_patients", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const setInvoices = useCallback((updater: React.SetStateAction<InvoiceRecord[]>) => {
+    setRawInvoices((prev) => {
+      const next = typeof updater === "function" ? (updater as (p: InvoiceRecord[]) => InvoiceRecord[])(prev) : updater;
+      try {
+        localStorage.setItem("sailor_clinic_invoices", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }, []);
   const [patientSearch, setPatientSearch] = useState("");
   const [dateFilter, setDateFilter] = useState("Today, Oct 21, 2026");
   const [notice, setNotice] = useState("");
@@ -289,10 +327,10 @@ function ClinicApp() {
           listInvoicesServer(),
         ]);
         if (active) {
-          if (mongoPatients && mongoPatients.length > 0) {
+          if (Array.isArray(mongoPatients)) {
             setPatients(mongoPatients);
           }
-          if (mongoInvoices && mongoInvoices.length > 0) {
+          if (Array.isArray(mongoInvoices)) {
             setInvoices(mongoInvoices);
           }
         }
@@ -304,7 +342,7 @@ function ClinicApp() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [setPatients, setInvoices]);
 
   const nextSrNo = useMemo(() => {
     return patients.reduce((max, p) => Math.max(max, p.srNo || 0), 0) + 1;

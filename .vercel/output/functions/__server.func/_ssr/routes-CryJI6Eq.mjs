@@ -2,7 +2,7 @@ import { o as __toESM } from "../_runtime.mjs";
 import { y as Link } from "../_libs/@tanstack/react-router+[...].mjs";
 import { a as clinicSections, c as formatINR, d as initialPatients, f as initialSalarySlips, g as staffStatuses, h as staffDepartments, i as canAccessSection, l as getVisibleSections, m as invoiceRecords, n as amountToWordsINR, o as convertNumberToWordsIndian, p as initialStaffMembers, r as appointmentRecords, s as documentTypes, t as activityRecords, u as initialCompanies } from "./staff-BI__96LE.mjs";
 import { n as feedbackQuestions, r as feedbackStatuses } from "./feedback-Clu2AqVp.mjs";
-import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-nv_a0s-T.mjs";
+import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-CNafSfLg.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { f as require_jsx_runtime, n as AvatarFallback$1, r as AvatarImage$1, t as Avatar$1 } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
@@ -13,7 +13,7 @@ import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
 import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
 import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-B9koOnaU.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-CryJI6Eq.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {
@@ -7001,7 +7001,25 @@ function SalarySlipModal({ open, onOpenChange, staffList, selectedStaffForSlip, 
 	});
 }
 function StaffManagementModule({ onNotice }) {
-	const [staffList, setStaffList] = (0, import_react.useState)(initialStaffMembers);
+	const [staffList, setRawStaffList] = (0, import_react.useState)(() => {
+		try {
+			const stored = localStorage.getItem("sailor_clinic_staff");
+			if (stored !== null) {
+				const parsed = JSON.parse(stored);
+				if (Array.isArray(parsed)) return parsed;
+			}
+		} catch {}
+		return initialStaffMembers;
+	});
+	const setStaffList = (0, import_react.useCallback)((updater) => {
+		setRawStaffList((prev) => {
+			const next = typeof updater === "function" ? updater(prev) : updater;
+			try {
+				localStorage.setItem("sailor_clinic_staff", JSON.stringify(next));
+			} catch {}
+			return next;
+		});
+	}, []);
 	const [isLoading, setIsLoading] = (0, import_react.useState)(true);
 	const [search, setSearch] = (0, import_react.useState)("");
 	const [departmentFilter, setDepartmentFilter] = (0, import_react.useState)("all");
@@ -7058,13 +7076,13 @@ function StaffManagementModule({ onNotice }) {
 		setIsLoading(true);
 		try {
 			const data = await listStaffServer();
-			if (data && data.length > 0) setStaffList(data);
+			if (Array.isArray(data)) setStaffList(data);
 		} catch (err) {
 			console.warn("Could not load staff from MongoDB, using baseline:", err);
 		} finally {
 			setIsLoading(false);
 		}
-	}, []);
+	}, [setStaffList]);
 	(0, import_react.useEffect)(() => {
 		loadStaff();
 	}, [loadStaff]);
@@ -10103,8 +10121,44 @@ function ClinicApp() {
 	const [section, setSection] = (0, import_react.useState)("dashboard");
 	const [sidebarOpen, setSidebarOpen] = (0, import_react.useState)(true);
 	const [mobileMenuOpen, setMobileMenuOpen] = (0, import_react.useState)(false);
-	const [patients, setPatients] = (0, import_react.useState)(initialPatients);
-	const [invoices, setInvoices] = (0, import_react.useState)(invoiceRecords);
+	const [patients, setRawPatients] = (0, import_react.useState)(() => {
+		try {
+			const stored = localStorage.getItem("sailor_clinic_patients");
+			if (stored !== null) {
+				const parsed = JSON.parse(stored);
+				if (Array.isArray(parsed)) return parsed;
+			}
+		} catch {}
+		return initialPatients;
+	});
+	const [invoices, setRawInvoices] = (0, import_react.useState)(() => {
+		try {
+			const stored = localStorage.getItem("sailor_clinic_invoices");
+			if (stored !== null) {
+				const parsed = JSON.parse(stored);
+				if (Array.isArray(parsed)) return parsed;
+			}
+		} catch {}
+		return invoiceRecords;
+	});
+	const setPatients = useCallback((updater) => {
+		setRawPatients((prev) => {
+			const next = typeof updater === "function" ? updater(prev) : updater;
+			try {
+				localStorage.setItem("sailor_clinic_patients", JSON.stringify(next));
+			} catch {}
+			return next;
+		});
+	}, []);
+	const setInvoices = useCallback((updater) => {
+		setRawInvoices((prev) => {
+			const next = typeof updater === "function" ? updater(prev) : updater;
+			try {
+				localStorage.setItem("sailor_clinic_invoices", JSON.stringify(next));
+			} catch {}
+			return next;
+		});
+	}, []);
 	const [patientSearch, setPatientSearch] = (0, import_react.useState)("");
 	const [dateFilter, setDateFilter] = (0, import_react.useState)("Today, Oct 21, 2026");
 	const [notice, setNotice] = (0, import_react.useState)("");
@@ -10202,8 +10256,8 @@ function ClinicApp() {
 			try {
 				const [mongoPatients, mongoInvoices] = await Promise.all([listPatientsServer(), listInvoicesServer()]);
 				if (active) {
-					if (mongoPatients && mongoPatients.length > 0) setPatients(mongoPatients);
-					if (mongoInvoices && mongoInvoices.length > 0) setInvoices(mongoInvoices);
+					if (Array.isArray(mongoPatients)) setPatients(mongoPatients);
+					if (Array.isArray(mongoInvoices)) setInvoices(mongoInvoices);
 				}
 			} catch (err) {
 				console.warn("Could not sync with MongoDB Atlas on start, using baseline records:", err);
@@ -10213,7 +10267,7 @@ function ClinicApp() {
 		return () => {
 			active = false;
 		};
-	}, []);
+	}, [setPatients, setInvoices]);
 	const nextSrNo = (0, import_react.useMemo)(() => {
 		return patients.reduce((max, p) => Math.max(max, p.srNo || 0), 0) + 1;
 	}, [patients]);

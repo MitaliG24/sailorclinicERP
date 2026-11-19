@@ -1,12 +1,13 @@
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
-import { t as getDatabase } from "./mongodb.server-DKHE0rbY.mjs";
+import { t as getDatabase } from "./mongodb.server-C_u4e3KP.mjs";
 import { d as initialPatients, m as invoiceRecords, p as initialStaffMembers, t as activityRecords } from "./staff-BI__96LE.mjs";
 import { i as initialFeedbackRecords, t as createFeedbackSchema } from "./feedback-Clu2AqVp.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-DDM7UMW5.js
+//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-BXnjuA9j.js
 async function ensureCollectionsSeeded() {
 	try {
 		const db = await getDatabase();
+		if (await db.collection("clinic_meta").findOne({ id: "seed_status" })) return;
 		if (await db.collection("patients").countDocuments() === 0) {
 			console.log("Seeding MongoDB patients collection with initial marine patients...");
 			const patientsToInsert = initialPatients.map((p) => ({ ...p }));
@@ -46,6 +47,11 @@ async function ensureCollectionsSeeded() {
 			const staffToInsert = initialStaffMembers.map((st) => ({ ...st }));
 			await db.collection("staff").insertMany(staffToInsert);
 		}
+		await db.collection("clinic_meta").updateOne({ id: "seed_status" }, { $set: {
+			id: "seed_status",
+			seeded: true,
+			seededAt: (/* @__PURE__ */ new Date()).toISOString()
+		} }, { upsert: true });
 	} catch (err) {
 		console.warn("MongoDB initial seed check failed:", err);
 	}
@@ -59,11 +65,10 @@ var listPatientsServer = createServerFn({ method: "GET" }).handler(listPatientsS
 	try {
 		await ensureCollectionsSeeded();
 		const raw = await (await getDatabase()).collection("patients").find({}, { projection: { _id: 0 } }).sort({ srNo: 1 }).toArray();
-		if (!raw || raw.length === 0) return initialPatients;
-		return JSON.parse(JSON.stringify(raw));
+		return JSON.parse(JSON.stringify(raw || []));
 	} catch (error) {
 		console.error("Failed to load patients from MongoDB:", error);
-		return initialPatients;
+		throw error;
 	}
 });
 var savePatientServer_createServerFn_handler = createServerRpc({
@@ -109,6 +114,9 @@ var deletePatientServer = createServerFn({ method: "POST" }).validator((input) =
 	try {
 		const db = await getDatabase();
 		await db.collection("patients").deleteOne({ id: data.id });
+		const invoiceFilters = [{ patientId: data.id }, { id: data.id }];
+		if (data.name && data.name !== data.id) invoiceFilters.push({ patient: data.name });
+		await db.collection("invoices").deleteMany({ $or: invoiceFilters });
 		try {
 			await db.collection("activity_logs").insertOne({
 				id: `ACT-${Date.now()}`,
@@ -138,11 +146,10 @@ var listInvoicesServer = createServerFn({ method: "GET" }).handler(listInvoicesS
 	try {
 		await ensureCollectionsSeeded();
 		const raw = await (await getDatabase()).collection("invoices").find({}, { projection: { _id: 0 } }).sort({ date: -1 }).toArray();
-		if (!raw || raw.length === 0) return invoiceRecords;
-		return JSON.parse(JSON.stringify(raw));
+		return JSON.parse(JSON.stringify(raw || []));
 	} catch (error) {
 		console.error("Failed to load invoices from MongoDB:", error);
-		return invoiceRecords;
+		throw error;
 	}
 });
 var saveInvoiceServer_createServerFn_handler = createServerRpc({
@@ -205,7 +212,7 @@ var listFeedbackServer = createServerFn({ method: "GET" }).handler(listFeedbackS
 	try {
 		await ensureCollectionsSeeded();
 		const raw = await (await getDatabase()).collection("feedback").find({}, { projection: { _id: 0 } }).sort({ createdAt: -1 }).toArray();
-		if (!raw || raw.length === 0) return initialFeedbackRecords;
+		if (!raw) return [];
 		const sanitized = raw.map((item) => ({
 			id: String(item.id || `SMC-FB-${Date.now()}`),
 			date: String(item.date || (/* @__PURE__ */ new Date()).toISOString().slice(0, 10)),
@@ -234,7 +241,7 @@ var listFeedbackServer = createServerFn({ method: "GET" }).handler(listFeedbackS
 		return JSON.parse(JSON.stringify(sanitized));
 	} catch (error) {
 		console.error("Failed to load feedback from MongoDB:", error);
-		return initialFeedbackRecords;
+		throw error;
 	}
 });
 var submitFeedbackServer_createServerFn_handler = createServerRpc({
@@ -390,7 +397,7 @@ var listStaffServer = createServerFn({ method: "GET" }).handler(listStaffServer_
 	try {
 		await ensureCollectionsSeeded();
 		const raw = await (await getDatabase()).collection("staff").find({}, { projection: { _id: 0 } }).sort({ joiningDate: 1 }).toArray();
-		if (!raw || raw.length === 0) return initialStaffMembers;
+		if (!raw) return [];
 		const sanitized = raw.map((item) => ({
 			id: String(item.id || `SMC-EMP-${Date.now().toString().slice(-3)}`),
 			name: String(item.name || "Employee"),
@@ -429,7 +436,7 @@ var listStaffServer = createServerFn({ method: "GET" }).handler(listStaffServer_
 		return JSON.parse(JSON.stringify(sanitized));
 	} catch (error) {
 		console.error("Failed to load staff members from MongoDB:", error);
-		return initialStaffMembers;
+		throw error;
 	}
 });
 var saveStaffServer_createServerFn_handler = createServerRpc({

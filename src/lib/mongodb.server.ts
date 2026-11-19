@@ -15,7 +15,7 @@ function getMongoClientPromise(): Promise<MongoClient> {
     throw new Error("Missing MONGODB_URI. Set it in your local environment.");
   }
 
-  const timeoutMs = process.env.NODE_ENV === "test" ? 300 : 2500;
+  const timeoutMs = process.env.NODE_ENV === "test" ? 300 : 8000;
 
   if (!globalForMongo.mongoClientPromise) {
     globalForMongo.mongoClientPromise = new MongoClient(uri, {
