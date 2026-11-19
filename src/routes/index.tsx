@@ -54,7 +54,7 @@ import {
   WalletCards,
   X,
 } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react";
 
 import { AdminProfileModal, type UserProfileData } from "@/components/clinic/AdminProfileModal";
 import { AppointmentScheduleModal } from "@/components/clinic/AppointmentScheduleModal";
