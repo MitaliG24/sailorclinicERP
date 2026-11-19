@@ -24,5 +24,10 @@ export default defineConfig({
     alias: {
       "punycode/": "punycode",
     },
+    vercel: {
+      functions: {
+        runtime: "nodejs22.x",
+      },
+    },
   },
 });
