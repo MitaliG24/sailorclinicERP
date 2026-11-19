@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   CalendarDays,
   CheckCircle2,
@@ -22,7 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { appointmentRecords, type AppointmentRecord } from "@/lib/clinic";
+import { appointmentRecords, type AppointmentRecord, type PatientRecord } from "@/lib/clinic";
 
 interface AppointmentScheduleModalProps {
   open: boolean;
@@ -30,6 +30,7 @@ interface AppointmentScheduleModalProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
   onNotice: (msg: string) => void;
+  patients?: PatientRecord[];
 }
 
 export function AppointmentScheduleModal({
@@ -38,6 +39,7 @@ export function AppointmentScheduleModal({
   selectedDate,
   onSelectDate,
   onNotice,
+  patients,
 }: AppointmentScheduleModalProps) {
   const [appointments, setAppointments] = useState<AppointmentRecord[]>(appointmentRecords);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -45,6 +47,12 @@ export function AppointmentScheduleModal({
   const [time, setTime] = useState("10:00 AM");
   const [doctor, setDoctor] = useState("Dr. Maya Bennett");
   const [medicalType, setMedicalType] = useState("DG Shipping Annual Medical");
+
+  const displayAppointments = useMemo(() => {
+    if (!patients || patients.length === 0) return appointments;
+    const names = new Set(patients.map((p) => p.name.trim().toLowerCase()));
+    return appointments.filter((a) => names.has(a.patient.trim().toLowerCase()));
+  }, [appointments, patients]);
 
   const formattedDate = selectedDate.toLocaleDateString("en-IN", {
     weekday: "long",
@@ -226,8 +234,8 @@ export function AppointmentScheduleModal({
 
             {/* List of appointments */}
             <div className="space-y-2.5 max-h-[340px] overflow-y-auto pr-1">
-              {appointments.length > 0 ? (
-                appointments.map((appt, i) => (
+              {displayAppointments.length > 0 ? (
+                displayAppointments.map((appt, i) => (
                   <div
                     key={`${appt.patient}-${i}`}
                     className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 transition-colors hover:border-primary/40"

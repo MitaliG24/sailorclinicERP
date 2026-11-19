@@ -952,6 +952,7 @@ function ClinicApp() {
           setNotice(`Active calendar date: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
         }}
         onNotice={setNotice}
+        patients={patients}
       />
     </div>
   );
@@ -1311,6 +1312,25 @@ function Dashboard({
   const todayStr = new Date().toISOString().slice(0, 10);
   const thisMonthStr = todayStr.slice(0, 7);
 
+  const existingPatientNames = useMemo(() => {
+    return new Set(patients.map((p) => p.name.trim().toLowerCase()));
+  }, [patients]);
+
+  const visibleAppointments = useMemo(() => {
+    return appointmentRecords.filter((apt) => existingPatientNames.has(apt.patient.trim().toLowerCase()));
+  }, [existingPatientNames]);
+
+  const visibleActivities = useMemo(() => {
+    return activityRecords.filter((act) => {
+      for (const p of patients) {
+        if (act.subject.includes(p.name) || (p.id && act.subject.includes(p.id))) {
+          return true;
+        }
+      }
+      return !act.subject.includes("PT-");
+    });
+  }, [patients]);
+
   const latestPatientDate = patients.reduce((latest, p) => {
     if (!p.date) return latest;
     const d = p.date.slice(0, 10);
@@ -1601,22 +1621,30 @@ function Dashboard({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {appointmentRecords.map((appointment) => (
-                  <TableRow key={appointment.patient}>
-                    <TableCell className="whitespace-nowrap pl-5 text-xs font-medium">{appointment.time}</TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2.5">
-                        <Avatar className="size-7">
-                          <AvatarFallback className="bg-secondary text-[9px] font-semibold text-secondary-foreground">{appointment.initials}</AvatarFallback>
-                        </Avatar>
-                        <span className="whitespace-nowrap text-xs font-medium">{appointment.patient}</span>
-                      </div>
+                {visibleAppointments.length > 0 ? (
+                  visibleAppointments.map((appointment) => (
+                    <TableRow key={appointment.patient}>
+                      <TableCell className="whitespace-nowrap pl-5 text-xs font-medium">{appointment.time}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2.5">
+                          <Avatar className="size-7">
+                            <AvatarFallback className="bg-secondary text-[9px] font-semibold text-secondary-foreground">{appointment.initials}</AvatarFallback>
+                          </Avatar>
+                          <span className="whitespace-nowrap text-xs font-medium">{appointment.patient}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground md:table-cell">{appointment.doctor}</TableCell>
+                      <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground sm:table-cell">{appointment.type}</TableCell>
+                      <TableCell className="pr-5 text-right"><StatusBadge status={appointment.status} /></TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-6 text-center text-xs text-muted-foreground">
+                      No appointments scheduled for active seafarers.
                     </TableCell>
-                    <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground md:table-cell">{appointment.doctor}</TableCell>
-                    <TableCell className="hidden whitespace-nowrap text-xs text-muted-foreground sm:table-cell">{appointment.type}</TableCell>
-                    <TableCell className="pr-5 text-right"><StatusBadge status={appointment.status} /></TableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
@@ -1653,7 +1681,7 @@ function Dashboard({
               </Button>
             </div>
             <div className="divide-y divide-border px-4 sm:px-5">
-              {activityRecords.slice(0, 3).map((entry) => (
+              {visibleActivities.slice(0, 3).map((entry) => (
                 <div key={entry.subject} className="flex gap-3 py-3.5">
                   <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded bg-secondary text-secondary-foreground">
                     <Activity className="size-3.5" />

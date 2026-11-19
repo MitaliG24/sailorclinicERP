@@ -13,7 +13,7 @@ import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
 import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
 import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-C87HQNyG.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-DsPfhxJc.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {
@@ -555,13 +555,18 @@ function CalendarDayButton({ className, day, modifiers, ...props }) {
 		...props
 	});
 }
-function AppointmentScheduleModal({ open, onOpenChange, selectedDate, onSelectDate, onNotice }) {
+function AppointmentScheduleModal({ open, onOpenChange, selectedDate, onSelectDate, onNotice, patients }) {
 	const [appointments, setAppointments] = (0, import_react.useState)(appointmentRecords);
 	const [showAddForm, setShowAddForm] = (0, import_react.useState)(false);
 	const [candidateName, setCandidateName] = (0, import_react.useState)("");
 	const [time, setTime] = (0, import_react.useState)("10:00 AM");
 	const [doctor, setDoctor] = (0, import_react.useState)("Dr. Maya Bennett");
 	const [medicalType, setMedicalType] = (0, import_react.useState)("DG Shipping Annual Medical");
+	const displayAppointments = (0, import_react.useMemo)(() => {
+		if (!patients || patients.length === 0) return appointments;
+		const names = new Set(patients.map((p) => p.name.trim().toLowerCase()));
+		return appointments.filter((a) => names.has(a.patient.trim().toLowerCase()));
+	}, [appointments, patients]);
 	const formattedDate = selectedDate.toLocaleDateString("en-IN", {
 		weekday: "long",
 		day: "numeric",
@@ -767,7 +772,7 @@ function AppointmentScheduleModal({ open, onOpenChange, selectedDate, onSelectDa
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "space-y-2.5 max-h-[340px] overflow-y-auto pr-1",
-								children: appointments.length > 0 ? appointments.map((appt, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								children: displayAppointments.length > 0 ? displayAppointments.map((appt, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3 transition-colors hover:border-primary/40",
 									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 										className: "flex items-center gap-3",
@@ -10878,7 +10883,8 @@ function ClinicApp() {
 					setSelectedCalendarDate(d);
 					setNotice(`Active calendar date: ${d.toLocaleDateString("en-IN", { dateStyle: "long" })}`);
 				},
-				onNotice: setNotice
+				onNotice: setNotice,
+				patients
 			})
 		]
 	});
@@ -11252,6 +11258,18 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 	const [paymentPeriod, setPaymentPeriod] = (0, import_react.useState)("month");
 	const todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
 	const thisMonthStr = todayStr.slice(0, 7);
+	const existingPatientNames = (0, import_react.useMemo)(() => {
+		return new Set(patients.map((p) => p.name.trim().toLowerCase()));
+	}, [patients]);
+	const visibleAppointments = (0, import_react.useMemo)(() => {
+		return appointmentRecords.filter((apt) => existingPatientNames.has(apt.patient.trim().toLowerCase()));
+	}, [existingPatientNames]);
+	const visibleActivities = (0, import_react.useMemo)(() => {
+		return activityRecords.filter((act) => {
+			for (const p of patients) if (act.subject.includes(p.name) || p.id && act.subject.includes(p.id)) return true;
+			return !act.subject.includes("PT-");
+		});
+	}, [patients]);
 	const latestPatientDate = patients.reduce((latest, p) => {
 		if (!p.date) return latest;
 		const d = p.date.slice(0, 10);
@@ -11507,7 +11525,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 										children: "Status"
 									})
 								]
-							}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: appointmentRecords.map((appointment) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
+							}) }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableBody, { children: visibleAppointments.length > 0 ? visibleAppointments.map((appointment) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(TableRow, { children: [
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
 									className: "whitespace-nowrap pl-5 text-xs font-medium",
 									children: appointment.time
@@ -11537,7 +11555,11 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 									className: "pr-5 text-right",
 									children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(StatusBadge, { status: appointment.status })
 								})
-							] }, appointment.patient)) })] })
+							] }, appointment.patient)) : /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableRow, { children: /* @__PURE__ */ (0, import_jsx_runtime.jsx)(TableCell, {
+								colSpan: 5,
+								className: "py-6 text-center text-xs text-muted-foreground",
+								children: "No appointments scheduled for active seafarers."
+							}) }) })] })
 						}),
 						/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 							type: "button",
@@ -11609,7 +11631,7 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 							}),
 							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 								className: "divide-y divide-border px-4 sm:px-5",
-								children: activityRecords.slice(0, 3).map((entry) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
+								children: visibleActivities.slice(0, 3).map((entry) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 									className: "flex gap-3 py-3.5",
 									children: [
 										/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", {

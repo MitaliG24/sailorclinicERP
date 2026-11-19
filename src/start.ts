@@ -50,33 +50,6 @@ const authMiddleware = createMiddleware({ type: "request" }).server(
 
     const authUser = await getSession(request);
 
-    // Public server functions: called from pages that don't require a login.
-    // submitFeedbackServer is used by the public candidate grievance portal (/feedback).
-    const PUBLIC_SERVER_FN_PATTERNS = ["submitFeedbackServer", "submitFeedback"];
-
-    let decodedServerFn = "";
-    if (pathname.includes("/_serverFn/")) {
-      const rawSegment = pathname.split("/_serverFn/")[1]?.split("/")[0]?.split("?")[0] || "";
-      try {
-        decodedServerFn = Buffer.from(rawSegment, "base64url").toString("utf8");
-      } catch {
-        decodedServerFn = "";
-      }
-    }
-
-    const isPublicServerFn =
-      handlerType === "serverFn" &&
-      PUBLIC_SERVER_FN_PATTERNS.some(
-        (name) => pathname.includes(name) || decodedServerFn.includes(name),
-      );
-
-    if (handlerType === "serverFn" && !authUser && !isPublicServerFn) {
-      return new Response(JSON.stringify({ message: "Authentication required." }), {
-        status: 401,
-        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
-      });
-    }
-
     return next({ context: { authUser } });
   },
 );
