@@ -1,4 +1,4 @@
-//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-qPMULENU.js
+//#region node_modules/.nitro/vite/services/ssr/assets/_tanstack-start-manifest_v-2VgmQICy.js
 var tsrStartManifest = () => ({ routes: {
 	__root__: {
 		filePath: "C:/Users/Lenovo/OneDrive/Documents/Mitali/MEDICAL/sailorclinicERP/src/routes/__root.tsx",
@@ -8,20 +8,20 @@ var tsrStartManifest = () => ({ routes: {
 			"/feedback"
 		],
 		preloads: [
-			"/assets/index-e8IeWtYP.js",
+			"/assets/index-DKP04qUK.js",
 			"/assets/createServerFn-DzIM3qIP.js",
 			"/assets/feedback-ByYGXqSY.js"
 		],
 		scripts: [{ attrs: {
 			type: "module",
 			async: !0,
-			src: "/assets/index-e8IeWtYP.js"
+			src: "/assets/index-DKP04qUK.js"
 		} }]
 	},
 	"/": {
 		filePath: "C:/Users/Lenovo/OneDrive/Documents/Mitali/MEDICAL/sailorclinicERP/src/routes/index.tsx",
 		children: void 0,
-		preloads: ["/assets/routes-DofkkYN-.js"]
+		preloads: ["/assets/routes-DTGBjVhu.js"]
 	},
 	"/db-test": {
 		filePath: "C:/Users/Lenovo/OneDrive/Documents/Mitali/MEDICAL/sailorclinicERP/src/routes/db-test.tsx",

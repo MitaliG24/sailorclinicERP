@@ -13,7 +13,7 @@ import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
 import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
 import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-eqMbQD1G.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-Dw_anfGU.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {
@@ -11306,22 +11306,22 @@ function Dashboard({ onSelect, onNotice, onAddPatient, onEditPatient, onViewPati
 		return sum + (p.paymentStatus === "Paid" || p.paymentStatus === "Own" ? fee : p.paymentStatus === "Partial" ? rawAmt : 0);
 	}, 0);
 	const dayCandidateCount = patients.filter((p) => {
-		const d = p.date || "";
+		const d = (p.date || "").slice(0, 10);
 		return d === activeDay || d === todayStr;
 	}).length;
 	const monthCandidateCount = patients.filter((p) => {
-		const d = p.date || "";
-		return d.startsWith(activeMonth) || d.startsWith(thisMonthStr);
+		const d = (p.date || "").slice(0, 7);
+		return d === activeMonth || d === thisMonthStr;
 	}).length;
 	const yearCandidateCount = patients.length;
 	const seafarerMetricValue = seafarerPeriod === "day" ? String(dayCandidateCount) : seafarerPeriod === "month" ? String(monthCandidateCount) : String(yearCandidateCount);
-	const seafarerMetricDetail = seafarerPeriod === "day" ? `${dayCandidateCount} registered today` : seafarerPeriod === "month" ? `${monthCandidateCount} examined this month` : `${yearCandidateCount} verified this year`;
+	const seafarerMetricDetail = seafarerPeriod === "day" ? `${dayCandidateCount} registered ${activeDay === todayStr ? "today" : "on active date"}` : seafarerPeriod === "month" ? `${monthCandidateCount} examined this month` : `${yearCandidateCount} verified this year`;
 	const activePaymentPeriod = isStaff ? "day" : paymentPeriod;
 	const paymentMetricValue = activePaymentPeriod === "day" ? formatINR(dayAmountReceived) : activePaymentPeriod === "month" ? formatINR(monthAmountReceived) : formatINR(yearAmountReceived);
 	const paymentMetricDetail = activePaymentPeriod === "day" ? `${dayPayments.length} receipt(s) collected today` : activePaymentPeriod === "month" ? `${monthPayments.length} cleared this month` : `${patients.filter((p) => p.paymentStatus !== "Pending").length} total settlements`;
 	const metricCards = [
 		{
-			label: "Total seafarers",
+			label: "Total seafarer records",
 			value: seafarerMetricValue,
 			detail: seafarerMetricDetail,
 			positive: true,

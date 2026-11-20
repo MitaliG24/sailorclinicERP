@@ -1405,13 +1405,13 @@ function Dashboard({
   }, 0);
 
   const dayCandidateCount = patients.filter((p) => {
-    const d = p.date || "";
+    const d = (p.date || "").slice(0, 10);
     return d === activeDay || d === todayStr;
   }).length;
 
   const monthCandidateCount = patients.filter((p) => {
-    const d = p.date || "";
-    return d.startsWith(activeMonth) || d.startsWith(thisMonthStr);
+    const d = (p.date || "").slice(0, 7);
+    return d === activeMonth || d === thisMonthStr;
   }).length;
 
   const yearCandidateCount = patients.length;
@@ -1425,7 +1425,7 @@ function Dashboard({
 
   const seafarerMetricDetail =
     seafarerPeriod === "day"
-      ? `${dayCandidateCount} registered today`
+      ? `${dayCandidateCount} registered ${activeDay === todayStr ? "today" : "on active date"}`
       : seafarerPeriod === "month"
         ? `${monthCandidateCount} examined this month`
         : `${yearCandidateCount} verified this year`;
@@ -1448,7 +1448,7 @@ function Dashboard({
 
   const metricCards = [
     {
-      label: "Total seafarers",
+      label: "Total seafarer records",
       value: seafarerMetricValue,
       detail: seafarerMetricDetail,
       positive: true,
