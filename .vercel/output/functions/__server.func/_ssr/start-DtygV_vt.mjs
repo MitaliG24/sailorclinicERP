@@ -2,7 +2,7 @@ import { t as getDatabase } from "./mongodb.server-C_u4e3KP.mjs";
 import { n as createMiddleware, t as createCsrfMiddleware } from "./createCsrfMiddleware-B2To0gPJ.mjs";
 import { t as renderErrorPage } from "./ssr.mjs";
 import crypto from "node:crypto";
-//#region node_modules/.nitro/vite/services/ssr/assets/start-BCJk5QQZ.js
+//#region node_modules/.nitro/vite/services/ssr/assets/start-DtygV_vt.js
 function dedupeSerializationAdapters(deduped, serializationAdapters) {
 	for (let i = 0, len = serializationAdapters.length; i < len; i++) {
 		const current = serializationAdapters[i];
@@ -338,7 +338,7 @@ var authMiddleware = createMiddleware({ type: "request" }).server(async ({ reque
 	if (authResponse) return authResponse;
 	if (pathname === "/api/feedback/submit" && request.method === "POST") try {
 		const body = await request.json();
-		const { submitFeedbackServer } = await import("./clinic.server-CNafSfLg.mjs").then((n) => n.t);
+		const { submitFeedbackServer } = await import("./clinic.server-4H8XWcQV.mjs").then((n) => n.t);
 		const res = await submitFeedbackServer({ data: body });
 		return Response.json(res, { status: res.success ? 200 : 400 });
 	} catch (err) {

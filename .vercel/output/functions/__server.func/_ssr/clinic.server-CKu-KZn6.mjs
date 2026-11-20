@@ -1,9 +1,9 @@
 import { l as createServerFn } from "./createServerFn-DDDJMFWM.mjs";
 import { t as createServerRpc } from "./createServerRpc-CxD4EZ5P.mjs";
 import { t as getDatabase } from "./mongodb.server-C_u4e3KP.mjs";
-import { d as initialPatients, m as invoiceRecords, p as initialStaffMembers, t as activityRecords } from "./staff-BI__96LE.mjs";
+import { d as initialPatients, m as invoiceRecords, p as initialStaffMembers, t as activityRecords } from "./staff-C38ySIaf.mjs";
 import { i as initialFeedbackRecords, t as createFeedbackSchema } from "./feedback-Clu2AqVp.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-BXnjuA9j.js
+//#region node_modules/.nitro/vite/services/ssr/assets/clinic.server-CKu-KZn6.js
 async function ensureCollectionsSeeded() {
 	try {
 		const db = await getDatabase();

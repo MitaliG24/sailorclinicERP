@@ -1,5 +1,5 @@
 import { a as objectType, i as numberType, n as enumType, o as stringType, r as literalType, t as arrayType } from "../_libs/zod.mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/staff-BI__96LE.js
+//#region node_modules/.nitro/vite/services/ssr/assets/staff-C38ySIaf.js
 var clinicSections = [
 	{
 		id: "dashboard",
@@ -28,7 +28,7 @@ var clinicSections = [
 	},
 	{
 		id: "companies",
-		label: "Add Company",
+		label: "Company Name",
 		group: "Clinic administration"
 	},
 	{
@@ -46,6 +46,7 @@ var staffSections = [
 	"dashboard",
 	"patients",
 	"invoices",
+	"companies",
 	"reports"
 ];
 function getVisibleSections(role) {

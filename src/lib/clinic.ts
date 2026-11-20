@@ -17,7 +17,7 @@ export const clinicSections: Array<{ id: ClinicSection; label: string; group: st
   { id: "invoices", label: "Payment Records", group: "Workspace" },
   { id: "feedback", label: "Grievances & Reviews", group: "Clinic administration" },
   { id: "staff", label: "Staff Management", group: "Clinic administration" },
-  { id: "companies", label: "Add Company", group: "Clinic administration" },
+  { id: "companies", label: "Company Name", group: "Clinic administration" },
   { id: "reports", label: "Reports", group: "Clinic administration" },
   { id: "settings", label: "Settings", group: "Clinic administration" },
 ];
@@ -26,6 +26,7 @@ const staffSections: ClinicSection[] = [
   "dashboard",
   "patients",
   "invoices",
+  "companies",
   "reports",
 ];
 

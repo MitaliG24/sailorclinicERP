@@ -1,8 +1,8 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { y as Link } from "../_libs/@tanstack/react-router+[...].mjs";
-import { a as clinicSections, c as formatINR, d as initialPatients, f as initialSalarySlips, g as staffStatuses, h as staffDepartments, i as canAccessSection, l as getVisibleSections, m as invoiceRecords, n as amountToWordsINR, o as convertNumberToWordsIndian, p as initialStaffMembers, r as appointmentRecords, s as documentTypes, t as activityRecords, u as initialCompanies } from "./staff-BI__96LE.mjs";
+import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-4H8XWcQV.mjs";
+import { a as clinicSections, c as formatINR, d as initialPatients, f as initialSalarySlips, g as staffStatuses, h as staffDepartments, i as canAccessSection, l as getVisibleSections, m as invoiceRecords, n as amountToWordsINR, o as convertNumberToWordsIndian, p as initialStaffMembers, r as appointmentRecords, s as documentTypes, t as activityRecords, u as initialCompanies } from "./staff-C38ySIaf.mjs";
 import { n as feedbackQuestions, r as feedbackStatuses } from "./feedback-Clu2AqVp.mjs";
-import { a as deleteStaffServer, c as listPatientsServer, d as savePatientServer, f as saveStaffServer, i as deletePatientServer, l as listStaffServer, m as updateFeedbackStatusServer, n as deleteFeedbackServer, o as listFeedbackServer, r as deleteInvoiceServer, s as listInvoicesServer, u as saveInvoiceServer } from "./clinic.server-CNafSfLg.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
 import { f as require_jsx_runtime, n as AvatarFallback$1, r as AvatarImage$1, t as Avatar$1 } from "../_libs/@radix-ui/react-avatar+[...].mjs";
 import { t as cva } from "../_libs/class-variance-authority+clsx.mjs";
@@ -13,7 +13,7 @@ import { t as Label$1 } from "../_libs/radix-ui__react-label.mjs";
 import { n as getDefaultClassNames, t as DayPicker } from "../_libs/react-day-picker.mjs";
 import { n as writeFileSync, t as utils } from "../_libs/xlsx.mjs";
 import { i as PopoverTrigger$1, n as PopoverContent$1, r as PopoverPortal, t as Popover$1 } from "../_libs/@radix-ui/react-popover+[...].mjs";
-//#region node_modules/.nitro/vite/services/ssr/assets/routes-DsPfhxJc.js
+//#region node_modules/.nitro/vite/services/ssr/assets/routes-eqMbQD1G.js
 var import_react = /* @__PURE__ */ __toESM(require_react());
 var import_jsx_runtime = require_jsx_runtime();
 var Avatar = import_react.forwardRef(({ className, ...props }, ref) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Avatar$1, {

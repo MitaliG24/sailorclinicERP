@@ -3,11 +3,12 @@ import { describe, expect, it } from "vitest";
 import { canAccessSection, getVisibleSections } from "@/lib/clinic";
 
 describe("clinic role visibility", () => {
-  it("shows Staff only Dashboard, Patient Records, Payment Records, and Reports", () => {
+  it("shows Staff Dashboard, Patient Records, Payment Records, Company Name, and Reports", () => {
     expect(getVisibleSections("staff").map((section) => section.label)).toEqual([
       "Dashboard",
       "Patient Records",
       "Payment Records",
+      "Company Name",
       "Reports",
     ]);
   });
@@ -19,7 +20,7 @@ describe("clinic role visibility", () => {
       "Payment Records",
       "Grievances & Reviews",
       "Staff Management",
-      "Add Company",
+      "Company Name",
       "Reports",
       "Settings",
     ]);
@@ -28,7 +29,7 @@ describe("clinic role visibility", () => {
   it("denies Staff direct access to admin-only sections", () => {
     expect(canAccessSection("staff", "feedback")).toBe(false);
     expect(canAccessSection("staff", "staff")).toBe(false);
-    expect(canAccessSection("staff", "companies")).toBe(false);
+    expect(canAccessSection("staff", "companies")).toBe(true);
     expect(canAccessSection("staff", "activity")).toBe(false);
     expect(canAccessSection("staff", "settings")).toBe(false);
   });
